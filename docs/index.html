@@ -481,9 +481,9 @@
     justify-content: center;
     align-items: center;
     position: relative;
-    max-width: 48.5vw;
-    max-height: 94vh;
-    background: #0f141d;
+    max-width: 47.5vw;
+    max-height: 80vh;
+    background: var(--ccx-paper-bg, #fdfaf3);
     overflow: hidden;
   }
   .spread-page-half.left-page {
@@ -496,7 +496,7 @@
   }
   .spread-page-half canvas, .spread-page-half img {
     max-width: 100%;
-    max-height: 93vh;
+    max-height: 78vh;
     width: auto !important;
     height: auto !important;
     object-fit: contain;
@@ -623,9 +623,12 @@
 
   /* True Conical Paper-Curl 2D Canvas Overlay & Physics Tuning Popover */
   .ccx-paper-curl-stage {
-    position: fixed;
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
     pointer-events: none;
-    z-index: 112;
+    z-index: 25;
     overflow: visible;
   }
   .ccx-paper-curl-stage canvas {
@@ -5692,15 +5695,15 @@
     const dpr = isCool
       ? Math.min(window.devicePixelRatio || 1.25, 1.25)
       : Math.min(window.devicePixelRatio || 1.75, 2.0);
-    const bookW = Math.round(rect.width);
-    const bookH = Math.round(rect.height);
+    const bookW = Math.round(frame.clientWidth || rect.width);
+    const bookH = Math.round(frame.clientHeight || rect.height);
     const pageW = isSpread ? Math.round(bookW * 0.5) : bookW;
     const pageH = bookH;
 
     const stage = document.createElement('div');
     stage.className = 'ccx-paper-curl-stage';
-    stage.style.left = Math.round(rect.left) + 'px';
-    stage.style.top = Math.round(rect.top) + 'px';
+    stage.style.left = '0px';
+    stage.style.top = '0px';
     stage.style.width = bookW + 'px';
     stage.style.height = bookH + 'px';
 
@@ -5713,7 +5716,7 @@
       canvas.style.filter = 'invert(0.89) hue-rotate(180deg) contrast(0.92)';
     }
     stage.appendChild(canvas);
-    document.getElementById('reader-overlay').appendChild(stage);
+    frame.appendChild(stage);
     _activeCurlStage = stage;
 
     const ctx = canvas.getContext('2d');
@@ -6272,11 +6275,13 @@
         : Math.min(window.devicePixelRatio || 2.0, 2.5);
       let displayW = getTargetPageRenderWidth();
       if (isSpreadHalf) {
-        displayW = Math.floor((window.innerWidth * 0.475) * zoomLevel);
+        const maxSpreadH = Math.max(280, (window.innerHeight - 145) * zoomLevel);
+        const wFromH = Math.floor(maxSpreadH * (baseVp.width / baseVp.height));
+        displayW = Math.min(Math.floor((window.innerWidth * 0.46) * zoomLevel), wFromH);
       } else if (readerMode !== 'webtoon') {
-        // In 1-Page Book mode, leave 26px horizontal room & 32px vertical room so the left book spine and right stacked paper edges are clearly visible on phones!
+        // In 1-Page Book mode, leave 26px horizontal room & 140px vertical room so the book spine, stacked pages, and top/bottom edges sit cleanly between the bars!
         const maxBookW = Math.max(240, (window.innerWidth - 26) * zoomLevel);
-        const maxBookH = Math.max(320, (window.innerHeight - 32) * zoomLevel);
+        const maxBookH = Math.max(320, (window.innerHeight - 140) * zoomLevel);
         const widthFromHeight = Math.floor(maxBookH * (baseVp.width / baseVp.height));
         displayW = Math.min(displayW, maxBookW, widthFromHeight);
       }
