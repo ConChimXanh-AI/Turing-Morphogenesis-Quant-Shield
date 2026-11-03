@@ -30,6 +30,17 @@
     --safe-bottom: env(safe-area-inset-bottom, 0px);
   }
 
+  /* Guaranteed iOS Status-Bar / Dynamic Island / Rounded Corner Safe Inset (iOS Only) */
+  body.ios-device {
+    --safe-top: max(env(safe-area-inset-top, 0px), 50px);
+    --safe-bottom: max(env(safe-area-inset-bottom, 0px), 20px);
+  }
+  @media (min-width: 760px) {
+    body.ios-device {
+      --safe-top: max(env(safe-area-inset-top, 0px), 28px);
+    }
+  }
+
   * {
     box-sizing: border-box;
     -webkit-tap-highlight-color: transparent;
@@ -57,7 +68,7 @@
 
   /* Top Cyber Header - Strict Non-Overlapping Flex Layout for All Phones & Tablets */
   .top-header {
-    padding: calc(10px + var(--safe-top)) 12px 9px 12px;
+    padding: calc(10px + var(--safe-top)) 16px 9px 16px;
     background: linear-gradient(180deg, #09101D 0%, #05070B 100%);
     border-bottom: 1px solid var(--border-cyber);
     display: flex;
@@ -966,7 +977,7 @@
   }
 
   .modal-header {
-    padding: 12px 14px;
+    padding: calc(12px + var(--safe-top)) 16px 12px 16px;
     background: #09101D;
     border-bottom: 1px solid var(--border-cyber);
     display: flex;
@@ -1121,7 +1132,7 @@
     background: rgba(5, 7, 11, 0.90);
     backdrop-filter: blur(8px);
     border-bottom: 1px solid var(--border-cyber);
-    padding: calc(10px + var(--safe-top)) 12px 10px 12px;
+    padding: calc(10px + var(--safe-top)) 16px 10px 16px;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -1324,7 +1335,7 @@
   /* Global Floating Cyber Toast */
   #ccx-toast-box {
     position: fixed;
-    top: 18px;
+    top: calc(14px + var(--safe-top));
     left: 50%;
     transform: translate(-50%, -20px);
     background: rgba(8, 15, 28, 0.94);
@@ -1788,7 +1799,7 @@
   </div>
 
   <!-- Floating Auto-Hiding Top Cinema HUD -->
-  <div id="video-hud-top" style="position:absolute; top:0; left:0; right:0; z-index:25; padding:12px 18px 22px 18px; background:linear-gradient(180deg, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.55) 68%, rgba(0,0,0,0) 100%); display:flex; align-items:center; gap:10px; transition:opacity 0.28s ease, transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);">
+  <div id="video-hud-top" style="position:absolute; top:0; left:0; right:0; z-index:25; padding:calc(12px + var(--safe-top)) 18px 22px 18px; background:linear-gradient(180deg, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.55) 68%, rgba(0,0,0,0) 100%); display:flex; align-items:center; gap:10px; transition:opacity 0.28s ease, transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);">
     <button class="back-btn" onclick="closeVideoPlayer()" style="background:rgba(15,23,42,0.85); border-color:rgba(56,189,248,0.45);">←</button>
     <div class="modal-title-wrap" onclick="toggleVideoCinemaHud()" style="cursor:pointer;">
       <div class="modal-title" id="video-doc-title" style="text-shadow:0 2px 6px rgba(0,0,0,0.95);">Tập Phim / Anime</div>
@@ -2099,6 +2110,9 @@
   window._isIphoneOrIpod = /iPhone|iPod/i.test(navigator.userAgent || '');
   window._isIosDevice = window._isIpadOS || window._isIphoneOrIpod;
   window._isStandalonePwa = !!(window.navigator.standalone || (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches));
+  if (window._isIosDevice && document.body) {
+    document.body.classList.add('ios-device');
+  }
 
   function openIosInstallModal() {
     const m = document.getElementById('ios-install-modal');
