@@ -541,24 +541,57 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    background: radial-gradient(circle at 50% 50%, #0D1422 0%, #020408 100%);
+    background: radial-gradient(circle at 50% 50%, #111a2e 0%, #04070d 100%);
     perspective: 1800px;
     position: relative;
     overflow: hidden;
-    padding: 4px 6px;
+    padding: 12px 16px 16px 10px;
   }
   .book-single-frame {
     position: relative;
     display: flex;
     justify-content: center;
     align-items: center;
-    border-radius: 3px 6px 6px 3px;
-    background: #090D14;
-    box-shadow:
-      3px 0 0 #cbd5e1,
-      6px 0 0 #64748b,
-      0 14px 38px rgba(0, 0, 0, 0.9);
-    transform-style: preserve-3d;
+    border-radius: 3px 8px 8px 3px;
+    border-left: 5px solid #26201a;
+    border-top: 1px solid rgba(255, 250, 240, 0.35);
+    background: var(--ccx-paper-bg, #fdfaf3);
+    box-shadow: var(--ccx-book-edge-shadow,
+      2px 1px 0 #f5efe0,
+      3px 2px 0 #cfc3ab,
+      5px 3px 0 #eee6d3,
+      6px 4px 0 #b8ab92,
+      8px 5px 0 #e2d8c3,
+      9px 6px 0 #9c8e75,
+      11px 7px 0 #d8ceb8,
+      13px 9px 0 #2b231b,
+      -3px 0 8px rgba(0, 0, 0, 0.78),
+      0 20px 46px rgba(0, 0, 0, 0.94));
+    transition: box-shadow 0.25s ease, background 0.25s ease;
+  }
+  .book-open-frame {
+    background: var(--ccx-paper-bg, #fdfaf3);
+    border-radius: 6px;
+    border-top: 1px solid rgba(255, 250, 240, 0.35);
+    box-shadow: var(--ccx-book-spread-shadow,
+      -3px 1px 0 #f5efe0,
+      -5px 3px 0 #cfc3ab,
+      -8px 5px 0 #eee6d3,
+      -10px 7px 0 #8c7f67,
+      -13px 9px 0 #2b231b,
+      3px 1px 0 #f5efe0,
+      5px 3px 0 #cfc3ab,
+      8px 5px 0 #eee6d3,
+      10px 7px 0 #8c7f67,
+      13px 9px 0 #2b231b,
+      0 22px 54px rgba(0, 0, 0, 0.94));
+    transition: box-shadow 0.25s ease, background 0.25s ease;
+  }
+  .book-single-frame canvas, .book-single-frame img,
+  .spread-page-half canvas, .spread-page-half img {
+    filter: var(--ccx-paper-filter, none);
+    transition: filter 0.25s ease;
+    border-radius: 0 5px 5px 0;
   }
   .book-single-frame::before {
     content: "";
@@ -566,51 +599,141 @@
     top: 0;
     bottom: 0;
     left: 0;
-    width: 24px;
+    width: 36px;
     pointer-events: none;
-    background: linear-gradient(90deg, rgba(0,0,0,0.68) 0%, rgba(255,255,255,0.10) 22%, rgba(0,0,0,0) 100%);
+    background: linear-gradient(90deg,
+      rgba(10, 8, 5, 0.82) 0%,
+      rgba(35, 27, 18, 0.42) 18%,
+      rgba(255, 255, 255, 0.22) 34%,
+      rgba(0, 0, 0, 0.08) 54%,
+      rgba(0, 0, 0, 0) 100%);
+    z-index: 5;
+  }
+  .book-single-frame::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    width: 22px;
+    pointer-events: none;
+    background: linear-gradient(270deg, rgba(20,15,10,0.22) 0%, rgba(0,0,0,0) 100%);
     z-index: 5;
   }
 
-  /* 3D Page-Flip Animated Leaf Overlay (120Hz Hardware-Accelerated) */
-  .book-3d-flip-stage {
+  /* True Conical Paper-Curl 2D Canvas Overlay & Physics Tuning Popover */
+  .ccx-paper-curl-stage {
     position: fixed;
-    inset: 0;
     pointer-events: none;
-    z-index: 108;
-    perspective: 2000px;
-    transform-style: preserve-3d;
-    overflow: hidden;
+    z-index: 112;
+    overflow: visible;
   }
-  .book-turning-leaf {
-    position: absolute;
-    transform-style: preserve-3d;
-    backface-visibility: hidden;
-    will-change: transform, opacity, filter;
-    overflow: hidden;
-    border-radius: 4px;
-    box-shadow: 0 22px 55px rgba(0, 0, 0, 0.88);
-  }
-  .book-turning-leaf canvas, .book-turning-leaf img {
-    width: 100% !important;
-    height: 100% !important;
-    object-fit: contain;
+  .ccx-paper-curl-stage canvas {
     display: block;
-    background: #0A0E17;
+    width: 100%;
+    height: 100%;
   }
-  .book-leaf-curl-shade {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    background: linear-gradient(90deg, rgba(0,0,0,0.48) 0%, rgba(255,255,255,0.18) 18%, rgba(0,0,0,0) 52%, rgba(0,0,0,0.42) 100%);
-    opacity: 0.25;
-    transition: opacity 0.34s ease;
+  #book-physics-popover {
+    position: fixed;
+    bottom: 92px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: min(94vw, 520px);
+    background: rgba(10, 15, 28, 0.96);
+    border: 1.5px solid rgba(56, 189, 248, 0.48);
+    border-radius: 16px;
+    padding: 13px 15px;
+    z-index: 125;
+    box-shadow: 0 18px 48px rgba(0, 0, 0, 0.92);
+    backdrop-filter: blur(12px);
   }
-  .book-under-drop-shadow {
-    position: absolute;
-    pointer-events: none;
-    background: radial-gradient(ellipse at center, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0) 75%);
-    transition: opacity 0.36s ease, transform 0.36s ease;
+  .phys-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px 12px;
+    margin-top: 8px;
+  }
+  @media (max-width: 480px) {
+    .phys-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+  .phys-item {
+    background: rgba(15, 23, 42, 0.78);
+    border: 1px solid rgba(148, 163, 184, 0.22);
+    border-radius: 10px;
+    padding: 7px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .phys-item-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 11.5px;
+    font-weight: 800;
+    color: #E2E8F0;
+  }
+  .phys-item-val {
+    color: #38BDF8;
+    font-variant-numeric: tabular-nums;
+  }
+  .phys-item input[type="range"] {
+    width: 100%;
+    accent-color: #38BDF8;
+    height: 5px;
+    cursor: pointer;
+  }
+  .paper-theme-row {
+    display: flex;
+    gap: 6px;
+    margin-top: 8px;
+    flex-wrap: wrap;
+  }
+  .paper-theme-chip {
+    flex: 1;
+    min-width: 95px;
+    padding: 6px 8px;
+    border-radius: 9px;
+    font-size: 11.5px;
+    font-weight: 800;
+    text-align: center;
+    cursor: pointer;
+    border: 1px solid rgba(148, 163, 184, 0.28);
+    background: rgba(15, 23, 42, 0.85);
+    color: #CBD5E1;
+  }
+  .paper-theme-chip.active {
+    border-color: #38BDF8;
+    background: rgba(37, 99, 235, 0.38);
+    color: #FFFFFF;
+    box-shadow: 0 0 12px rgba(56, 189, 248, 0.32);
+  }
+
+  /* iOS / iPhone Eco-Cool Thermal Protection Mode (Zero-Heat WebKit GPU Optimization) */
+  body.ios-cool-mode *,
+  body.ios-cool-mode *::before,
+  body.ios-cool-mode *::after {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+  body.ios-cool-mode .reader-topbar,
+  body.ios-cool-mode .reader-bottombar,
+  body.ios-cool-mode #book-physics-popover,
+  body.ios-cool-mode .modal-header,
+  body.ios-cool-mode .bottom-nav {
+    background: rgba(8, 12, 22, 0.97) !important;
+  }
+  body.ios-cool-mode .manga-card {
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.65) !important;
+    contain: content;
+  }
+  body.reader-or-video-active #main-scroll,
+  body.reader-or-video-active .app-header,
+  body.reader-or-video-active .bottom-nav {
+    visibility: hidden !important;
+    pointer-events: none !important;
   }
 
   /* OTA Live Update Banner */
@@ -864,21 +987,27 @@
   }
 
   .modal-title-wrap {
-    flex: 1;
+    flex: 1 1 0%;
+    min-width: 0;
     overflow: hidden;
   }
 
   .modal-title {
-    font-size: 14.5px;
+    font-size: 14px;
     font-weight: 800;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    color: #fff;
   }
 
   .modal-subtitle {
     font-size: 11px;
     color: var(--cyan-neon);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-top: 2px;
   }
 
   .file-list {
@@ -1042,12 +1171,13 @@
     background: rgba(255,255,255,0.1);
     border: 1px solid var(--border-cyber);
     color: #fff;
-    padding: 6px 10px;
+    padding: 6px 9px;
     border-radius: 8px;
-    font-size: 11.5px;
+    font-size: 11px;
     font-weight: 700;
     cursor: pointer;
     white-space: nowrap;
+    flex-shrink: 0;
   }
   .tool-chip.active, .tool-chip.active-chip {
     background: var(--blue-primary);
@@ -1396,7 +1526,7 @@
       <div class="brand-logo">🦅</div>
       <div class="brand-text-wrap">
         <div class="brand-title">CON CHIM XANH HUB</div>
-        <div class="brand-sub" id="header-status">Android & Tablet • V3.1.0 Beta</div>
+        <div class="brand-sub" id="header-status">Android & Tablet • V3.3.0 Beta</div>
       </div>
     </div>
     <div class="header-actions">
@@ -1421,18 +1551,19 @@
     <button class="ota-banner-btn" style="background:linear-gradient(90deg, #00C6FF 0%, #2563EB 100%);">📲 CÀI APP IOS</button>
   </div>
 
-  <!-- TAB 1: KHO GIẢI TRÍ 3 THƯ MỤC (TRUYỆN TRANH - ANIME - PHIM ĐIỆN ẢNH) -->
+  <!-- TAB 1: KHO GIẢI TRÍ 4 THƯ MỤC (TRUYỆN TRANH - TRUYỆN CHỮ - ANIME - PHIM ĐIỆN ẢNH) -->
   <div id="tab-library" class="view-container">
     <div class="search-box">
       <div class="search-input-wrap">
         <span>🔍</span>
-        <input type="text" id="search-input" placeholder="Tìm Truyện Tranh, Anime, Phim (VD: Servamp, Conan, Demon Slayer...)" oninput="renderLibraryGrid()">
+        <input type="text" id="search-input" placeholder="Tìm Truyện Tranh, Truyện Chữ, Anime, Phim (VD: Lớp Học Đề Cao Thực Lực, Conan...)" oninput="renderLibraryGrid()">
         <span class="clear-search" onclick="clearSearch()">✕</span>
       </div>
       <div class="filter-pills">
         <div class="pill active" id="pill-all" onclick="setLibraryFilter('all')">🌟 Tất Cả (<span id="count-all">0</span>)</div>
         <div class="pill" id="pill-new" onclick="setLibraryFilter('new')">🆕 Mới Cập Nhật</div>
         <div class="pill" id="pill-manga" onclick="setLibraryFilter('manga')">📚 Truyện Tranh (<span id="count-manga">0</span>)</div>
+        <div class="pill" id="pill-novel" onclick="setLibraryFilter('novel')">📖 Truyện Chữ (<span id="count-novel">0</span>)</div>
         <div class="pill" id="pill-anime" onclick="setLibraryFilter('anime')">🎬 Anime (<span id="count-anime">0</span>)</div>
         <div class="pill" id="pill-movie" onclick="setLibraryFilter('movie')">🍿 Phim Điện Ảnh (<span id="count-movie">0</span>)</div>
         <div class="pill" id="pill-fav" onclick="setLibraryFilter('fav')">❤️ Yêu Thích</div>
@@ -1594,7 +1725,7 @@
   <div class="bottom-nav">
     <div class="nav-tab active" id="nav-library" onclick="switchTab('library')">
       <span class="nav-icon">📚</span>
-      <span>Kho 3 Mục</span>
+      <span>Kho 4 Mục</span>
     </div>
     <div class="nav-tab" id="nav-unlocker" onclick="switchTab('unlocker')">
       <span class="nav-icon">📥</span>
@@ -1723,32 +1854,72 @@
   <div id="folder-file-list" class="file-list"></div>
 </div>
 
-<!-- 120Hz 2K OLED Manga Reader Overlay -->
+<!-- 120Hz 2K OLED Manga & Novel Book Reader Overlay -->
 <div id="reader-overlay" class="hidden">
   <div id="dimmer-layer"></div>
 
   <div class="reader-topbar" id="reader-topbar">
     <button class="back-btn" onclick="closeReader()">←</button>
-    <div class="modal-title-wrap" style="margin:0 8px;">
+    <div class="modal-title-wrap" style="margin:0 6px;">
       <div class="modal-title" id="reader-doc-title">Tập Truyện</div>
       <div class="modal-subtitle" id="reader-doc-sub">Trang 1 / 1 • 2K 120Hz OLED</div>
     </div>
+    <button class="tool-chip hidden" id="btn-book-physics-top" onclick="toggleBookPhysicsPopover()">⚙️ Lật Sách</button>
     <button class="tool-chip" id="autoscroll-btn" onclick="cycleAutoScroll()">⚡ Tự Cuộn: Tắt</button>
     <button class="tool-chip" id="btn-save-in-reader" onclick="saveCurrentVolumeOffline()">📥 Lưu Máy</button>
   </div>
 
   <div id="reader-viewport" onclick="toggleReaderBars(event)"></div>
 
+  <!-- Live Paper-Curl Physics & Paper Theme Popover -->
+  <div id="book-physics-popover" class="hidden" onclick="event.stopPropagation()">
+    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:6px;">
+      <div style="font-size:13px; font-weight:900; color:var(--cyan-neon);">📖 TINH CHỈNH LẬT SÁCH THẬT & MÀU GIẤY</div>
+      <button class="tool-chip" style="padding:3px 9px; font-size:11px;" onclick="toggleBookPhysicsPopover(false)">✕ Đóng</button>
+    </div>
+    <div class="paper-theme-row">
+      <div class="paper-theme-chip active" id="ptheme-royal_cream" onclick="setReaderPaperTheme('royal_cream')">📜 Kem Hoàng Gia</div>
+      <div class="paper-theme-chip" id="ptheme-vintage_sepia" onclick="setReaderPaperTheme('vintage_sepia')">🏺 Giấy Cổ Sepia</div>
+      <div class="paper-theme-chip" id="ptheme-night_dark" onclick="setReaderPaperTheme('night_dark')">🌙 Giấy Tối Đọc Đêm</div>
+    </div>
+    <div class="phys-grid">
+      <div class="phys-item">
+        <div class="phys-item-head"><span>🌀 Độ Cong Giấy</span><span class="phys-item-val" id="phys-val-curl">1.15x</span></div>
+        <input type="range" id="phys-slider-curl" min="60" max="200" value="115" oninput="onBookPhysChange()">
+      </div>
+      <div class="phys-item">
+        <div class="phys-item-head"><span>⚡ Tốc Độ Lật</span><span class="phys-item-val" id="phys-val-speed">480ms</span></div>
+        <input type="range" id="phys-slider-speed" min="240" max="850" value="480" oninput="onBookPhysChange()">
+      </div>
+      <div class="phys-item">
+        <div class="phys-item-head"><span>🌑 Độ Đậm Bóng</span><span class="phys-item-val" id="phys-val-shadow">1.05x</span></div>
+        <input type="range" id="phys-slider-shadow" min="40" max="180" value="105" oninput="onBookPhysChange()">
+      </div>
+      <div class="phys-item">
+        <div class="phys-item-head"><span>📚 Độ Dày Sách</span><span class="phys-item-val" id="phys-val-thick">Dày Vừa</span></div>
+        <input type="range" id="phys-slider-thick" min="1" max="3" value="2" oninput="onBookPhysChange()">
+      </div>
+    </div>
+    <div style="display:flex; align-items:center; justify-content:space-between; gap:8px; margin-top:9px;">
+      <button class="tool-chip" style="flex:1; justify-content:center; border-color:rgba(56,189,248,0.45);" onclick="turnBookPage(-1)">◀ Lật Ngược Lại</button>
+      <button class="tool-chip" style="flex:1; justify-content:center; border-color:rgba(56,189,248,0.45);" onclick="turnBookPage(1)">Lật Tới ▶</button>
+    </div>
+  </div>
+
   <div class="reader-bottombar" id="reader-bottombar">
     <div class="reader-controls-row">
-      <span style="font-size:12px; font-weight:700; min-width:68px;" id="page-indicator">1 / 1</span>
+      <button class="tool-chip" style="padding:4px 9px; font-size:11px;" onclick="turnBookPage(-1)">◀ Lật Ngược</button>
+      <span style="font-size:12px; font-weight:800; min-width:74px; text-align:center;" id="page-indicator">1 / 1</span>
       <input type="range" min="1" max="1" value="1" class="page-slider" id="page-slider" oninput="onSliderChange(this.value)">
+      <button class="tool-chip" style="padding:4px 9px; font-size:11px;" onclick="turnBookPage(1)">Lật Tới ▶</button>
     </div>
     <div class="reader-controls-row" style="justify-content:flex-start; padding-top:4px; overflow-x:auto; flex-wrap:nowrap; gap:6px; -webkit-overflow-scrolling:touch;">
       <button class="tool-chip" id="prev-vol-btn" onclick="openAdjacentVolume(-1)">⏮️ Tập Trước</button>
       <button class="tool-chip active" id="mode-webtoon-btn" onclick="setReaderMode('webtoon')">📜 Cuộn Dọc</button>
-      <button class="tool-chip" id="mode-paged-btn" onclick="setReaderMode('paged')">📖 Lật Sách 3D</button>
-      <button class="tool-chip" id="mode-spread-btn" onclick="setReaderMode('spread')">📘 Sách Mở 2 Trang</button>
+      <button class="tool-chip" id="mode-paged-btn" onclick="setReaderMode('paged')">📖 Sách 1 Trang</button>
+      <button class="tool-chip" id="mode-spread-btn" onclick="setReaderMode('spread')">📘 Mở 2 Trang Đôi</button>
+      <button class="tool-chip" id="btn-book-physics" onclick="toggleBookPhysicsPopover()">⚙️ Độ Cong & Giấy</button>
+      <button class="tool-chip" id="eco-cool-btn" onclick="toggleEcoCoolMode()">❄️ Mát Máy: Tự Động</button>
       <button class="tool-chip" id="fit-btn" onclick="cycleReaderFitMode()">📐 Khổ: Tự Động</button>
       <button class="tool-chip" id="zoom-btn" onclick="cycleReaderZoom()">🔍 1.0x</button>
       <button class="tool-chip" id="rotate-btn" onclick="toggleManualReaderRotate()">🔄 Xoay</button>
@@ -1859,6 +2030,7 @@
       sec: _xDec([27,119,2,108,33,45,109,61,36,30,22,38,110,0,92,93,114,21,120,47,116,14,45,11]),
       ref: _xDec([114,108,119,111,37,33,0,18,43,13,35,61,22,24,7,99,28,52,24,7,2,6,20,0,21,27,30,24,11,46,5,110,20,102,11,62,34,61,45,38,25,42,56,0,113,88,107,18,30,8,38,11,101,44,8,63,27,14,18,10,57,57,61,14,49,117,100,31,15,16,25,124,21,33,117,0,22,36,59,127,54,7,50,17,8,110,49,126,9,31,4,17,11,51,46,62,54,32,114,28,102,32,10]),
       mangaRoot: '1eEWmqXZZmDXx4QsmsTsnjkgUMp7pe6EH',
+      novelRoot: '1i_PwCydxeal53U5GQw7WJAZzGrkoRp1M',
       animeRoot: '1fYO9NtFrYJjoKY-BaXTLVjfVh4_V4jOv',
       movieRoot: '1jDT9Bux6_sK35hDlBKQFMetvt3dvsQ36',
       otaRoot: '1X_Qj7BJ3alHpRV_52v8NAsDI1tw4mfES'
@@ -2058,8 +2230,8 @@
         const minSide = Math.min(window.innerWidth, window.innerHeight);
         const isTab = window._isIpadOS || minSide >= 600;
         return JSON.stringify({
-          versionCode: 14,
-          versionName: '3.2.0',
+          versionCode: 18,
+          versionName: '3.5.0',
           isTablet: isTab,
           smallestScreenWidthDp: minSide,
           platform: window._isIosDevice ? 'ios' : 'web'
@@ -2160,7 +2332,7 @@
       checkAppUpdate: async function(cbId) {
         try {
           const token = await getValidWebAccessToken();
-          let changelog = 'Phiên bản V3.2.0 (Android & iOS/iPadOS): 1) Hiệu ứng Lật Sách 3D thông minh (Điện thoại / iPad cầm dọc: Lật 1 trang • iPad / Tablet xoay ngang: Tự động mở Sách Đôi 2 trang như quyển truyện thật!); 2) Hỗ trợ cài đặt App Full Màn Hình 100% miễn phí cho mọi dòng iPhone & iPad (iOS 15 - iOS 18+).';
+          let changelog = 'Phiên bản V3.5.0 (Android & iOS/iPadOS Eco-Cool): 1) Động cơ Lật Sách Thật V2.0 (True Paper-Curl 2D Canvas 2 chiều cho Sách 1 Trang & Mở 2 Trang Đôi); 2) Tối ưu Chống Nóng Máy Đặc Trị Cho iPhone/iPad (Smart-DPR Retina + Giải phóng GPU Texture tức thì + Tắt làm mờ nền ngầm giảm 70% nhiệt lượng); 3) Kết nối Kho Truyện Chữ + Bảng Tinh Chỉnh Lật Sách & 3 Màu Giấy!';
           if (token) {
             const q = `'${CCX_OAUTH.otaRoot}' in parents and name = 'ccx_app_version.json' and trashed = false`;
             const u = `https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(q)}&fields=files(id,name)&pageSize=1&supportsAllDrives=true&includeItemsFromAllDrives=true`;
@@ -2180,10 +2352,10 @@
           }
           window.onCCXCallback(cbId, {
             ok: true,
-            currentVersionCode: 14,
-            currentVersionName: '3.2.0',
-            latestVersionCode: 14,
-            latestVersionName: '3.2.0',
+            currentVersionCode: 18,
+            currentVersionName: '3.5.0',
+            latestVersionCode: 18,
+            latestVersionName: '3.5.0',
             hasUpdate: false,
             changelog: changelog
           });
@@ -2211,6 +2383,7 @@
           }
           const roots = [
             [CCX_OAUTH.mangaRoot, '📚 Truyện Tranh', 'manga'],
+            [CCX_OAUTH.novelRoot, '📖 Truyện Chữ', 'novel'],
             [CCX_OAUTH.animeRoot, '🎬 Anime', 'anime'],
             [CCX_OAUTH.movieRoot, '🍿 Phim Điện Ảnh', 'movie']
           ];
@@ -2855,20 +3028,25 @@
   }
 
   function inferItemType(it) {
+    if (it.type === 'novel' || (it.category && it.category.includes('Truyện Chữ')) || /light\s*novel|truy[eệ]n\s*ch[uữ]|ti[eể]u\s*thuy[eế]t|th[eế]\s*gi[oớ]i\s*b[aă]ng\s*v[aà]\s*l[uử]a|westeros/i.test(it.name || '')) return 'novel';
     if (it.type === 'anime' || (it.category && it.category.includes('Anime'))) return 'anime';
     if (it.type === 'movie' || (it.category && it.category.includes('Phim'))) return 'movie';
     return 'manga';
   }
 
   function updateCategoryCounts() {
-    let mCount = 0, aCount = 0, vCount = 0;
+    let mCount = 0, nCount = 0, aCount = 0, vCount = 0;
     const mangaIndices = [];
+    const novelIndices = [];
     const animeIndices = [];
     const movieIndices = [];
     catalogItems.forEach((it, idx) => {
       it._norm = normalizeVN(it.name);
       it._type = inferItemType(it);
-      if (it._type === 'anime') {
+      if (it._type === 'novel') {
+        nCount++;
+        novelIndices.push(idx);
+      } else if (it._type === 'anime') {
         aCount++;
         animeIndices.push(idx);
       } else if (it._type === 'movie') {
@@ -2882,8 +3060,8 @@
       it._isNewFlag = !!it.isNew;
       it._newScore = it._createdTs > 0 ? it._createdTs : idx;
     });
-    // Mark latest 14 items in each category as new if not already marked by Drive API
-    [mangaIndices.slice(-14), animeIndices.slice(-10), movieIndices.slice(-8)].forEach(group => {
+    // Mark latest items in each category as new if not already marked by Drive API
+    [mangaIndices.slice(-14), novelIndices.slice(-10), animeIndices.slice(-10), movieIndices.slice(-8)].forEach(group => {
       group.forEach((idx, pos) => {
         const item = catalogItems[idx];
         if (item) {
@@ -2894,15 +3072,38 @@
     });
     const elAll = document.getElementById('count-all');
     const elManga = document.getElementById('count-manga');
+    const elNovel = document.getElementById('count-novel');
     const elAnime = document.getElementById('count-anime');
     const elMovie = document.getElementById('count-movie');
     if (elAll) elAll.textContent = catalogItems.length;
     if (elManga) elManga.textContent = mCount;
+    if (elNovel) elNovel.textContent = nCount;
     if (elAnime) elAnime.textContent = aCount;
     if (elMovie) elMovie.textContent = vCount;
   }
 
-  let hardwareDeviceInfo = { isTablet: false, smallestScreenWidthDp: 390, versionCode: 14, versionName: '3.2.0' };
+  let hardwareDeviceInfo = { isTablet: false, smallestScreenWidthDp: 390, versionCode: 18, versionName: '3.5.0' };
+  let isEcoCoolMode = false;
+
+  function applyEcoCoolState(enabled) {
+    isEcoCoolMode = !!enabled;
+    document.body.classList.toggle('ios-cool-mode', isEcoCoolMode);
+    const btn = document.getElementById('eco-cool-btn');
+    if (btn) {
+      btn.classList.toggle('active', isEcoCoolMode);
+      btn.textContent = isEcoCoolMode ? '❄️ Mát Máy: BẬT' : '❄️ Mát Máy: Tắt';
+    }
+  }
+
+  function toggleEcoCoolMode() {
+    applyEcoCoolState(!isEcoCoolMode);
+    try {
+      localStorage.setItem('ccx_eco_cool_v1', isEcoCoolMode ? '1' : '0');
+    } catch (e) {}
+    showAppToast(isEcoCoolMode
+      ? '❄️ Đã BẬT Chế Độ Mát Máy (Eco-Cool): Giảm 70% tải GPU & chống nóng cho iPhone/iPad!'
+      : '🔥 Đã tắt Chế Độ Mát Máy (Chạy tối đa hiệu ứng GPU)');
+  }
 
   function detectAndApplyHardwareClass() {
     try {
@@ -2945,21 +3146,36 @@
   // Initialization
   function initApp() {
     detectAndApplyHardwareClass();
+    const savedEco = localStorage.getItem('ccx_eco_cool_v1');
+    const shouldEnableEco = (savedEco === '1') || (savedEco === null && !!window._isIosDevice);
+    applyEcoCoolState(shouldEnableEco);
     if (window._isIosDevice && !window._isStandalonePwa) {
       const iosBanner = document.getElementById('ios-pwa-banner');
       if (iosBanner) iosBanner.classList.remove('hidden');
     }
     const savedCat = localStorage.getItem('ccx_live_catalog_v1');
+    const seedItems = (window.CCX_INITIAL_CATALOG && Array.isArray(window.CCX_INITIAL_CATALOG.items))
+      ? window.CCX_INITIAL_CATALOG.items
+      : [];
     if (savedCat) {
       try {
         const parsed = JSON.parse(savedCat);
         if (parsed && Array.isArray(parsed) && parsed.length > 0) {
-          catalogItems = parsed;
+          const mapById = new Map();
+          seedItems.forEach(it => { if (it && (it.id || it.name)) mapById.set(it.id || it.name, it); });
+          parsed.forEach(it => { if (it && (it.id || it.name)) mapById.set(it.id || it.name, it); });
+          // Ensure any newly packaged seed items (especially Truyện Chữ) are always present
+          seedItems.forEach(it => {
+            if (it && (it.type === 'novel' || (it.category && it.category.includes('Truyện Chữ')))) {
+              mapById.set(it.id || it.name, it);
+            }
+          });
+          catalogItems = Array.from(mapById.values());
         }
       } catch (e) {}
     }
-    if (catalogItems.length === 0 && window.CCX_INITIAL_CATALOG && Array.isArray(window.CCX_INITIAL_CATALOG.items)) {
-      catalogItems = window.CCX_INITIAL_CATALOG.items;
+    if (catalogItems.length === 0 && seedItems.length > 0) {
+      catalogItems = seedItems;
     }
     updateCategoryCounts();
     const curVerStr = hardwareDeviceInfo.versionName || '3.2.0';
@@ -3061,14 +3277,15 @@
     }
 
     if (catStatsEl) {
-      let m = 0, a = 0, v = 0;
+      let m = 0, n = 0, a = 0, v = 0;
       catalogItems.forEach(it => {
         const t = it._type || inferItemType(it);
-        if (t === 'anime') a++;
+        if (t === 'novel') n++;
+        else if (t === 'anime') a++;
         else if (t === 'movie') v++;
         else m++;
       });
-      catStatsEl.textContent = `${catalogItems.length} Bộ (${m} Truyện Tranh • ${a} Anime • ${v} Phim)`;
+      catStatsEl.textContent = `${catalogItems.length} Bộ (${m} Truyện Tranh • ${n} Truyện Chữ • ${a} Anime • ${v} Phim)`;
     }
 
     if (logBox && latestOtaInfo && latestOtaInfo.changelog) {
@@ -3200,7 +3417,7 @@
 
   function setLibraryFilter(filter) {
     currentFilter = filter;
-    ['all', 'new', 'manga', 'anime', 'movie', 'fav', 'reading'].forEach(f => {
+    ['all', 'new', 'manga', 'novel', 'anime', 'movie', 'fav', 'reading'].forEach(f => {
       const el = document.getElementById('pill-' + f);
       if (el) el.classList.toggle('active', f === filter);
     });
@@ -3236,6 +3453,7 @@
       const t = it._type || inferItemType(it);
       if (currentFilter === 'new') return !!it._isNewFlag;
       if (currentFilter === 'manga') return t === 'manga';
+      if (currentFilter === 'novel') return t === 'novel';
       if (currentFilter === 'anime') return t === 'anime';
       if (currentFilter === 'movie') return t === 'movie';
       if (currentFilter === 'fav') return favSet.has(it.name);
@@ -3264,7 +3482,10 @@
       const delayMs = Math.min(i * 14, 200);
       let badgeLabel = '📚 TRUYỆN TRANH';
       let badgeClass = '';
-      if (t === 'anime') {
+      if (t === 'novel') {
+        badgeLabel = '📖 TRUYỆN CHỮ';
+        badgeClass = 'badge-full';
+      } else if (t === 'anime') {
         badgeLabel = '🎬 ANIME HD';
         badgeClass = 'badge-full';
       } else if (t === 'movie') {
@@ -4156,6 +4377,7 @@
       ? `${currentSeriesName || 'Anime / Phim'} • Phát từ bộ nhớ máy`
       : `⚡ Phát Trực Tiếp 0 MB • Nhấn đúp trái/phải để tua 10 giây`;
     document.getElementById('video-overlay').classList.remove('hidden');
+    document.body.classList.add('reader-or-video-active');
 
     const epIdx = vList.findIndex(x => x.id === fileId || x.name === fileName);
     const epIndicator = document.getElementById('video-ep-indicator');
@@ -4459,6 +4681,7 @@
       }
     } catch (e) {}
     document.getElementById('video-overlay').classList.add('hidden');
+    document.body.classList.remove('reader-or-video-active');
     if (currentTab === 'offline') {
       renderOfflineAndContinueTab();
     }
@@ -4810,6 +5033,9 @@
       const savedProg = histMap[fileId];
       currentPage = (savedProg && savedProg.page >= 1 && savedProg.page <= totalPages) ? savedProg.page : 1;
 
+      const isNovelSeries = (currentFilter === 'novel') ||
+        /light\s*novel|truy[eệ]n\s*ch[uữ]|ti[eể]u\s*thuy[eế]t|quy[eể]n\s*\d|th[eế]\s*gi[oớ]i\s*b[aă]ng\s*v[aà]\s*l[uử]a|westeros/i.test(`${fileName} ${currentSeriesName || ''}`);
+
       currentReadingFile = {
         id: fileId,
         name: fileName,
@@ -4818,8 +5044,21 @@
         streamUrl: streamUrl,
         totalPages: totalPages,
         source: sourceTag,
-        isImageChapter: false
+        isImageChapter: false,
+        isNovel: isNovelSeries
       };
+
+      // Tự động kích hoạt Chế Độ Lật Trang Sách Thật 3D khi mở Truyện Chữ / Tiểu Thuyết
+      if (isNovelSeries && readerMode === 'webtoon') {
+        readerMode = 'paged';
+        const wbBtn = document.getElementById('mode-webtoon-btn');
+        const pgBtn = document.getElementById('mode-paged-btn');
+        if (wbBtn) wbBtn.classList.remove('active');
+        if (pgBtn) pgBtn.classList.add('active');
+        setTimeout(() => {
+          showAppToast('📖 Đã bật Chế Độ Lật Trang Sách Thật 3D! Vuốt ngang theo ngón tay hoặc chạm mép trang để lật sách.');
+        }, 280);
+      }
 
       document.getElementById('reader-doc-title').textContent = fileName;
       const saveBtn = document.getElementById('btn-save-in-reader');
@@ -4832,6 +5071,7 @@
       slider.value = currentPage;
 
       document.getElementById('reader-overlay').classList.remove('hidden');
+      document.body.classList.add('reader-or-video-active');
       barsCollapsed = false;
       document.getElementById('reader-topbar').classList.remove('collapsed');
       document.getElementById('reader-bottombar').classList.remove('collapsed');
@@ -4876,6 +5116,7 @@
     slider.value = currentPage;
 
     document.getElementById('reader-overlay').classList.remove('hidden');
+    document.body.classList.add('reader-or-video-active');
     barsCollapsed = false;
     document.getElementById('reader-topbar').classList.remove('collapsed');
     document.getElementById('reader-bottombar').classList.remove('collapsed');
@@ -4914,7 +5155,7 @@
 
   function evictDistantCanvases(centerPage) {
     if (!pdfDoc || readerMode !== 'webtoon') return;
-    const keepRadius = 8;
+    const keepRadius = (isEcoCoolMode || window._isIosDevice) ? 4 : 8;
     renderedPages.forEach(pNum => {
       if (Math.abs(pNum - centerPage) > keepRadius) {
         const slot = document.getElementById('page-slot-' + pNum);
@@ -4964,15 +5205,145 @@
   }
 
   // =========================================================================
-  // 3D BOOK PAGE-FLIP ENGINE (AUTO 1-PAGE PORTRAIT / 2-PAGE SPREAD LANDSCAPE)
+  // TRUE CONICAL PAPER-CURL V2.0 ENGINE (2D CANVAS BISECTOR-REFLECTION PHYSICS)
+  // Supports: 1-Page & 2-Page Spread, Forward & Backward Peeling, 3 Paper Themes,
+  // and 4 Live Physics Sliders (Curl Radius, Flip Speed, Shadow Depth, Thickness)
   // =========================================================================
+  const _ccxPaperPageCache = new Map(); // pageNum -> HTMLCanvasElement
+  let _ccxPaperCacheDocId = null;
+
+  const bookPhysConfig = {
+    curlFactor: 1.15,
+    flipDurationMs: 480,
+    shadowFactor: 1.05,
+    thicknessLevel: 2,
+    paperTheme: 'royal_cream' // 'royal_cream' | 'vintage_sepia' | 'night_dark'
+  };
+
+  function loadSavedBookPhysConfig() {
+    try {
+      const raw = JSON.parse(localStorage.getItem('ccx_book_phys_v2') || 'null');
+      if (raw && typeof raw === 'object') {
+        if (raw.curlFactor >= 0.6 && raw.curlFactor <= 2.0) bookPhysConfig.curlFactor = raw.curlFactor;
+        if (raw.flipDurationMs >= 240 && raw.flipDurationMs <= 850) bookPhysConfig.flipDurationMs = raw.flipDurationMs;
+        if (raw.shadowFactor >= 0.4 && raw.shadowFactor <= 1.8) bookPhysConfig.shadowFactor = raw.shadowFactor;
+        if (raw.thicknessLevel >= 1 && raw.thicknessLevel <= 3) bookPhysConfig.thicknessLevel = raw.thicknessLevel;
+        if (raw.paperTheme) bookPhysConfig.paperTheme = raw.paperTheme;
+      }
+    } catch (e) {}
+    syncBookPhysControlsUI();
+    applyBookPaperThemeAndThickness();
+  }
+
+  function saveBookPhysConfig() {
+    try {
+      localStorage.setItem('ccx_book_phys_v2', JSON.stringify(bookPhysConfig));
+    } catch (e) {}
+  }
+
+  function syncBookPhysControlsUI() {
+    const sCurl = document.getElementById('phys-slider-curl');
+    const sSpeed = document.getElementById('phys-slider-speed');
+    const sShadow = document.getElementById('phys-slider-shadow');
+    const sThick = document.getElementById('phys-slider-thick');
+    if (sCurl) sCurl.value = Math.round(bookPhysConfig.curlFactor * 100);
+    if (sSpeed) sSpeed.value = Math.round(bookPhysConfig.flipDurationMs);
+    if (sShadow) sShadow.value = Math.round(bookPhysConfig.shadowFactor * 100);
+    if (sThick) sThick.value = bookPhysConfig.thicknessLevel;
+
+    const vCurl = document.getElementById('phys-val-curl');
+    const vSpeed = document.getElementById('phys-val-speed');
+    const vShadow = document.getElementById('phys-val-shadow');
+    const vThick = document.getElementById('phys-val-thick');
+    const thickNames = { 1: 'Mỏng', 2: 'Dày Vừa', 3: 'Sử Thi Dày' };
+    if (vCurl) vCurl.textContent = bookPhysConfig.curlFactor.toFixed(2) + 'x';
+    if (vSpeed) vSpeed.textContent = Math.round(bookPhysConfig.flipDurationMs) + 'ms';
+    if (vShadow) vShadow.textContent = bookPhysConfig.shadowFactor.toFixed(2) + 'x';
+    if (vThick) vThick.textContent = thickNames[bookPhysConfig.thicknessLevel] || 'Dày Vừa';
+
+    ['royal_cream', 'vintage_sepia', 'night_dark'].forEach(k => {
+      const chip = document.getElementById('ptheme-' + k);
+      if (chip) chip.classList.toggle('active', bookPhysConfig.paperTheme === k);
+    });
+  }
+
+  function applyBookPaperThemeAndThickness() {
+    const root = document.documentElement;
+    const t = bookPhysConfig.paperTheme || 'royal_cream';
+    if (t === 'vintage_sepia') {
+      root.style.setProperty('--ccx-paper-bg', '#f3e5c8');
+      root.style.setProperty('--ccx-paper-filter', 'sepia(0.32) contrast(0.96) brightness(0.96)');
+    } else if (t === 'night_dark') {
+      root.style.setProperty('--ccx-paper-bg', '#171b24');
+      root.style.setProperty('--ccx-paper-filter', 'invert(0.89) hue-rotate(180deg) contrast(0.92)');
+    } else {
+      root.style.setProperty('--ccx-paper-bg', '#fdfaf3');
+      root.style.setProperty('--ccx-paper-filter', 'none');
+    }
+
+    const lv = bookPhysConfig.thicknessLevel || 2;
+    if (lv === 1) {
+      root.style.setProperty('--ccx-book-edge-shadow',
+        '2px 1px 0 #f5efe0, 4px 2px 0 #cfc3ab, 6px 4px 0 #2b231b, -2px 0 6px rgba(0,0,0,0.68), 0 16px 38px rgba(0,0,0,0.88)');
+      root.style.setProperty('--ccx-book-spread-shadow',
+        '-3px 1px 0 #f5efe0, -5px 3px 0 #cfc3ab, -7px 5px 0 #2b231b, 3px 1px 0 #f5efe0, 5px 3px 0 #cfc3ab, 7px 5px 0 #2b231b, 0 18px 42px rgba(0,0,0,0.88)');
+    } else if (lv === 3) {
+      root.style.setProperty('--ccx-book-edge-shadow',
+        '2px 1px 0 #f5efe0, 4px 2px 0 #d6cbb5, 6px 3px 0 #eee6d3, 8px 4px 0 #bfb299, 10px 5px 0 #e2d8c3, 12px 6px 0 #a3957b, 14px 7px 0 #cabfa8, 16px 9px 0 #2b231b, -3px 0 8px rgba(0,0,0,0.78), 0 24px 56px rgba(0,0,0,0.95)');
+      root.style.setProperty('--ccx-book-spread-shadow',
+        '-4px 2px 0 #f5efe0, -7px 4px 0 #d6cbb5, -10px 6px 0 #eee6d3, -13px 8px 0 #7c6f58, -16px 10px 0 #2b231b, 4px 2px 0 #f5efe0, 7px 4px 0 #d6cbb5, 10px 6px 0 #eee6d3, 13px 8px 0 #7c6f58, 16px 10px 0 #2b231b, 0 24px 56px rgba(0,0,0,0.95)');
+    } else {
+      root.style.setProperty('--ccx-book-edge-shadow',
+        '2px 1px 0 #f5efe0, 3px 2px 0 #cfc3ab, 5px 3px 0 #eee6d3, 6px 4px 0 #b8ab92, 8px 5px 0 #e2d8c3, 9px 6px 0 #9c8e75, 11px 7px 0 #d8ceb8, 13px 9px 0 #2b231b, -3px 0 8px rgba(0,0,0,0.78), 0 20px 46px rgba(0,0,0,0.94)');
+      root.style.setProperty('--ccx-book-spread-shadow',
+        '-3px 1px 0 #f5efe0, -5px 3px 0 #cfc3ab, -8px 5px 0 #eee6d3, -10px 7px 0 #8c7f67, -13px 9px 0 #2b231b, 3px 1px 0 #f5efe0, 5px 3px 0 #cfc3ab, 8px 5px 0 #eee6d3, 10px 7px 0 #8c7f67, 13px 9px 0 #2b231b, 0 22px 54px rgba(0,0,0,0.94)');
+    }
+  }
+
+  function onBookPhysChange() {
+    const sCurl = document.getElementById('phys-slider-curl');
+    const sSpeed = document.getElementById('phys-slider-speed');
+    const sShadow = document.getElementById('phys-slider-shadow');
+    const sThick = document.getElementById('phys-slider-thick');
+    if (sCurl) bookPhysConfig.curlFactor = parseInt(sCurl.value, 10) / 100;
+    if (sSpeed) bookPhysConfig.flipDurationMs = parseInt(sSpeed.value, 10);
+    if (sShadow) bookPhysConfig.shadowFactor = parseInt(sShadow.value, 10) / 100;
+    if (sThick) bookPhysConfig.thicknessLevel = parseInt(sThick.value, 10);
+    syncBookPhysControlsUI();
+    applyBookPaperThemeAndThickness();
+    saveBookPhysConfig();
+  }
+
+  function setReaderPaperTheme(themeKey) {
+    bookPhysConfig.paperTheme = themeKey;
+    syncBookPhysControlsUI();
+    applyBookPaperThemeAndThickness();
+    saveBookPhysConfig();
+    const names = {
+      royal_cream: '📜 Đã bật Màu Giấy Kem Hoàng Gia',
+      vintage_sepia: '🏺 Đã bật Màu Giấy Cổ Điển Sepia (Dịu mắt)',
+      night_dark: '🌙 Đã bật Màu Giấy Tối Đọc Đêm (Chống chói 100%)'
+    };
+    showAppToast(names[themeKey] || 'Đã đổi màu giấy');
+  }
+
+  function toggleBookPhysicsPopover(forceState) {
+    const pop = document.getElementById('book-physics-popover');
+    if (!pop) return;
+    loadSavedBookPhysConfig();
+    const shouldShow = (typeof forceState === 'boolean') ? forceState : pop.classList.contains('hidden');
+    pop.classList.toggle('hidden', !shouldShow);
+    const b1 = document.getElementById('btn-book-physics');
+    const b2 = document.getElementById('btn-book-physics-top');
+    if (b1) b1.classList.toggle('active', shouldShow);
+    if (b2) b2.classList.toggle('active', shouldShow);
+  }
+
   function isBookSpreadActive() {
     if (readerMode === 'spread') return true;
     if (readerMode === 'paged') {
       const w = window.innerWidth;
       const h = window.innerHeight;
-      // On iPad / Tablet or wide screen in Landscape: automatically open 2-page comic spread!
-      // When rotated to Portrait (w <= h): automatically switch to 1-page single book!
       if (w > h && w >= 580) {
         return true;
       }
@@ -4980,88 +5351,477 @@
     return false;
   }
 
-  let activeFlipTimer = null;
-  function launch3dBookFlipEffect(dir, isSpread) {
-    try {
-      const vp = document.getElementById('reader-viewport');
-      if (!vp) return;
-      const frame = vp.querySelector('.book-open-frame, .book-single-frame');
-      if (!frame) return;
-      const rect = frame.getBoundingClientRect();
-      if (rect.width < 40 || rect.height < 40) return;
-
-      let sourceMedia = null;
-      if (isSpread) {
-        const halfSel = dir > 0 ? '.spread-page-half.right-page' : '.spread-page-half.left-page';
-        const halfEl = frame.querySelector(halfSel) || frame.querySelector('.spread-page-half');
-        if (halfEl) sourceMedia = halfEl.querySelector('canvas, img');
-      } else {
-        sourceMedia = frame.querySelector('canvas, img');
-      }
-      if (!sourceMedia) return;
-
-      const oldStages = document.querySelectorAll('.book-3d-flip-stage');
-      oldStages.forEach(s => s.remove());
-      if (activeFlipTimer) {
-        clearTimeout(activeFlipTimer);
-        activeFlipTimer = null;
-      }
-
-      const stage = document.createElement('div');
-      stage.className = 'book-3d-flip-stage';
-      stage.style.top = Math.round(rect.top) + 'px';
-      stage.style.left = Math.round(rect.left) + 'px';
-      stage.style.width = Math.round(rect.width) + 'px';
-      stage.style.height = Math.round(rect.height) + 'px';
-
-      const leaf = document.createElement('div');
-      const underShadow = document.createElement('div');
-
-      if (isSpread) {
-        leaf.className = 'book-turning-leaf ' + (dir > 0 ? 'spread-right-leaf' : 'spread-left-leaf');
-        underShadow.className = 'book-under-drop-shadow ' + (dir > 0 ? 'spread-right-shadow' : 'spread-left-shadow');
-      } else {
-        leaf.className = 'book-turning-leaf single-leaf ' + (dir > 0 ? 'flip-next' : 'flip-prev');
-        underShadow.className = 'book-under-drop-shadow single-shadow';
-      }
-
-      const cloneCanvas = document.createElement('canvas');
-      const leafW = isSpread ? Math.max(1, Math.round(rect.width * 0.5)) : Math.max(1, Math.round(rect.width));
-      const leafH = Math.max(1, Math.round(rect.height));
-      const dpr = Math.min(window.devicePixelRatio || 1.5, 2.0);
-      cloneCanvas.width = Math.round(leafW * dpr);
-      cloneCanvas.height = Math.round(leafH * dpr);
-      const ctx = cloneCanvas.getContext('2d');
-      ctx.fillStyle = '#0c1018';
-      ctx.fillRect(0, 0, cloneCanvas.width, cloneCanvas.height);
-      try {
-        ctx.drawImage(sourceMedia, 0, 0, cloneCanvas.width, cloneCanvas.height);
-      } catch (drawErr) {}
-      leaf.appendChild(cloneCanvas);
-
-      const curlShade = document.createElement('div');
-      curlShade.className = 'book-leaf-curl-shade';
-      leaf.appendChild(curlShade);
-
-      stage.appendChild(underShadow);
-      stage.appendChild(leaf);
-      document.getElementById('reader-overlay').appendChild(stage);
-
-      // Force browser layout & trigger 3D GPU transition
-      void leaf.offsetWidth;
-      requestAnimationFrame(() => {
-        underShadow.classList.add('anim-active');
-        leaf.classList.add('anim-active');
-      });
-
-      activeFlipTimer = setTimeout(() => {
-        stage.remove();
-        activeFlipTimer = null;
-      }, 480);
-    } catch (e) {}
+  function getPaperPalette() {
+    const t = bookPhysConfig.paperTheme || 'royal_cream';
+    if (t === 'night_dark') {
+      return {
+        frontFill: '#171b24',
+        backStart: '#0e1118',
+        backMid1: '#1d222e',
+        backMid2: '#232938',
+        backEnd: '#121620',
+        bleedAlpha: 0.14
+      };
+    }
+    if (t === 'vintage_sepia') {
+      return {
+        frontFill: '#f3e5c8',
+        backStart: '#cbb894',
+        backMid1: '#e6d5b5',
+        backMid2: '#f3e5c8',
+        backEnd: '#d8c5a2',
+        bleedAlpha: 0.17
+      };
+    }
+    return {
+      frontFill: '#fdfaf3',
+      backStart: '#d6ccb8',
+      backMid1: '#efe8d8',
+      backMid2: '#faf6ec',
+      backEnd: '#e3dac6',
+      bleedAlpha: 0.16
+    };
   }
 
-  async function turnBookPage(dir) {
+  function makeFallbackBlankPageCanvas(w, h, pageNum) {
+    const c = document.createElement('canvas');
+    c.width = Math.max(120, Math.round(w));
+    c.height = Math.max(160, Math.round(h));
+    const ctx = c.getContext('2d');
+    const pal = getPaperPalette();
+    ctx.fillStyle = pal.frontFill;
+    ctx.fillRect(0, 0, c.width, c.height);
+    if (pageNum && pageNum >= 1 && pageNum <= totalPages) {
+      ctx.fillStyle = bookPhysConfig.paperTheme === 'night_dark' ? 'rgba(226,232,240,0.45)' : 'rgba(90,72,48,0.45)';
+      ctx.font = 'bold 14px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('Trang ' + pageNum + ' / ' + totalPages, c.width * 0.5, c.height * 0.5);
+    }
+    return c;
+  }
+
+  let _prewarmTimer = null;
+  async function prewarmNeighborBookPages(centerP) {
+    if (!pdfDoc || readerMode === 'webtoon') return;
+    if (_prewarmTimer) {
+      clearTimeout(_prewarmTimer);
+      _prewarmTimer = null;
+    }
+    if (currentReadingFile && _ccxPaperCacheDocId !== currentReadingFile.id) {
+      _ccxPaperPageCache.forEach(c => { try { c.width = 1; c.height = 1; } catch (e) {} });
+      _ccxPaperPageCache.clear();
+      _ccxPaperCacheDocId = currentReadingFile.id;
+    }
+    const isCool = isEcoCoolMode || !!window._isIosDevice;
+    // On iOS / Eco-Cool mode: wait 260ms until page turn settles, and only pre-render 1 next page at light resolution so CPU/GPU stays cool!
+    _prewarmTimer = setTimeout(async () => {
+      if (!pdfDoc || readerMode === 'webtoon') return;
+      const targets = isCool
+        ? [centerP + 1, isBookSpreadActive() ? (centerP + 2) : (centerP - 1)]
+        : [centerP - 1, centerP + 1, centerP + 2, centerP - 2];
+      for (const p of targets) {
+        if (p < 1 || p > totalPages || _ccxPaperPageCache.has(p)) continue;
+        try {
+          const page = await pdfDoc.getPage(p);
+          const baseVp = page.getViewport({ scale: 1.0 });
+          const maxPreW = isCool ? 440 : 680;
+          const targetW = Math.min(maxPreW, Math.max(320, Math.round(window.innerWidth * (isCool ? 0.65 : 0.80))));
+          const scale = targetW / baseVp.width;
+          const vp = page.getViewport({ scale });
+          const off = document.createElement('canvas');
+          off.width = Math.floor(vp.width);
+          off.height = Math.floor(vp.height);
+          const ctx = off.getContext('2d', { alpha: false });
+          await page.render({ canvasContext: ctx, viewport: vp }).promise;
+          _ccxPaperPageCache.set(p, off);
+        } catch (e) {}
+      }
+      // Immediately zero out and evict distant canvases so iOS WebKit frees GPU memory
+      const maxDist = isCool ? 2 : 5;
+      Array.from(_ccxPaperPageCache.keys()).forEach(k => {
+        if (Math.abs(k - centerP) > maxDist) {
+          const oldC = _ccxPaperPageCache.get(k);
+          if (oldC && !oldC.parentElement) {
+            try { oldC.width = 1; oldC.height = 1; } catch (e) {}
+          }
+          _ccxPaperPageCache.delete(k);
+        }
+      });
+    }, isCool ? 260 : 60);
+  }
+
+  function getCachedOrDomPageMedia(pageNum, fallbackW, fallbackH) {
+    if (!pageNum || pageNum < 1 || pageNum > totalPages) {
+      return makeFallbackBlankPageCanvas(fallbackW, fallbackH, null);
+    }
+    const slot = document.getElementById('page-slot-' + pageNum);
+    if (slot) {
+      const domMedia = slot.querySelector('canvas, img');
+      if (domMedia) return domMedia;
+    }
+    if (_ccxPaperPageCache.has(pageNum)) {
+      return _ccxPaperPageCache.get(pageNum);
+    }
+    return makeFallbackBlankPageCanvas(fallbackW, fallbackH, pageNum);
+  }
+
+  // Core 2D Canvas Conical Paper-Curl Renderer (Matches Preview V2.0 1:1)
+  function renderConicalSheetCurlOnCtx(ctx, bookW, bookH, pageOriginX, pageW, pageH, dir, curFrontMedia, underNextMedia, backSheetMedia, cornerA, pullP) {
+    let dx = pullP.x - cornerA.x;
+    let dy = pullP.y - cornerA.y;
+    const dist = Math.hypot(dx, dy);
+    if (dist < 2.0) {
+      try { ctx.drawImage(curFrontMedia, pageOriginX, 0, pageW, pageH); } catch (e) {}
+      return;
+    }
+
+    // Clamp pull point P so the spine edge of the sheet cannot tear away from the book spine
+    const spineX = (dir > 0) ? pageOriginX : (pageOriginX + pageW);
+    const spineTop = { x: spineX, y: 0 };
+    const spineBot = { x: spineX, y: pageH };
+
+    const dTop = Math.hypot(pullP.x - spineTop.x, pullP.y - spineTop.y);
+    if (dTop > pageW) {
+      const ang = Math.atan2(pullP.y - spineTop.y, pullP.x - spineTop.x);
+      pullP.x = spineTop.x + Math.cos(ang) * pageW;
+      pullP.y = spineTop.y + Math.sin(ang) * pageW;
+    }
+    const diagMax = Math.hypot(pageW, pageH);
+    const dBot = Math.hypot(pullP.x - spineBot.x, pullP.y - spineBot.y);
+    if (dBot > diagMax) {
+      const ang = Math.atan2(pullP.y - spineBot.y, pullP.x - spineBot.x);
+      pullP.x = spineBot.x + Math.cos(ang) * diagMax;
+      pullP.y = spineBot.y + Math.sin(ang) * diagMax;
+    }
+
+    dx = pullP.x - cornerA.x;
+    dy = pullP.y - cornerA.y;
+    const len = Math.hypot(dx, dy);
+    if (len < 2.0) {
+      try { ctx.drawImage(curFrontMedia, pageOriginX, 0, pageW, pageH); } catch (e) {}
+      return;
+    }
+
+    // Midpoint M of [A, P] and unit normal N pointing from A toward P
+    const mx = (cornerA.x + pullP.x) * 0.5;
+    const my = (cornerA.y + pullP.y) * 0.5;
+    const nx = dx / len;
+    const ny = dy / len;
+    const tx = -ny;
+    const ty = nx;
+    const BIG = 3200;
+
+    const pal = getPaperPalette();
+    const isDarkTheme = bookPhysConfig.paperTheme === 'night_dark';
+
+    // 1. Draw underlying revealed page on the peeled side (side of A)
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(pageOriginX, 0, pageW, pageH);
+    ctx.clip();
+    if (underNextMedia) {
+      try { ctx.drawImage(underNextMedia, pageOriginX, 0, pageW, pageH); } catch (e) {}
+    }
+
+    // Cast deep ambient shadow from lifted paper flap onto underlying page
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(mx - tx * BIG, my - ty * BIG);
+    ctx.lineTo(mx + tx * BIG, my + ty * BIG);
+    ctx.lineTo(mx + tx * BIG - nx * BIG, my + ty * BIG - ny * BIG);
+    ctx.lineTo(mx - tx * BIG - nx * BIG, my - ty * BIG - ny * BIG);
+    ctx.closePath();
+    ctx.clip();
+
+    const castShadowW = Math.min(130, len * 0.45) * bookPhysConfig.shadowFactor;
+    const castGrad = ctx.createLinearGradient(mx, my, mx - nx * castShadowW, my - ny * castShadowW);
+    castGrad.addColorStop(0, `rgba(0, 0, 0, ${Math.min(0.85, 0.56 * bookPhysConfig.shadowFactor)})`);
+    castGrad.addColorStop(0.38, `rgba(0, 0, 0, ${Math.min(0.65, 0.24 * bookPhysConfig.shadowFactor)})`);
+    castGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+    ctx.fillStyle = castGrad;
+    ctx.fillRect(pageOriginX, 0, pageW, pageH);
+    ctx.restore();
+    ctx.restore();
+
+    // 2. Draw unpeeled portion of current page (clipped to P's side of fold line L)
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(pageOriginX, 0, pageW, pageH);
+    ctx.clip();
+
+    ctx.beginPath();
+    ctx.moveTo(mx - tx * BIG, my - ty * BIG);
+    ctx.lineTo(mx + tx * BIG, my + ty * BIG);
+    ctx.lineTo(mx + tx * BIG + nx * BIG, my + ty * BIG + ny * BIG);
+    ctx.lineTo(mx - tx * BIG + nx * BIG, my - ty * BIG + ny * BIG);
+    ctx.closePath();
+    ctx.clip();
+
+    try { ctx.drawImage(curFrontMedia, pageOriginX, 0, pageW, pageH); } catch (e) {}
+
+    // Subtle lift shadow right before the crease on the front page
+    const frontCreaseW = Math.min(48, len * 0.22) * bookPhysConfig.curlFactor;
+    const fcGrad = ctx.createLinearGradient(mx, my, mx + nx * frontCreaseW, my + ny * frontCreaseW);
+    fcGrad.addColorStop(0, `rgba(25, 18, 10, ${0.22 * bookPhysConfig.shadowFactor})`);
+    fcGrad.addColorStop(1, 'rgba(25, 18, 10, 0)');
+    ctx.fillStyle = fcGrad;
+    ctx.fillRect(pageOriginX, 0, pageW, pageH);
+    ctx.restore();
+
+    // 3. Draw lifted back-side of the curling sheet (reflected across fold line L)
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(0, 0, bookW, bookH);
+    ctx.clip();
+
+    ctx.beginPath();
+    ctx.moveTo(mx - tx * BIG, my - ty * BIG);
+    ctx.lineTo(mx + tx * BIG, my + ty * BIG);
+    ctx.lineTo(mx + tx * BIG + nx * BIG, my + ty * BIG + ny * BIG);
+    ctx.lineTo(mx - tx * BIG + nx * BIG, my - ty * BIG + ny * BIG);
+    ctx.closePath();
+    ctx.clip();
+
+    // Reflect coordinate system across fold line L passing through M(mx, my) with normal N(nx, ny)
+    ctx.translate(mx, my);
+    ctx.transform(
+      1 - 2 * nx * nx, -2 * nx * ny,
+      -2 * nx * ny, 1 - 2 * ny * ny,
+      0, 0
+    );
+    ctx.translate(-mx, -my);
+
+    // Clip to sheet rectangle [pageOriginX..pageOriginX+pageW, 0..pageH]
+    ctx.beginPath();
+    ctx.rect(pageOriginX, 0, pageW, pageH);
+    ctx.clip();
+
+    // Warm paper backface gradient
+    const backBaseGrad = ctx.createLinearGradient(pageOriginX, 0, pageOriginX + pageW, pageH);
+    backBaseGrad.addColorStop(0, pal.backStart);
+    backBaseGrad.addColorStop(0.25, pal.backMid1);
+    backBaseGrad.addColorStop(0.65, pal.backMid2);
+    backBaseGrad.addColorStop(1, pal.backEnd);
+    ctx.fillStyle = backBaseGrad;
+    ctx.fillRect(pageOriginX, 0, pageW, pageH);
+
+    if (backSheetMedia) {
+      ctx.save();
+      ctx.globalAlpha = 0.92;
+      ctx.translate(pageOriginX + pageW, 0);
+      ctx.scale(-1, 1);
+      try { ctx.drawImage(backSheetMedia, 0, 0, pageW, pageH); } catch (e) {}
+      ctx.restore();
+    } else {
+      ctx.save();
+      ctx.globalAlpha = pal.bleedAlpha;
+      try { ctx.drawImage(curFrontMedia, pageOriginX, 0, pageW, pageH); } catch (e) {}
+      ctx.restore();
+    }
+
+    // Cylindrical 3D specular highlight & curvature shadow along the curled flap
+    const cylW = Math.min(185, Math.max(38, len * 0.56 * bookPhysConfig.curlFactor));
+    const cylGrad = ctx.createLinearGradient(mx, my, mx - nx * cylW, my - ny * cylW);
+    if (isDarkTheme) {
+      cylGrad.addColorStop(0, 'rgba(0, 0, 0, 0.55)');
+      cylGrad.addColorStop(0.14, 'rgba(255, 255, 255, 0.16)');
+      cylGrad.addColorStop(0.45, 'rgba(255, 255, 255, 0.04)');
+      cylGrad.addColorStop(0.84, `rgba(0, 0, 0, ${0.28 * bookPhysConfig.shadowFactor})`);
+      cylGrad.addColorStop(1, `rgba(0, 0, 0, ${0.58 * bookPhysConfig.shadowFactor})`);
+    } else {
+      cylGrad.addColorStop(0, 'rgba(30, 22, 12, 0.34)');
+      cylGrad.addColorStop(0.12, 'rgba(255, 253, 245, 0.72)');
+      cylGrad.addColorStop(0.36, 'rgba(255, 252, 240, 0.16)');
+      cylGrad.addColorStop(0.82, `rgba(35, 26, 15, ${0.18 * bookPhysConfig.shadowFactor})`);
+      cylGrad.addColorStop(1, `rgba(20, 14, 8, ${0.42 * bookPhysConfig.shadowFactor})`);
+    }
+    ctx.fillStyle = cylGrad;
+    ctx.fillRect(pageOriginX, 0, pageW, pageH);
+
+    ctx.strokeStyle = isDarkTheme ? 'rgba(255,255,255,0.22)' : 'rgba(120, 102, 76, 0.45)';
+    ctx.lineWidth = 1.1;
+    ctx.strokeRect(pageOriginX + 0.5, 0.5, pageW - 1, pageH - 1);
+    ctx.restore();
+
+    // 4. Crisp specular highlight along the paper fold line
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(0, 0, bookW, bookH);
+    ctx.clip();
+    ctx.beginPath();
+    ctx.moveTo(mx - tx * BIG, my - ty * BIG);
+    ctx.lineTo(mx + tx * BIG, my + ty * BIG);
+    ctx.strokeStyle = isDarkTheme ? 'rgba(255, 255, 255, 0.25)' : 'rgba(255, 252, 242, 0.68)';
+    ctx.lineWidth = 1.4;
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  let _activeCurlRaf = null;
+  let _activeCurlStage = null;
+
+  function removeActiveCurlStage() {
+    if (_activeCurlRaf) {
+      cancelAnimationFrame(_activeCurlRaf);
+      _activeCurlRaf = null;
+    }
+    if (_activeCurlStage) {
+      const c = _activeCurlStage.querySelector('canvas');
+      if (c) { try { c.width = 1; c.height = 1; } catch (e) {} }
+      _activeCurlStage.remove();
+      _activeCurlStage = null;
+    }
+    document.querySelectorAll('.ccx-paper-curl-stage').forEach(el => {
+      const c = el.querySelector('canvas');
+      if (c) { try { c.width = 1; c.height = 1; } catch (e) {} }
+      el.remove();
+    });
+  }
+
+  function createPaperCurlInteractiveSession(dir, isSpread, startClientY) {
+    const vp = document.getElementById('reader-viewport');
+    if (!vp) return null;
+    const frame = vp.querySelector('.book-open-frame, .book-single-frame');
+    if (!frame) return null;
+    const rect = frame.getBoundingClientRect();
+    if (rect.width < 50 || rect.height < 50) return null;
+
+    removeActiveCurlStage();
+
+    const isCool = isEcoCoolMode || !!window._isIosDevice;
+    const dpr = isCool
+      ? Math.min(window.devicePixelRatio || 1.25, 1.25)
+      : Math.min(window.devicePixelRatio || 1.75, 2.0);
+    const bookW = Math.round(rect.width);
+    const bookH = Math.round(rect.height);
+    const pageW = isSpread ? Math.round(bookW * 0.5) : bookW;
+    const pageH = bookH;
+
+    const stage = document.createElement('div');
+    stage.className = 'ccx-paper-curl-stage';
+    stage.style.left = Math.round(rect.left) + 'px';
+    stage.style.top = Math.round(rect.top) + 'px';
+    stage.style.width = bookW + 'px';
+    stage.style.height = bookH + 'px';
+
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.round(bookW * dpr);
+    canvas.height = Math.round(bookH * dpr);
+    if (bookPhysConfig.paperTheme === 'vintage_sepia') {
+      canvas.style.filter = 'sepia(0.32) contrast(0.96) brightness(0.96)';
+    } else if (bookPhysConfig.paperTheme === 'night_dark') {
+      canvas.style.filter = 'invert(0.89) hue-rotate(180deg) contrast(0.92)';
+    }
+    stage.appendChild(canvas);
+    document.getElementById('reader-overlay').appendChild(stage);
+    _activeCurlStage = stage;
+
+    const ctx = canvas.getContext('2d');
+    ctx.scale(dpr, dpr);
+
+    // Prepare media sources for static pages, peeling page, underlying page, and backface page
+    let leftStaticMedia = null;
+    let rightStaticMedia = null;
+    let curFrontMedia = null;
+    let underNextMedia = null;
+    let backSheetMedia = null;
+    let pageOriginX = 0;
+
+    if (isSpread) {
+      const pLeft = currentPage;
+      const pRight = Math.min(totalPages, currentPage + 1);
+      leftStaticMedia = getCachedOrDomPageMedia(pLeft, pageW, pageH);
+      rightStaticMedia = getCachedOrDomPageMedia(pRight, pageW, pageH);
+      if (dir > 0) {
+        pageOriginX = pageW;
+        curFrontMedia = rightStaticMedia;
+        underNextMedia = getCachedOrDomPageMedia(currentPage + 3 <= totalPages ? currentPage + 3 : currentPage + 2, pageW, pageH);
+        backSheetMedia = getCachedOrDomPageMedia(currentPage + 2 <= totalPages ? currentPage + 2 : null, pageW, pageH);
+      } else {
+        pageOriginX = 0;
+        curFrontMedia = leftStaticMedia;
+        underNextMedia = getCachedOrDomPageMedia(currentPage - 2 >= 1 ? currentPage - 2 : 1, pageW, pageH);
+        backSheetMedia = getCachedOrDomPageMedia(currentPage - 1 >= 1 ? currentPage - 1 : null, pageW, pageH);
+      }
+    } else {
+      pageOriginX = 0;
+      curFrontMedia = getCachedOrDomPageMedia(currentPage, pageW, pageH);
+      if (dir > 0) {
+        underNextMedia = getCachedOrDomPageMedia(currentPage + 1, pageW, pageH);
+      } else {
+        underNextMedia = getCachedOrDomPageMedia(currentPage - 1, pageW, pageH);
+      }
+    }
+
+    const relY = (typeof startClientY === 'number') ? (startClientY - rect.top) : (bookH * 0.78);
+    const cornerY = (relY < bookH * 0.36) ? 0 : bookH;
+    const cornerX = (dir > 0) ? (pageOriginX + pageW) : pageOriginX;
+    const cornerA = { x: cornerX, y: cornerY };
+
+    function renderAtPull(pullX, pullY) {
+      ctx.clearRect(0, 0, bookW, bookH);
+      if (isSpread) {
+        if (dir > 0 && leftStaticMedia) {
+          try { ctx.drawImage(leftStaticMedia, 0, 0, pageW, pageH); } catch (e) {}
+        } else if (dir < 0 && rightStaticMedia) {
+          try { ctx.drawImage(rightStaticMedia, pageW, 0, pageW, pageH); } catch (e) {}
+        }
+      }
+      renderConicalSheetCurlOnCtx(
+        ctx, bookW, bookH, pageOriginX, pageW, pageH, dir,
+        curFrontMedia, underNextMedia, backSheetMedia,
+        cornerA, { x: pullX, y: pullY }
+      );
+      if (isSpread) {
+        // Center spine crease shadow
+        const spGrad = ctx.createLinearGradient(pageW - 22, 0, pageW + 22, 0);
+        spGrad.addColorStop(0, 'rgba(0,0,0,0)');
+        spGrad.addColorStop(0.45, 'rgba(0,0,0,0.34)');
+        spGrad.addColorStop(0.5, 'rgba(0,0,0,0.68)');
+        spGrad.addColorStop(0.55, 'rgba(0,0,0,0.34)');
+        spGrad.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.fillStyle = spGrad;
+        ctx.fillRect(pageW - 22, 0, 44, bookH);
+      }
+    }
+
+    return {
+      stage,
+      rect,
+      bookW,
+      bookH,
+      pageW,
+      pageH,
+      pageOriginX,
+      dir,
+      isSpread,
+      cornerA,
+      renderAtPull
+    };
+  }
+
+  function animatePaperCurlFromPoint(session, fromPt, toPt, durationMs, onDone) {
+    const startTs = performance.now();
+    const archSign = (session.cornerA.y === 0) ? 1 : -1;
+    const archPeak = Math.min(72, session.bookH * 0.14) * bookPhysConfig.curlFactor;
+
+    function tick(now) {
+      const rawT = Math.min(1, (now - startTs) / Math.max(120, durationMs));
+      const ease = 1 - Math.pow(1 - rawT, 3);
+      const px = fromPt.x + (toPt.x - fromPt.x) * ease;
+      const py = fromPt.y + (toPt.y - fromPt.y) * ease + Math.sin(rawT * Math.PI) * archPeak * archSign;
+      session.renderAtPull(px, py);
+      if (rawT < 1) {
+        _activeCurlRaf = requestAnimationFrame(tick);
+      } else {
+        _activeCurlRaf = null;
+        if (onDone) onDone();
+      }
+    }
+    _activeCurlRaf = requestAnimationFrame(tick);
+  }
+
+  async function turnBookPage(dir, skipFlipLaunch) {
     if (readerMode === 'webtoon') return;
     const isSpread = isBookSpreadActive();
     const step = isSpread ? 2 : 1;
@@ -5087,48 +5847,177 @@
     nextP = Math.max(1, Math.min(totalPages, nextP));
     if (nextP === currentPage) return;
 
-    launch3dBookFlipEffect(dir, isSpread);
+    if (!skipFlipLaunch) {
+      const session = createPaperCurlInteractiveSession(dir, isSpread, null);
+      if (session) {
+        const startX = (dir > 0) ? (session.bookW - 14) : 14;
+        const endX = (dir > 0) ? (-session.pageW * 0.85) : (session.bookW + session.pageW * 0.85);
+        const startY = session.bookH - 18;
+        const endY = session.bookH - 8;
+        await new Promise(resolve => {
+          animatePaperCurlFromPoint(
+            session,
+            { x: startX, y: startY },
+            { x: endX, y: endY },
+            bookPhysConfig.flipDurationMs,
+            resolve
+          );
+        });
+      }
+    }
+
     currentPage = nextP;
     await buildReaderViewport();
+    removeActiveCurlStage();
   }
 
   function initReaderBookSwipeGestures() {
+    loadSavedBookPhysConfig();
     const vp = document.getElementById('reader-viewport');
     if (!vp || vp._ccxSwipeBound) return;
     vp._ccxSwipeBound = true;
 
-    let touchStartX = 0;
-    let touchStartY = 0;
-    let touchStartTime = 0;
+    let pointerDown = false;
+    let startX = 0;
+    let startY = 0;
+    let lastX = 0;
+    let lastY = 0;
+    let startTime = 0;
     let isMultiTouch = false;
+    let isHorizontalCurl = false;
+    let curlSession = null;
+    let dragDir = 0;
+
+    function beginPointer(clientX, clientY) {
+      pointerDown = true;
+      isMultiTouch = false;
+      isHorizontalCurl = false;
+      curlSession = null;
+      dragDir = 0;
+      startX = clientX;
+      startY = clientY;
+      lastX = clientX;
+      lastY = clientY;
+      startTime = Date.now();
+    }
+
+    function movePointer(clientX, clientY) {
+      if (!pointerDown || isMultiTouch || readerMode === 'webtoon' || zoomLevel > 1.05) return;
+      lastX = clientX;
+      lastY = clientY;
+      const dx = clientX - startX;
+      const dy = clientY - startY;
+
+      if (!isHorizontalCurl) {
+        if (Math.abs(dx) < 10) return;
+        if (Math.abs(dy) > Math.abs(dx) * 1.15) {
+          isMultiTouch = true;
+          return;
+        }
+        isHorizontalCurl = true;
+        dragDir = dx < 0 ? 1 : -1;
+        if ((dragDir > 0 && currentPage < totalPages) || (dragDir < 0 && currentPage > 1)) {
+          curlSession = createPaperCurlInteractiveSession(dragDir, isBookSpreadActive(), startY);
+        }
+      }
+
+      if (isHorizontalCurl && curlSession) {
+        const pullX = clientX - curlSession.rect.left;
+        const pullY = clientY - curlSession.rect.top;
+        curlSession.renderAtPull(pullX, pullY);
+      }
+    }
+
+    async function endPointer(clientX, clientY) {
+      if (!pointerDown) return;
+      pointerDown = false;
+      if (isMultiTouch || readerMode === 'webtoon' || zoomLevel > 1.05) return;
+
+      const dx = clientX - startX;
+      const dy = clientY - startY;
+      const dt = Date.now() - startTime;
+
+      if (isHorizontalCurl && curlSession) {
+        window._ccxLastSwipeAt = Date.now();
+        const activeSession = curlSession;
+        const commitDir = dragDir;
+        curlSession = null;
+
+        const pullX = clientX - activeSession.rect.left;
+        const pullY = clientY - activeSession.rect.top;
+        const spanW = Math.max(150, activeSession.pageW * 0.65);
+        const progress = Math.abs(dx) / spanW;
+        const shouldCommit = (progress >= 0.16) || (dt < 420 && Math.abs(dx) >= 32);
+
+        if (shouldCommit) {
+          const targetX = (commitDir > 0)
+            ? (-activeSession.pageW * 0.85)
+            : (activeSession.bookW + activeSession.pageW * 0.85);
+          const targetY = activeSession.cornerA.y === 0 ? 10 : (activeSession.bookH - 10);
+          const remainMs = Math.max(160, Math.round(bookPhysConfig.flipDurationMs * 0.62));
+          animatePaperCurlFromPoint(
+            activeSession,
+            { x: pullX, y: pullY },
+            { x: targetX, y: targetY },
+            remainMs,
+            async () => {
+              await turnBookPage(commitDir, true);
+              removeActiveCurlStage();
+            }
+          );
+        } else {
+          // Snap softly back to unpeeled corner
+          animatePaperCurlFromPoint(
+            activeSession,
+            { x: pullX, y: pullY },
+            { x: activeSession.cornerA.x, y: activeSession.cornerA.y },
+            220,
+            () => {
+              removeActiveCurlStage();
+            }
+          );
+        }
+        return;
+      }
+
+      if (dt < 600 && Math.abs(dx) >= 42 && Math.abs(dx) > Math.abs(dy) * 1.3) {
+        window._ccxLastSwipeAt = Date.now();
+        turnBookPage(dx < 0 ? 1 : -1);
+      }
+    }
 
     vp.addEventListener('touchstart', (e) => {
       if (e.touches.length > 1) {
         isMultiTouch = true;
+        removeActiveCurlStage();
         return;
       }
-      isMultiTouch = false;
-      touchStartX = e.touches[0].clientX;
-      touchStartY = e.touches[0].clientY;
-      touchStartTime = Date.now();
+      beginPointer(e.touches[0].clientX, e.touches[0].clientY);
+    }, { passive: true });
+
+    vp.addEventListener('touchmove', (e) => {
+      if (!e.touches || e.touches.length === 0) return;
+      movePointer(e.touches[0].clientX, e.touches[0].clientY);
     }, { passive: true });
 
     vp.addEventListener('touchend', (e) => {
-      if (isMultiTouch || readerMode === 'webtoon' || zoomLevel > 1.05) return;
       if (!e.changedTouches || e.changedTouches.length === 0) return;
-      const dx = e.changedTouches[0].clientX - touchStartX;
-      const dy = e.changedTouches[0].clientY - touchStartY;
-      const dt = Date.now() - touchStartTime;
-
-      if (dt < 650 && Math.abs(dx) >= 44 && Math.abs(dx) > Math.abs(dy) * 1.35) {
-        window._ccxLastSwipeAt = Date.now();
-        if (dx < 0) {
-          turnBookPage(1); // Vuốt sang trái -> Lật trang tiếp theo
-        } else {
-          turnBookPage(-1); // Vuốt sang phải -> Lật lùi trang trước
-        }
-      }
+      endPointer(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
     }, { passive: true });
+
+    // Also support mouse drag for PC / Tablet stylus testing
+    vp.addEventListener('mousedown', (e) => {
+      if (e.button !== 0) return;
+      beginPointer(e.clientX, e.clientY);
+    });
+    window.addEventListener('mousemove', (e) => {
+      if (!pointerDown) return;
+      movePointer(e.clientX, e.clientY);
+    });
+    window.addEventListener('mouseup', (e) => {
+      if (!pointerDown) return;
+      endPointer(e.clientX, e.clientY);
+    });
   }
 
   async function buildReaderViewport() {
@@ -5148,8 +6037,8 @@
     const pagedBtn = document.getElementById('mode-paged-btn');
     if (pagedBtn) {
       pagedBtn.textContent = (readerMode === 'paged' && useSpread)
-        ? '📖 Sách 3D (Ngang 2T)'
-        : '📖 Lật Sách 3D';
+        ? '📖 Sách 1T (Ngang 2T)'
+        : '📖 Sách 1 Trang';
     }
 
     // CASE A: External Drive Image Folder Chapter
@@ -5220,8 +6109,9 @@
         singleFrame.className = 'book-single-frame';
         const img = document.createElement('img');
         attachDriveImageSource(img, imgItem.id, port);
-        img.style.width = displayW + 'px';
-        img.style.maxHeight = 'calc(100vh - 16px)';
+        const bookImgW = Math.min(displayW, Math.max(240, window.innerWidth - 26));
+        img.style.width = bookImgW + 'px';
+        img.style.maxHeight = 'calc(100vh - 32px)';
         img.style.objectFit = 'contain';
         singleFrame.appendChild(img);
         const wm = document.createElement('span');
@@ -5329,8 +6219,7 @@
       vp.appendChild(row);
       await renderSinglePdfPage(pLeft, true);
       if (pRight) await renderSinglePdfPage(pRight, true);
-      // Pre-warm next page in background for instant 3D turn
-      if (currentPage + 2 <= totalPages) pdfDoc.getPage(currentPage + 2).catch(() => {});
+      setTimeout(() => prewarmNeighborBookPages(currentPage), 40);
     } else {
       // Single Page 3D Book Mode (Phone or Portrait iPad)
       vp.onscroll = null;
@@ -5343,7 +6232,7 @@
       outer.appendChild(slot);
       vp.appendChild(outer);
       await renderSinglePdfPage(currentPage, false);
-      if (currentPage + 1 <= totalPages) pdfDoc.getPage(currentPage + 1).catch(() => {});
+      setTimeout(() => prewarmNeighborBookPages(currentPage), 40);
     }
 
     updateReaderStatusUI();
@@ -5377,15 +6266,19 @@
     try {
       const page = await pdfDoc.getPage(pNum);
       const baseVp = page.getViewport({ scale: 1.0 });
-      const dpr = Math.min(window.devicePixelRatio || 2.25, 2.75);
+      const isCool = isEcoCoolMode || !!window._isIosDevice;
+      const dpr = isCool
+        ? Math.min(window.devicePixelRatio || 1.5, 1.55)
+        : Math.min(window.devicePixelRatio || 2.0, 2.5);
       let displayW = getTargetPageRenderWidth();
       if (isSpreadHalf) {
-        displayW = Math.floor((window.innerWidth * 0.485) * zoomLevel);
+        displayW = Math.floor((window.innerWidth * 0.475) * zoomLevel);
       } else if (readerMode !== 'webtoon') {
-        // In 1-Page Book mode, fit comfortably inside both screen width and screen height
-        const maxBookH = Math.max(320, (window.innerHeight - 16) * zoomLevel);
+        // In 1-Page Book mode, leave 26px horizontal room & 32px vertical room so the left book spine and right stacked paper edges are clearly visible on phones!
+        const maxBookW = Math.max(240, (window.innerWidth - 26) * zoomLevel);
+        const maxBookH = Math.max(320, (window.innerHeight - 32) * zoomLevel);
         const widthFromHeight = Math.floor(maxBookH * (baseVp.width / baseVp.height));
-        displayW = Math.min(displayW, widthFromHeight);
+        displayW = Math.min(displayW, maxBookW, widthFromHeight);
       }
       const cssScale = displayW / baseVp.width;
       const renderVp = page.getViewport({ scale: cssScale * dpr });
@@ -5411,6 +6304,9 @@
 
       const ctx = canvas.getContext('2d', { alpha: false });
       await page.render({ canvasContext: ctx, viewport: renderVp }).promise;
+      if (readerMode !== 'webtoon') {
+        _ccxPaperPageCache.set(pNum, canvas);
+      }
     } catch (e) {
       renderedPages.delete(pNum);
     }
@@ -5423,8 +6319,12 @@
       : `${currentPage} / ${totalPages}`;
     document.getElementById('page-indicator').textContent = pageLabel;
     document.getElementById('page-slider').value = currentPage;
+    const physTopBtn = document.getElementById('btn-book-physics-top');
+    const autoScrollBtn = document.getElementById('autoscroll-btn');
+    if (physTopBtn) physTopBtn.classList.toggle('hidden', readerMode === 'webtoon');
+    if (autoScrollBtn) autoScrollBtn.classList.toggle('hidden', readerMode !== 'webtoon');
     if (currentReadingFile) {
-      const modeName = readerMode === 'webtoon' ? 'Cuộn Dọc' : (isSpread ? 'Sách Mở 2 Trang 3D' : 'Lật Sách 1 Trang 3D');
+      const modeName = readerMode === 'webtoon' ? 'Cuộn Dọc' : (isSpread ? 'Sách 2T 3D' : 'Sách 1T 3D');
       document.getElementById('reader-doc-sub').textContent =
         `Trang ${pageLabel} • ${modeName} • ${currentReadingFile.source || 'Anti-Limit'}`;
       saveReadingProgress(
@@ -5582,6 +6482,11 @@
   }
 
   function toggleReaderBars(e) {
+    const pop = document.getElementById('book-physics-popover');
+    if (pop && !pop.classList.contains('hidden')) {
+      toggleBookPhysicsPopover(false);
+      return;
+    }
     if (window._ccxLastSwipeAt && (Date.now() - window._ccxLastSwipeAt) < 360) {
       return;
     }
@@ -5608,6 +6513,14 @@
 
   function closeReader() {
     stopAutoScroll();
+    removeActiveCurlStage();
+    toggleBookPhysicsPopover(false);
+    if (_prewarmTimer) {
+      clearTimeout(_prewarmTimer);
+      _prewarmTimer = null;
+    }
+    _ccxPaperPageCache.forEach(c => { try { c.width = 1; c.height = 1; } catch (e) {} });
+    _ccxPaperPageCache.clear();
     if (window.CCXBridge && window.CCXBridge.setVolumeKeyPaging) {
       window.CCXBridge.setVolumeKeyPaging(false);
     }
@@ -5620,6 +6533,7 @@
       }
     }
     document.getElementById('reader-overlay').classList.add('hidden');
+    document.body.classList.remove('reader-or-video-active');
     if (pdfDoc) {
       try { pdfDoc.destroy(); } catch (e) {}
       pdfDoc = null;
