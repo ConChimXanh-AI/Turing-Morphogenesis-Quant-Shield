@@ -2233,8 +2233,8 @@
         const minSide = Math.min(window.innerWidth, window.innerHeight);
         const isTab = window._isIpadOS || minSide >= 600;
         return JSON.stringify({
-          versionCode: 18,
-          versionName: '3.5.0',
+          versionCode: 19,
+          versionName: '3.5.1',
           isTablet: isTab,
           smallestScreenWidthDp: minSide,
           platform: window._isIosDevice ? 'ios' : 'web'
@@ -2355,10 +2355,10 @@
           }
           window.onCCXCallback(cbId, {
             ok: true,
-            currentVersionCode: 18,
-            currentVersionName: '3.5.0',
-            latestVersionCode: 18,
-            latestVersionName: '3.5.0',
+            currentVersionCode: 19,
+            currentVersionName: '3.5.1',
+            latestVersionCode: 19,
+            latestVersionName: '3.5.1',
             hasUpdate: false,
             changelog: changelog
           });
@@ -3085,7 +3085,7 @@
     if (elMovie) elMovie.textContent = vCount;
   }
 
-  let hardwareDeviceInfo = { isTablet: false, smallestScreenWidthDp: 390, versionCode: 18, versionName: '3.5.0' };
+  let hardwareDeviceInfo = { isTablet: false, smallestScreenWidthDp: 390, versionCode: 19, versionName: '3.5.1' };
   let isEcoCoolMode = false;
 
   function applyEcoCoolState(enabled) {
