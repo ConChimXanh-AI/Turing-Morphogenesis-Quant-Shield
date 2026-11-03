@@ -1995,18 +1995,19 @@
   </div>
 </div>
 
-<script src="catalog_data.js"></script>
-<script src="folder_tree.js"></script>
+<script src="catalog_data.js?v=3.6.2"></script>
+<script src="folder_tree.js?v=3.6.2"></script>
 <script src="pdf.min.js"></script>
 <script>
   if (window.pdfjsLib) {
-    pdfjsLib.GlobalWorkerOptions.workerSrc = 'pdf.worker.min.js';
+    pdfjsLib.GlobalWorkerOptions.workerSrc = window._isNativeAndroidBridge ? 'pdf.worker.min.js' : 'pdf.worker.min.js?v=3.6.2';
   }
 
   // ============================================================================
   // Instant 0ms Local Folder Tree Resolver (Zero-Quota for all 1,878+ folders!)
   // ============================================================================
   window._ccxFileSizeCache = {};
+  window._ccxRangeRamCache = {};
   window._ccxResolveLocalFolderTree = function(inputUrlOrId) {
     try {
       const tree = window.CCX_FOLDER_TREE;
@@ -2205,16 +2206,23 @@
     }
 
     window._ccxFetchDriveByteRange = async function(fileId, startByte, endByte) {
+      const cacheKey = `${fileId}:${startByte}:${endByte}`;
+      if (window._ccxRangeRamCache && window._ccxRangeRamCache[cacheKey]) {
+        const hit = window._ccxRangeRamCache[cacheKey];
+        delete window._ccxRangeRamCache[cacheKey];
+        return hit;
+      }
       const token = await getValidWebAccessToken();
       if (!token) return null;
       let effId = _tempCloneMap[fileId] || fileId;
       let clonedTried = false;
+      const rangeStr = (endByte !== null && endByte !== undefined) ? `bytes=${startByte}-${endByte}` : `bytes=${startByte}-`;
       for (let attempt = 0; attempt < 6; attempt++) {
         const u = `https://www.googleapis.com/drive/v3/files/${encodeURIComponent(effId)}?alt=media&acknowledgeAbuse=true&supportsAllDrives=true`;
         const r = await fetch(u, {
           headers: {
             'Authorization': 'Bearer ' + token,
-            'Range': `bytes=${startByte}-${endByte}`
+            'Range': rangeStr
           }
         });
         if (r.status === 200 || r.status === 206) {
@@ -2674,9 +2682,35 @@
 
           // 2. If reading online (!saveOffline), use Instant Zero-RAM HTTP 206 Byte-Range Streaming!
           if (!saveOffline) {
-            if (window.onCCXDownloadProgress) window.onCCXDownloadProgress(35, 0, 0, 'Đang mở luồng đọc nhanh HTTP 206 (0 MB)...');
-            const firstChunk = await window._ccxFetchDriveByteRange(fileId, 0, 65535);
-            const fileSize = window._ccxFileSizeCache[fileId] || 0;
+            if (window.onCCXDownloadProgress) window.onCCXDownloadProgress(40, 0, 0, 'Đang nạp song song Đầu Sách & Mục Lục HTTP 206...');
+            const CHUNK_SZ = 655360;
+            let knownSize = window._ccxFileSizeCache[fileId] || 0;
+            let firstChunk = null;
+            if (knownSize > CHUNK_SZ) {
+              const tailStart = Math.floor((knownSize - 1) / CHUNK_SZ) * CHUNK_SZ;
+              const tailEnd = knownSize - 1;
+              const [hChunk, tChunk] = await Promise.all([
+                window._ccxFetchDriveByteRange(fileId, 0, CHUNK_SZ - 1),
+                window._ccxFetchDriveByteRange(fileId, tailStart, tailEnd)
+              ]);
+              firstChunk = hChunk;
+              if (tChunk) {
+                window._ccxRangeRamCache[`${fileId}:${tailStart}:${tailEnd}`] = tChunk;
+              }
+            } else {
+              firstChunk = await window._ccxFetchDriveByteRange(fileId, 0, CHUNK_SZ - 1);
+              knownSize = window._ccxFileSizeCache[fileId] || (firstChunk ? firstChunk.byteLength : 0);
+              if (knownSize > CHUNK_SZ) {
+                const tailStart = Math.floor((knownSize - 1) / CHUNK_SZ) * CHUNK_SZ;
+                const tailEnd = knownSize - 1;
+                if (window.onCCXDownloadProgress) window.onCCXDownloadProgress(75, 0, 0, 'Đang đồng bộ Mục Lục Trang...');
+                const tChunk = await window._ccxFetchDriveByteRange(fileId, tailStart, tailEnd);
+                if (tChunk) {
+                  window._ccxRangeRamCache[`${fileId}:${tailStart}:${tailEnd}`] = tChunk;
+                }
+              }
+            }
+            const fileSize = window._ccxFileSizeCache[fileId] || knownSize || (firstChunk ? firstChunk.byteLength : 0);
             if (firstChunk && firstChunk.byteLength > 128) {
               if (window.onCCXDownloadProgress) window.onCCXDownloadProgress(100, fileSize, fileSize, 'Sẵn sàng 100%!');
               window.onCCXCallback(cbId, {
@@ -5129,7 +5163,7 @@
           requestDataRange(begin, end) {
             window._ccxFetchDriveByteRange(this.targetDriveId, begin, end - 1)
               .then(chunk => {
-                this.onDataRange(begin, chunk);
+                if (chunk) this.onDataRange(begin, chunk);
               })
               .catch(err => {
                 console.error('Range error:', err);
@@ -5139,6 +5173,7 @@
         const transport = new CcxDriveRangeTransport(rawRes.fileSize, rawRes.initialChunk, rawRes.driveFileId);
         pdfDoc = await pdfjsLib.getDocument({
           range: transport,
+          length: rawRes.fileSize,
           rangeChunkSize: 655360,
           disableAutoFetch: true,
           disableStream: true
