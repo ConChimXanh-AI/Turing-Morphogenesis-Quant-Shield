@@ -3,7 +3,7 @@
 // 1. Offline App Shell caching (index.html, pdf.min.js, pdf.worker.min.js, catalog_data.js, icons)
 // 2. HTTP 206 Byte-Range Proxy for /ccx-stream/video?id=... & /ccx-stream/img?id=... with Google Drive OAuth Bearer header
 
-const CACHE_NAME = 'ccx-hub-pwa-v3.6.3';
+const CACHE_NAME = 'ccx-hub-pwa-v3.6.4';
 const APP_SHELL_ASSETS = [
   './',
   './index.html',
