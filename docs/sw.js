@@ -3,7 +3,7 @@
 // 1. Offline App Shell caching (index.html, pdf.min.js, pdf.worker.min.js, catalog_data.js, icons)
 // 2. HTTP 206 Byte-Range Proxy for /ccx-stream/video?id=... & /ccx-stream/img?id=... with Google Drive OAuth Bearer header
 
-const CACHE_NAME = 'ccx-hub-pwa-v3.2.0';
+const CACHE_NAME = 'ccx-hub-pwa-v3.6.1';
 const APP_SHELL_ASSETS = [
   './',
   './index.html',
@@ -11,6 +11,7 @@ const APP_SHELL_ASSETS = [
   './pdf.min.js',
   './pdf.worker.min.js',
   './catalog_data.js',
+  './folder_tree.js',
   './icon.svg'
 ];
 
@@ -109,10 +110,15 @@ async function handleDriveStreamProxy(request, fileId, isVideo) {
       headers['Range'] = 'bytes=0-';
     }
     const driveUrl = `https://www.googleapis.com/drive/v3/files/${encodeURIComponent(fileId)}?alt=media&supportsAllDrives=true&acknowledgeAbuse=true`;
-    const upstream = await fetch(driveUrl, {
-      method: 'GET',
-      headers: headers
-    });
+    let upstream = null;
+    for (let attempt = 0; attempt < 5; attempt++) {
+      upstream = await fetch(driveUrl, {
+        method: 'GET',
+        headers: headers
+      });
+      if (upstream.status !== 403 && upstream.status !== 429) break;
+      await new Promise((r) => setTimeout(r, 700 * (attempt + 1)));
+    }
 
     const respHeaders = new Headers();
     const copyHeaderNames = ['content-type', 'content-length', 'content-range', 'accept-ranges', 'etag', 'last-modified'];
