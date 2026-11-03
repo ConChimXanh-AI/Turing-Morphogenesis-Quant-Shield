@@ -2233,8 +2233,8 @@
         const minSide = Math.min(window.innerWidth, window.innerHeight);
         const isTab = window._isIpadOS || minSide >= 600;
         return JSON.stringify({
-          versionCode: 19,
-          versionName: '3.5.1',
+          versionCode: 20,
+          versionName: '3.6.0',
           isTablet: isTab,
           smallestScreenWidthDp: minSide,
           platform: window._isIosDevice ? 'ios' : 'web'
@@ -2335,7 +2335,7 @@
       checkAppUpdate: async function(cbId) {
         try {
           const token = await getValidWebAccessToken();
-          let changelog = 'Phiên bản V3.5.0 (Android & iOS/iPadOS Eco-Cool): 1) Động cơ Lật Sách Thật V2.0 (True Paper-Curl 2D Canvas 2 chiều cho Sách 1 Trang & Mở 2 Trang Đôi); 2) Tối ưu Chống Nóng Máy Đặc Trị Cho iPhone/iPad (Smart-DPR Retina + Giải phóng GPU Texture tức thì + Tắt làm mờ nền ngầm giảm 70% nhiệt lượng); 3) Kết nối Kho Truyện Chữ + Bảng Tinh Chỉnh Lật Sách & 3 Màu Giấy!';
+          let changelog = 'Phiên bản V3.6.0 Supreme (Build #20 — Nhảy thẳng từ mọi bản cũ lên bản mới nhất & tự xóa file APK thừa): 1) Hiệu ứng Lật Quyển Sách 3D Thông Minh (Điện thoại dọc: Sách 1 Trang có gáy da & xấp giấy; Tablet/iPad ngang: Tự mở Sách Đôi 2 Trang + lật giấy cong 2 chiều); 2) Bảng Tinh Chỉnh Lật Sách & 3 Màu Giấy (Kem Hoàng Gia, Giấy Cổ Sepia, Giấy Tối Đọc Đêm); 3) Mở Kho Truyện Chữ / Tiểu Thuyết / Light Novel mới; 4) Ra mắt bản iOS/iPadOS Eco-Cool chống nóng máy cho iPhone & iPad!';
           if (token) {
             const q = `'${CCX_OAUTH.otaRoot}' in parents and name = 'ccx_app_version.json' and trashed = false`;
             const u = `https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(q)}&fields=files(id,name)&pageSize=1&supportsAllDrives=true&includeItemsFromAllDrives=true`;
@@ -2355,10 +2355,10 @@
           }
           window.onCCXCallback(cbId, {
             ok: true,
-            currentVersionCode: 19,
-            currentVersionName: '3.5.1',
-            latestVersionCode: 19,
-            latestVersionName: '3.5.1',
+            currentVersionCode: 20,
+            currentVersionName: '3.6.0',
+            latestVersionCode: 20,
+            latestVersionName: '3.6.0',
             hasUpdate: false,
             changelog: changelog
           });
@@ -3085,7 +3085,7 @@
     if (elMovie) elMovie.textContent = vCount;
   }
 
-  let hardwareDeviceInfo = { isTablet: false, smallestScreenWidthDp: 390, versionCode: 19, versionName: '3.5.1' };
+  let hardwareDeviceInfo = { isTablet: false, smallestScreenWidthDp: 390, versionCode: 20, versionName: '3.6.0' };
   let isEcoCoolMode = false;
 
   function applyEcoCoolState(enabled) {
