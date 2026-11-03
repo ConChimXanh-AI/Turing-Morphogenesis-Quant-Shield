@@ -2675,8 +2675,8 @@
           // 1. Check IndexedDB Offline Storage first
           const existing = await getOfflineBlobRecord(fileId);
           if (existing && existing.blob && existing.blob.size > 1024) {
-            if (window.onCCXDownloadProgress) window.onCCXDownloadProgress(100, existing.blob.size, existing.blob.size, 'Đang mở tức thì từ Bộ Nhớ Máy (0ms)...');
-            const blobUrl = URL.createObjectURL(existing.blob);
+            if (window.onCCXDownloadProgress) window.onCCXDownloadProgress(100, existing.blob.size, existing.blob.size, 'Đã có sẵn trong Bộ Nhớ Máy (0ms)...');
+            const blobUrl = saveOffline ? '' : URL.createObjectURL(existing.blob);
             window.onCCXCallback(cbId, {
               ok: true,
               path: 'idb://' + fileId,
@@ -2808,18 +2808,8 @@
             blob: blob
           });
 
-          const blobUrl = URL.createObjectURL(blob);
-          // Also trigger browser file save into iOS "Tệp (Files)" if explicitly saving offline
-          if (saveOffline) {
-            try {
-              const a = document.createElement('a');
-              a.href = blobUrl;
-              a.download = fileName || (fileId + (isVid ? '.mp4' : '.pdf'));
-              document.body.appendChild(a);
-              a.click();
-              setTimeout(() => a.remove(), 1200);
-            } catch (e) {}
-          }
+          // Do NOT call a.click() on blobUrl on iOS/WebClip, because iOS WebKit hijacks <a download> on PDF blobs and navigates away from the app into the raw PDF previewer, aborting batch downloads!
+          const blobUrl = saveOffline ? '' : URL.createObjectURL(blob);
 
           if (window.onCCXDownloadProgress) window.onCCXDownloadProgress(100, blob.size, blob.size, 'Hoàn tất 100%!');
           window.onCCXCallback(cbId, {
@@ -3934,7 +3924,7 @@
 
   async function downloadSingleItemOffline(fileId, fileName) {
     const loader = document.getElementById('loading-dialog');
-    document.getElementById('loader-title').textContent = 'Đang Tải Tập Về Bộ Nhớ Máy...';
+    document.getElementById('loader-title').textContent = '📥 Đang Tải Tập Về Bộ Nhớ Máy...';
     document.getElementById('loader-stage').textContent = fileName;
     document.getElementById('loader-bar').style.width = '5%';
     document.getElementById('loader-pct').textContent = '0%';
@@ -3944,14 +3934,15 @@
     loader.classList.add('hidden');
 
     if (!res || !res.ok) {
-      if (res && res.error && res.error.includes('Đã hủy')) return;
+      if (res && (res.cancelled || (res.error && res.error.includes('Đã hủy')))) return;
       alert((res && res.error) || 'Không thể tải tập này!');
       return;
     }
     if (!document.getElementById('folder-modal').classList.contains('hidden')) {
-      loadCurrentFolderStack();
+      await loadCurrentFolderStack();
     }
     renderOfflineAndContinueTab();
+    showAppToast(`✅ Đã lưu "${fileName}" vào Tủ Offline trong máy!`);
   }
 
   async function downloadEntireCurrentFolder() {
@@ -3963,17 +3954,28 @@
     const loader = document.getElementById('loading-dialog');
     loader.classList.remove('hidden');
     let okCount = 0;
+    let userCancelled = false;
     for (let i = 0; i < allItems.length; i++) {
       const it = allItems[i];
-      document.getElementById('loader-title').textContent = `📥 Đang Tải Cả Bộ (${i + 1}/${allItems.length})...`;
+      document.getElementById('loader-title').textContent = `📥 Đang Tải Trọn Bộ (${i + 1}/${allItems.length})...`;
       document.getElementById('loader-stage').textContent = it.name;
       document.getElementById('loader-bar').style.width = '5%';
       document.getElementById('loader-pct').textContent = '0%';
-      const res = await callBridgeAsync('preparePdfStream', [it.id, it.name, currentSeriesName || it.name, true]);
+
+      let res = null;
+      for (let retry = 0; retry < 3; retry++) {
+        res = await callBridgeAsync('preparePdfStream', [it.id, it.name, currentSeriesName || it.name, true]);
+        if (res && res.ok) break;
+        if (res && (res.cancelled || (res.error && res.error.includes('Đã hủy')))) {
+          userCancelled = true;
+          break;
+        }
+        await new Promise(r => setTimeout(r, 900 * (retry + 1)));
+      }
+      if (userCancelled) break;
       if (res && res.ok) {
         okCount++;
-      } else if (res && res.error && res.error.includes('Đã hủy')) {
-        break;
+        it.isOffline = true;
       }
     }
     loader.classList.add('hidden');
@@ -3981,7 +3983,11 @@
       await loadCurrentFolderStack();
     }
     renderOfflineAndContinueTab();
-    alert(`✅ Đã tải thành công ${okCount}/${allItems.length} tập của bộ "${currentSeriesName}"!\n\nToàn bộ file đã nằm trong Tủ Offline của App VÀ thư mục Download/ConChimXanh/${currentSeriesName}/ trong máy của mày!`);
+    if (userCancelled) {
+      showAppToast(`⏹️ Đã dừng tải (Đã lưu ${okCount}/${allItems.length} tập vào máy)`);
+    } else {
+      showAppToast(`✅ Hoàn tất tải trọn bộ ${okCount}/${allItems.length} tập của "${currentSeriesName}"!`, 3800);
+    }
   }
 
   // Global Animated Cyber Toast
@@ -6698,7 +6704,9 @@
 
   async function saveCurrentVolumeOffline() {
     if (!currentReadingFile) return;
-    await startReadingPdf(currentReadingFile.id, currentReadingFile.name, true);
+    await downloadSingleItemOffline(currentReadingFile.id, currentReadingFile.name);
+    const saveBtn = document.getElementById('btn-save-in-reader');
+    if (saveBtn) saveBtn.textContent = '✓ Đã Lưu Máy';
   }
 
   function closeReader() {
