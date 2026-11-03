@@ -1,0 +1,19 @@
+{
+  "name": "Con Chim Xanh Hub — Kho Truyện & Anime 120Hz",
+  "short_name": "Con Chim Xanh",
+  "description": "Siêu ứng dụng Đọc Truyện Tranh (3D Book Flip / Webtoon 120Hz) & Xem Anime / Phim Điện Ảnh Vượt Limit Google Drive cho iOS, iPadOS & Android.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#05070B",
+  "theme_color": "#090D16",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
