@@ -1,9 +1,9 @@
-// Con Chim Xanh Hub V3.2.0 — iOS / iPadOS Standalone PWA Service Worker
+// Con Chim Xanh Hub V3.7.0 — iOS / iPadOS Standalone PWA Service Worker
 // Provides:
 // 1. Offline App Shell caching (index.html, pdf.min.js, pdf.worker.min.js, catalog_data.js, icons)
 // 2. HTTP 206 Byte-Range Proxy for /ccx-stream/video?id=... & /ccx-stream/img?id=... with Google Drive OAuth Bearer header
 
-const CACHE_NAME = 'ccx-hub-pwa-v3.6.6';
+const CACHE_NAME = 'ccx-hub-pwa-v3.6.8';
 const APP_SHELL_ASSETS = [
   './',
   './index.html',
@@ -69,6 +69,13 @@ self.addEventListener('activate', (event) => {
   );
 });
 
+self.addEventListener('message', (event) => {
+  if (event && event.data && event.data.type === 'CCX_SET_TOKEN' && event.data.token) {
+    swAccessToken = event.data.token;
+    swTokenExpireAt = Date.now() + 3000 * 1000;
+  }
+});
+
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
 
@@ -83,8 +90,9 @@ self.addEventListener('fetch', (event) => {
 
   // Network-first for HTML/Catalog so updates show immediately, fallback to cache when offline
   if (url.origin === self.location.origin) {
+    const isDynamicAsset = /\/($|index\.html|catalog_data\.js|folder_tree\.js|ccx_catalog\.json)/i.test(url.pathname);
     event.respondWith(
-      fetch(event.request)
+      fetch(event.request, isDynamicAsset ? { cache: 'no-cache' } : undefined)
         .then((netResp) => {
           if (netResp && netResp.status === 200 && event.request.method === 'GET') {
             const clone = netResp.clone();
@@ -92,7 +100,7 @@ self.addEventListener('fetch', (event) => {
           }
           return netResp;
         })
-        .catch(() => caches.match(event.request))
+        .catch(() => caches.match(event.request, { ignoreSearch: true }))
     );
   }
 });
