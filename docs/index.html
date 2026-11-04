@@ -725,27 +725,47 @@
     box-shadow: 0 0 12px rgba(56, 189, 248, 0.32);
   }
 
-  /* iOS / iPhone Eco-Cool Thermal Protection Mode (Zero-Heat WebKit GPU Optimization) */
+  /* iOS / iPadOS M-Series Eco-Cool Thermal Protection Mode (Zero-Heat 10Hz Idle WebKit GPU Optimization) */
   body.ios-cool-mode *,
   body.ios-cool-mode *::before,
-  body.ios-cool-mode *::after {
+  body.ios-cool-mode *::after,
+  body.ios-device .brand-logo,
+  body.ios-device .hero-box,
+  body.ios-device .donate-gold-card {
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
+    animation: none !important;
+  }
+  body.ios-cool-mode .brand-logo,
+  body.ios-cool-mode .hero-box,
+  body.ios-cool-mode .donate-gold-card,
+  body.ios-cool-mode .view-container,
+  body.ios-cool-mode .manga-card,
+  body.ios-cool-mode .file-item {
+    animation: none !important;
+    transition: none !important;
+    box-shadow: none !important;
+  }
+  body.ios-cool-mode .card-glow {
+    display: none !important;
   }
   body.ios-cool-mode .reader-topbar,
   body.ios-cool-mode .reader-bottombar,
   body.ios-cool-mode #book-physics-popover,
   body.ios-cool-mode .modal-header,
   body.ios-cool-mode .bottom-nav {
-    background: rgba(8, 12, 22, 0.97) !important;
+    background: rgba(8, 12, 22, 0.98) !important;
   }
-  body.ios-cool-mode .manga-card {
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.65) !important;
+  body.ios-cool-mode .manga-card,
+  body.ios-cool-mode .file-item {
     contain: content;
+    content-visibility: auto;
+    contain-intrinsic-size: 0 116px;
   }
   body.reader-or-video-active #main-scroll,
   body.reader-or-video-active .app-header,
   body.reader-or-video-active .bottom-nav {
+    display: none !important;
     visibility: hidden !important;
     pointer-events: none !important;
   }
@@ -3442,11 +3462,21 @@
   }
 
   async function syncCloudCatalogSilent() {
+    // On iOS/iPadOS Eco-Cool mode: if catalog_data.js already loaded >500 items, skip redundant 2MB fetch & double DOM rebuild on startup!
+    if ((isEcoCoolMode || window._isIosDevice) && catalogItems && catalogItems.length > 500) {
+      return;
+    }
+    const prevCount = catalogItems ? catalogItems.length : 0;
+    const prevFirstId = (catalogItems && catalogItems[0]) ? (catalogItems[0].id || catalogItems[0].name) : '';
     const res = await callBridgeAsync('syncLiveCloudCatalog', []);
     if (res && res.ok && Array.isArray(res.items) && res.items.length > 0) {
+      const nextFirstId = (res.items[0]) ? (res.items[0].id || res.items[0].name) : '';
+      if (res.items.length === prevCount && nextFirstId === prevFirstId) {
+        return; // Zero changes -> skip 9,500-node DOM rebuild & localStorage write!
+      }
       catalogItems = res.items;
       updateCategoryCounts();
-      localStorage.setItem('ccx_live_catalog_v1', JSON.stringify(catalogItems));
+      try { localStorage.setItem('ccx_live_catalog_v1', JSON.stringify(catalogItems)); } catch (e) {}
       const curVerStr = hardwareDeviceInfo.versionName || '3.2.0';
       document.getElementById('header-status').textContent = `${getDeviceTypeLabel()} • V${curVerStr} (${catalogItems.length} bộ)`;
       renderLibraryGrid();
@@ -3704,16 +3734,53 @@
       return;
     }
 
-    grid.innerHTML = filtered.map((it, i) => {
+    window._ccxFilteredGridList = filtered;
+    window._ccxRenderedGridCount = 0;
+    window._ccxGridMetaCtx = { readingSeriesSet, offlineSeriesCountMap, favSet };
+    grid.innerHTML = '';
+    appendMoreLibraryGridCards(window._isIosDevice || isEcoCoolMode ? 48 : 80);
+
+    const mainScroll = document.getElementById('main-scroll');
+    if (mainScroll && !mainScroll._ccxGridScrollBound) {
+      mainScroll._ccxGridScrollBound = true;
+      let scrollRaf = false;
+      mainScroll.addEventListener('scroll', () => {
+        if (scrollRaf || currentTab !== 'library') return;
+        scrollRaf = true;
+        requestAnimationFrame(() => {
+          scrollRaf = false;
+          if (!window._ccxFilteredGridList || window._ccxRenderedGridCount >= window._ccxFilteredGridList.length) return;
+          const remain = mainScroll.scrollHeight - (mainScroll.scrollTop + mainScroll.clientHeight);
+          if (remain < 950) {
+            appendMoreLibraryGridCards(48);
+          }
+        });
+      }, { passive: true });
+    }
+  }
+
+  function appendMoreLibraryGridCards(batchSize) {
+    const grid = document.getElementById('series-grid');
+    const list = window._ccxFilteredGridList || [];
+    const startIdx = window._ccxRenderedGridCount || 0;
+    if (!grid || startIdx >= list.length) return;
+    const endIdx = Math.min(list.length, startIdx + (batchSize || 48));
+    const ctx = window._ccxGridMetaCtx || { readingSeriesSet: new Set(), offlineSeriesCountMap: {}, favSet: new Set() };
+    const isCool = isEcoCoolMode || !!window._isIosDevice;
+
+    const oldMoreBtn = document.getElementById('ccx-grid-load-more-row');
+    if (oldMoreBtn) oldMoreBtn.remove();
+
+    const sliceHtml = list.slice(startIdx, endIdx).map((it, idx) => {
+      const i = startIdx + idx;
       const t = it._type || inferItemType(it);
-      const isReading = readingSeriesSet.has(it.name);
-      const offCnt = offlineSeriesCountMap[it.name] || 0;
-      const isFav = favSet.has(it.name);
+      const isReading = ctx.readingSeriesSet.has(it.name);
+      const offCnt = ctx.offlineSeriesCountMap[it.name] || 0;
+      const isFav = ctx.favSet.has(it.name);
       const isNewSeries = !!it._isNewFlag;
       const safeName = escapeHtml(it.name);
       const jsName = safeName.replace(/'/g, "\\'");
       const safeId = escapeHtml(it.id || it.url);
-      const delayMs = Math.min(i * 14, 200);
       let badgeLabel = '📚 TRUYỆN TRANH';
       let badgeClass = '';
       if (t === 'novel') {
@@ -3733,13 +3800,13 @@
         ? `<span style="color:#34D399; font-weight:800;">✅ Đã tải ${offCnt} tập trong máy</span>`
         : (it.filesText ? escapeHtml(it.filesText) : '📥 Tải cả bộ');
       return `
-        <div class="manga-card" style="animation-delay:${delayMs}ms; ${offCnt > 0 ? 'border-color:rgba(16,185,129,0.55);' : ''}" onclick="openSeriesRoot('${safeId}', '${jsName}')">
-          <div class="card-glow"></div>
+        <div class="manga-card" style="${offCnt > 0 ? 'border-color:rgba(16,185,129,0.55);' : ''}" onclick="openSeriesRoot('${safeId}', '${jsName}')">
+          ${isCool ? '' : '<div class="card-glow"></div>'}
           <div>
             <div class="card-badge-row">
               <div style="display:flex; align-items:center; gap:5px; flex-wrap:wrap;">
                 <span class="badge-tag ${badgeClass}">${badgeLabel}</span>
-                ${isNewSeries ? `<span style="font-size:9.5px; background:linear-gradient(90deg,#EC4899,#8B5CF6); color:#fff; padding:2px 6px; border-radius:5px; font-weight:800; box-shadow:0 0 8px rgba(236,72,153,0.45);">✨ MỚI</span>` : ''}
+                ${isNewSeries ? `<span style="font-size:9.5px; background:linear-gradient(90deg,#EC4899,#8B5CF6); color:#fff; padding:2px 6px; border-radius:5px; font-weight:800;">✨ MỚI</span>` : ''}
               </div>
               <div style="display:flex; align-items:center; gap:6px;">
                 ${offCnt > 0 ? `<span style="font-size:10.5px; color:#34D399; font-weight:800;">📥 Đã tải (${offCnt})</span>` : (isReading ? '<span style="font-size:10.5px; color:var(--amber-neon); font-weight:800;">🔥 Đang xem</span>' : '')}
@@ -3755,6 +3822,17 @@
         </div>
       `;
     }).join('');
+
+    grid.insertAdjacentHTML('beforeend', sliceHtml);
+    window._ccxRenderedGridCount = endIdx;
+
+    if (endIdx < list.length) {
+      grid.insertAdjacentHTML('beforeend', `
+        <div id="ccx-grid-load-more-row" style="grid-column:1/-1; text-align:center; padding:14px;">
+          <button class="btn-cyber" style="max-width:320px; margin:0 auto;" onclick="appendMoreLibraryGridCards(96)">👇 Hiển thị thêm (${endIdx} / ${list.length} bộ)</button>
+        </div>
+      `);
+    }
   }
 
   async function syncCloudCatalogNow() {
@@ -5524,15 +5602,22 @@
   function applyBookPaperThemeAndThickness() {
     const root = document.documentElement;
     const t = bookPhysConfig.paperTheme || 'royal_cream';
+    const isCool = isEcoCoolMode || !!window._isIosDevice;
     if (t === 'vintage_sepia') {
       root.style.setProperty('--ccx-paper-bg', '#f3e5c8');
-      root.style.setProperty('--ccx-paper-filter', 'sepia(0.32) contrast(0.96) brightness(0.96)');
+      root.style.setProperty('--ccx-paper-filter', isCool ? 'none' : 'sepia(0.32) contrast(0.96) brightness(0.96)');
     } else if (t === 'night_dark') {
       root.style.setProperty('--ccx-paper-bg', '#171b24');
-      root.style.setProperty('--ccx-paper-filter', 'invert(0.89) hue-rotate(180deg) contrast(0.92)');
+      root.style.setProperty('--ccx-paper-filter', isCool ? 'none' : 'invert(0.89) hue-rotate(180deg) contrast(0.92)');
     } else {
       root.style.setProperty('--ccx-paper-bg', '#fdfaf3');
       root.style.setProperty('--ccx-paper-filter', 'none');
+    }
+
+    if (isCool) {
+      root.style.setProperty('--ccx-book-edge-shadow', '3px 2px 0 #cfc3ab, 6px 4px 0 #2b231b');
+      root.style.setProperty('--ccx-book-spread-shadow', '-4px 2px 0 #cfc3ab, 4px 2px 0 #cfc3ab');
+      return;
     }
 
     const lv = bookPhysConfig.thicknessLevel || 2;
@@ -5961,10 +6046,12 @@
     const canvas = document.createElement('canvas');
     canvas.width = Math.round(bookW * dpr);
     canvas.height = Math.round(bookH * dpr);
-    if (bookPhysConfig.paperTheme === 'vintage_sepia') {
-      canvas.style.filter = 'sepia(0.32) contrast(0.96) brightness(0.96)';
-    } else if (bookPhysConfig.paperTheme === 'night_dark') {
-      canvas.style.filter = 'invert(0.89) hue-rotate(180deg) contrast(0.92)';
+    if (!isCool) {
+      if (bookPhysConfig.paperTheme === 'vintage_sepia') {
+        canvas.style.filter = 'sepia(0.32) contrast(0.96) brightness(0.96)';
+      } else if (bookPhysConfig.paperTheme === 'night_dark') {
+        canvas.style.filter = 'invert(0.89) hue-rotate(180deg) contrast(0.92)';
+      }
     }
     stage.appendChild(canvas);
     frame.appendChild(stage);
@@ -6629,7 +6716,7 @@
       const baseVp = page.getViewport({ scale: 1.0 });
       const isCool = isEcoCoolMode || !!window._isIosDevice;
       let dpr = isCool
-        ? Math.min(window.devicePixelRatio || 1.5, 1.50)
+        ? (window._isIpadOS ? 1.15 : Math.min(window.devicePixelRatio || 1.35, 1.35))
         : Math.min(window.devicePixelRatio || 2.0, 2.25);
       let displayW = getTargetPageRenderWidth();
       if (isSpreadHalf) {
