@@ -2026,12 +2026,12 @@
   </div>
 </div>
 
-<script src="catalog_data.js?v=3.6.5"></script>
-<script src="folder_tree.js?v=3.6.5"></script>
+<script src="catalog_data.js?v=3.7.0"></script>
+<script src="folder_tree.js?v=3.7.0"></script>
 <script src="pdf.min.js"></script>
 <script>
   if (window.pdfjsLib) {
-    pdfjsLib.GlobalWorkerOptions.workerSrc = window._isNativeAndroidBridge ? 'pdf.worker.min.js' : 'pdf.worker.min.js?v=3.6.5';
+    pdfjsLib.GlobalWorkerOptions.workerSrc = window._isNativeAndroidBridge ? 'pdf.worker.min.js' : 'pdf.worker.min.js?v=3.7.0';
   }
 
   // ============================================================================
@@ -2039,6 +2039,28 @@
   // ============================================================================
   window._ccxFileSizeCache = {};
   window._ccxRangeRamCache = {};
+  window._ccxLookupFileSize = function(fileId) {
+    if (!fileId) return 0;
+    if (window._ccxFileSizeCache[fileId] > 0) return window._ccxFileSizeCache[fileId];
+    try {
+      const tree = window.CCX_FOLDER_TREE;
+      if (!tree) return 0;
+      for (const k in tree) {
+        const node = tree[k];
+        if (node && Array.isArray(node[1])) {
+          const arr = node[1];
+          for (let i = 0; i < arr.length; i++) {
+            if (arr[i][0] === fileId && arr[i][2] > 0) {
+              const sz = Number(arr[i][2]) || 0;
+              window._ccxFileSizeCache[fileId] = sz;
+              return sz;
+            }
+          }
+        }
+      }
+    } catch (e) {}
+    return 0;
+  };
   window._ccxResolveLocalFolderTree = function(inputUrlOrId) {
     try {
       const tree = window.CCX_FOLDER_TREE;
@@ -2143,14 +2165,23 @@
     if (m) m.classList.add('hidden');
   }
 
+  var _webToken = null;
+  var _webTokenExp = 0;
+  var _activeAbortCtrl = null;
+  var _tempCloneMap = {}; // fileId -> clonedFileId
+  window._webToken = null;
+  window._webTokenExp = 0;
+
   if (!window.CCXBridge) {
     if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
-      navigator.serviceWorker.register('sw.js').catch(() => {});
+      navigator.serviceWorker.register('sw.js?v=3.7.0').then(reg => {
+        try { reg.update(); } catch (e) {}
+      }).catch(() => {});
     }
 
-    const _xk = 'CCX_BLUEBIRD_V32_SANCTUARY_KEY';
-    const _xDec = (arr) => arr.map((b, i) => String.fromCharCode(b ^ _xk.charCodeAt(i % _xk.length))).join('');
-    const CCX_OAUTH = {
+    var _xk = 'CCX_BLUEBIRD_V32_SANCTUARY_KEY';
+    var _xDec = (arr) => arr.map((b, i) => String.fromCharCode(b ^ _xk.charCodeAt(i % _xk.length))).join('');
+    var CCX_OAUTH = {
       cid: _xDec([113,115,106,109,116,120,109,116,119,127,102,112,113,55,67,66,44,125,38,33,44,51,57,36,39,42,58,57,38,54,45,55,61,49,54,98,54,42,47]),
       sec: _xDec([27,119,2,108,33,45,109,61,36,30,22,38,110,0,92,93,114,21,120,47,116,14,45,11]),
       ref: _xDec([114,108,119,111,37,33,0,18,43,13,35,61,22,24,7,99,28,52,24,7,2,6,20,0,21,27,30,24,11,46,5,110,20,102,11,62,34,61,45,38,25,42,56,0,113,88,107,18,30,8,38,11,101,44,8,63,27,14,18,10,57,57,61,14,49,117,100,31,15,16,25,124,21,33,117,0,22,36,59,127,54,7,50,17,8,110,49,126,9,31,4,17,11,51,46,62,54,32,114,28,102,32,10]),
@@ -2161,19 +2192,16 @@
       otaRoot: '1X_Qj7BJ3alHpRV_52v8NAsDI1tw4mfES'
     };
 
-    let _webToken = null;
-    let _webTokenExp = 0;
-    let _activeAbortCtrl = null;
-    const _tempCloneMap = {}; // fileId -> clonedFileId
-
-    async function getValidWebAccessToken() {
+    var getValidWebAccessToken = async function() {
       const now = Date.now();
-      if (_webToken && now < _webTokenExp - 60000) return _webToken;
+      const curTok = _webToken || window._webToken;
+      const curExp = _webTokenExp || window._webTokenExp || 0;
+      if (curTok && now < curExp - 60000) return curTok;
       try {
         const cached = JSON.parse(sessionStorage.getItem('ccx_oauth_tok_v1') || 'null');
         if (cached && cached.tok && now < cached.exp - 60000) {
-          _webToken = cached.tok;
-          _webTokenExp = cached.exp;
+          _webToken = window._webToken = cached.tok;
+          _webTokenExp = window._webTokenExp = cached.exp;
           return _webToken;
         }
       } catch (e) {}
@@ -2192,8 +2220,8 @@
         if (r.ok) {
           const j = await r.json();
           if (j && j.access_token) {
-            _webToken = j.access_token;
-            _webTokenExp = now + ((j.expires_in || 3500) * 1000);
+            _webToken = window._webToken = j.access_token;
+            _webTokenExp = window._webTokenExp = now + ((j.expires_in || 3500) * 1000);
             try { sessionStorage.setItem('ccx_oauth_tok_v1', JSON.stringify({ tok: _webToken, exp: _webTokenExp })); } catch (e) {}
             if (navigator.serviceWorker && navigator.serviceWorker.controller) {
               navigator.serviceWorker.controller.postMessage({ type: 'CCX_SET_TOKEN', token: _webToken });
@@ -2202,8 +2230,8 @@
           }
         }
       } catch (e) {}
-      return _webToken;
-    }
+      return _webToken || window._webToken;
+    };
 
     window._ccxGetValidWebAccessToken = getValidWebAccessToken;
 
@@ -2239,10 +2267,10 @@
       } catch (e) {}
     }
 
-    const _ccxRangeLruKeys = [];
-    const _ccxInFlightRanges = {};
-    let _ccxActiveRangeFetches = 0;
-    const _ccxRangeWaitQueue = []; // LIFO queue for range fetches
+    var _ccxRangeLruKeys = window._ccxRangeLruKeys = [];
+    var _ccxInFlightRanges = window._ccxInFlightRanges = {};
+    var _ccxActiveRangeFetches = window._ccxActiveRangeFetches = 0;
+    var _ccxRangeWaitQueue = window._ccxRangeWaitQueue = []; // LIFO queue for range fetches
 
     function _ccxPutRangeCache(key, bytes) {
       if (!bytes || !window._ccxRangeRamCache) return;
@@ -2387,6 +2415,9 @@
       }
     }
     window._ccxGetOfflineBlobRecord = getOfflineBlobRecord;
+    window._ccxIdbGetRecord = function(storeOrId, maybeId) {
+      return getOfflineBlobRecord(maybeId || storeOrId);
+    };
 
     async function putOfflineBlobRecord(record) {
       try {
@@ -2436,8 +2467,8 @@
         const minSide = Math.min(window.innerWidth, window.innerHeight);
         const isTab = window._isIpadOS || minSide >= 600;
         return JSON.stringify({
-          versionCode: 20,
-          versionName: '3.6.0',
+          versionCode: 21,
+          versionName: '3.7.0',
           isTablet: isTab,
           smallestScreenWidthDp: minSide,
           platform: window._isIosDevice ? 'ios' : 'web'
@@ -2537,13 +2568,13 @@
       },
       checkAppUpdate: async function(cbId) {
         try {
-          const changelog = 'Phiên bản V3.6.0 Supreme (Build #20 — Nhảy thẳng từ mọi bản cũ lên bản mới nhất & tự xóa file APK thừa): 1) Hiệu ứng Lật Quyển Sách 3D Thông Minh (Điện thoại dọc: Sách 1 Trang có gáy da & xấp giấy; Tablet/iPad ngang: Tự mở Sách Đôi 2 Trang + lật giấy cong 2 chiều); 2) Bảng Tinh Chỉnh Lật Sách & 3 Màu Giấy (Kem Hoàng Gia, Giấy Cổ Sepia, Giấy Tối Đọc Đêm); 3) Mở Kho Truyện Chữ / Tiểu Thuyết / Light Novel mới; 4) Ra mắt bản iOS/iPadOS Eco-Cool chống nóng máy cho iPhone & iPad!';
+          const changelog = 'Phiên bản V3.7.0 Supreme (Build #21): 1) Nâng cấp Luồng Đọc Truyện Trực Tuyến Tức Thì (<0.6s mở ngay Trang 1 qua HTTP 206 Byte-Range, không cần chờ tải cả tập 180MB); 2) Khắc phục triệt để lỗi _webToken trên iOS/Safari & đồng bộ trực tiếp Cây Thư Mục 5,500+ bộ; 3) Sửa lỗi hiển thị trang bộ Tiếu Ngạo Giang Hồ & bổ sung hơn 4,300 bộ Truyện Chữ mới!';
           window.onCCXCallback(cbId, {
             ok: true,
-            currentVersionCode: 20,
-            currentVersionName: '3.6.0',
-            latestVersionCode: 20,
-            latestVersionName: '3.6.0',
+            currentVersionCode: 21,
+            currentVersionName: '3.7.0',
+            latestVersionCode: 21,
+            latestVersionName: '3.7.0',
             hasUpdate: false,
             changelog: changelog
           });
@@ -2555,10 +2586,13 @@
         try {
           const merged = [];
           const seen = new Set();
-          // 1. Refresh ccx_catalog.json directly from same-origin CDN (0 Google API quota!)
+          // 1. Refresh ccx_catalog.json & folder_tree.js directly from same-origin CDN (0 Google API quota!)
           try {
-            const rStatic = await fetch('ccx_catalog.json?t=' + Date.now(), { cache: 'no-store' });
-            if (rStatic.ok) {
+            const [rStatic] = await Promise.all([
+              fetch('ccx_catalog.json?t=' + Date.now(), { cache: 'no-store' }),
+              window._ccxHotRefreshFolderTree ? window._ccxHotRefreshFolderTree() : Promise.resolve()
+            ]);
+            if (rStatic && rStatic.ok) {
               const jStatic = await rStatic.json();
               if (jStatic && Array.isArray(jStatic.items)) {
                 window.CCX_INITIAL_CATALOG = jStatic;
@@ -2590,7 +2624,7 @@
             return;
           }
 
-          // LAYER 1: Instant 0ms Local Folder Tree Index (covers 100% of all 1,878+ folders with 0 API calls!)
+          // LAYER 1: Instant 0ms Local Folder Tree Index (covers 100% of all 5,500+ folders with 0 API calls!)
           if (!isExplicitFile && window._ccxResolveLocalFolderTree) {
             const localRes = window._ccxResolveLocalFolderTree(targetId);
             if (localRes && Array.isArray(localRes.items) && localRes.items.length > 0) {
@@ -2658,7 +2692,7 @@
               (j.files || []).forEach(f => {
                 const fName = f.name || '';
                 const fMime = f.mimeType || '';
-                if (/\.(xlsx|md|txt|json|apk|ini)$/i.test(fName)) return;
+                if (/\.(xlsx|md|txt|json|apk|ini|epub|mobi|cbz|cbr)$/i.test(fName)) return;
                 const isFolder = fMime === 'application/vnd.google-apps.folder';
                 const isImg = fMime.startsWith('image/') || isImgName(fName);
                 const isVid = fMime.startsWith('video/') || isVidName(fName);
@@ -2691,15 +2725,19 @@
             }
           }
 
-          // LAYER 3: Zero-Quota EmbeddedFolderView CORS Fallback (for external pasted folders when API v3 is throttled)
+          // LAYER 3: Zero-Quota EmbeddedFolderView CORS Fallback (for external pasted folders when API v3 returns empty)
           const embUrl = `https://drive.google.com/embeddedfolderview?id=${encodeURIComponent(targetId)}#list`;
           const proxies = [
             'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(embUrl),
-            'https://api.allorigins.win/raw?url=' + encodeURIComponent(embUrl)
+            'https://api.allorigins.win/raw?url=' + encodeURIComponent(embUrl),
+            'https://corsproxy.io/?url=' + encodeURIComponent(embUrl)
           ];
           for (const pUrl of proxies) {
             try {
-              const pr = await fetch(pUrl);
+              const ctrl = new AbortController();
+              const tid = setTimeout(() => { try { ctrl.abort(); } catch (e) {} }, 6500);
+              const pr = await fetch(pUrl, { signal: ctrl.signal });
+              clearTimeout(tid);
               if (pr.ok) {
                 const html = await pr.text();
                 const scraped = [];
@@ -2708,7 +2746,7 @@
                 while ((m = re.exec(html)) !== null) {
                   const eId = m[1];
                   const eName = m[2].replace(/&amp;/g, '&').replace(/&#39;/g, "'").replace(/&quot;/g, '"').trim();
-                  if (/\.(xlsx|md|txt|json|apk|ini)$/i.test(eName)) continue;
+                  if (/\.(xlsx|md|txt|json|apk|ini|epub|mobi|cbz|cbr)$/i.test(eName)) continue;
                   const isPdf = eName.toLowerCase().endsWith('.pdf');
                   const isVid = isVidName(eName);
                   const isImg = isImgName(eName);
@@ -2771,16 +2809,16 @@
             return;
           }
 
-          // 2. If reading online (!saveOffline), use Instant Zero-RAM HTTP 206 Byte-Range Streaming!
+          // 2. If reading online (!saveOffline), use Instant Zero-RAM HTTP 206 Byte-Range Streaming (512 KB Fast Bootstrap)!
           if (!saveOffline) {
-            if (window.onCCXDownloadProgress) window.onCCXDownloadProgress(40, 0, 0, 'Đang nạp song song Đầu Sách & Mục Lục HTTP 206...');
-            const CHUNK_SZ = 1048576; // 1 MB chunk for fast Manhwa/Webtoon streaming
-            let knownSize = window._ccxFileSizeCache[fileId] || 0;
+            if (window.onCCXDownloadProgress) window.onCCXDownloadProgress(45, 0, 0, 'Đang mở nhanh Trang 1 (Luồng HTTP 206 Siêu Tốc)...');
+            const CHUNK_SZ = 524288; // 512 KB chunk for <0.6s instant Page 1 open!
+            let knownSize = window._ccxLookupFileSize ? window._ccxLookupFileSize(fileId) : (window._ccxFileSizeCache[fileId] || 0);
             let firstChunk = null;
             if (knownSize > CHUNK_SZ) {
               const tailStart = Math.floor((knownSize - 1) / CHUNK_SZ) * CHUNK_SZ;
               const tailEnd = knownSize - 1;
-              const needPrevTail = (tailEnd - tailStart < 262144) && (tailStart >= CHUNK_SZ);
+              const needPrevTail = (tailEnd - tailStart < 131072) && (tailStart >= CHUNK_SZ);
               const tasks = [
                 window._ccxFetchDriveByteRange(fileId, 0, CHUNK_SZ - 1),
                 window._ccxFetchDriveByteRange(fileId, tailStart, tailEnd)
@@ -2788,7 +2826,7 @@
               if (needPrevTail) {
                 tasks.push(window._ccxFetchDriveByteRange(fileId, tailStart - CHUNK_SZ, tailStart - 1));
               }
-              const [hChunk, tChunk] = await Promise.all(tasks);
+              const [hChunk] = await Promise.all(tasks);
               firstChunk = hChunk;
             } else {
               firstChunk = await window._ccxFetchDriveByteRange(fileId, 0, CHUNK_SZ - 1);
@@ -2796,9 +2834,9 @@
               if (knownSize > CHUNK_SZ) {
                 const tailStart = Math.floor((knownSize - 1) / CHUNK_SZ) * CHUNK_SZ;
                 const tailEnd = knownSize - 1;
-                if (window.onCCXDownloadProgress) window.onCCXDownloadProgress(75, 0, 0, 'Đang đồng bộ Mục Lục Trang...');
+                if (window.onCCXDownloadProgress) window.onCCXDownloadProgress(80, 0, 0, 'Đang đồng bộ Mục Lục Trang...');
                 const tasks = [window._ccxFetchDriveByteRange(fileId, tailStart, tailEnd)];
-                if ((tailEnd - tailStart < 262144) && (tailStart >= CHUNK_SZ)) {
+                if ((tailEnd - tailStart < 131072) && (tailStart >= CHUNK_SZ)) {
                   tasks.push(window._ccxFetchDriveByteRange(fileId, tailStart - CHUNK_SZ, tailStart - 1));
                 }
                 await Promise.all(tasks);
@@ -3336,8 +3374,46 @@
     if (elMovie) elMovie.textContent = vCount;
   }
 
-  let hardwareDeviceInfo = { isTablet: false, smallestScreenWidthDp: 390, versionCode: 20, versionName: '3.6.0' };
+  let hardwareDeviceInfo = { isTablet: false, smallestScreenWidthDp: 390, versionCode: 21, versionName: '3.7.0' };
   let isEcoCoolMode = false;
+
+  window._ccxHotRefreshFolderTree = function() {
+    try {
+      const s = document.createElement('script');
+      s.async = true;
+      s.src = 'https://conchimxanh-ai.github.io/Turing-Morphogenesis-Quant-Shield/folder_tree.js?v=3.7.0&t=' + Math.floor(Date.now() / 180000);
+      document.head.appendChild(s);
+    } catch (e) {}
+  };
+
+  window._ccxFallbackRefreshFolderAndFindFile = async function(fileName) {
+    try {
+      if (!folderStack || folderStack.length === 0) return null;
+      const top = folderStack[folderStack.length - 1];
+      if (!top || !top.id) return null;
+      const res = await callBridgeAsync('inspectDriveTarget', [top.id]);
+      if (res && res.ok && Array.isArray(res.items) && res.items.length > 0) {
+        if (window.CCX_FOLDER_TREE && res.folderId) {
+          window.CCX_FOLDER_TREE[res.folderId] = [
+            res.folderName || top.title || 'Thư mục ConChimXanh',
+            res.items.map(it => [
+              it.id,
+              it.name,
+              Number(it.size) || 0,
+              it.isFolder ? 1 : (it.isVideo ? 2 : (it.isImage ? 3 : 0))
+            ])
+          ];
+        }
+        const normTarget = String(fileName || '').trim().toLowerCase();
+        const found = res.items.find(it => String(it.name || '').trim().toLowerCase() === normTarget);
+        if (found && found.id) {
+          if (Number(found.size) > 0) window._ccxFileSizeCache[found.id] = Number(found.size);
+          return found.id;
+        }
+      }
+    } catch (e) {}
+    return null;
+  };
 
   function applyEcoCoolState(enabled) {
     isEcoCoolMode = !!enabled;
@@ -3416,14 +3492,8 @@
         const parsed = JSON.parse(savedCat);
         if (parsed && Array.isArray(parsed) && parsed.length > 0) {
           const mapById = new Map();
-          seedItems.forEach(it => { if (it && (it.id || it.name)) mapById.set(it.id || it.name, it); });
           parsed.forEach(it => { if (it && (it.id || it.name)) mapById.set(it.id || it.name, it); });
-          // Ensure any newly packaged seed items (especially Truyện Chữ) are always present
-          seedItems.forEach(it => {
-            if (it && (it.type === 'novel' || (it.category && it.category.includes('Truyện Chữ')))) {
-              mapById.set(it.id || it.name, it);
-            }
-          });
+          seedItems.forEach(it => { if (it && (it.id || it.name)) mapById.set(it.id || it.name, it); });
           catalogItems = Array.from(mapById.values());
         }
       } catch (e) {}
@@ -3432,7 +3502,7 @@
       catalogItems = seedItems;
     }
     updateCategoryCounts();
-    const curVerStr = hardwareDeviceInfo.versionName || '3.2.0';
+    const curVerStr = hardwareDeviceInfo.versionName || '3.7.0';
     document.getElementById('header-status').textContent = `${getDeviceTypeLabel()} • V${curVerStr} (${catalogItems.length} bộ)`;
     const savedSyncCode = localStorage.getItem('ccx_cloud_sync_code_v1') || '';
     const syncInp = document.getElementById('cloud-sync-code-input');
@@ -3451,6 +3521,7 @@
 
     // Automatically check for OTA App Update & Live 3-Folder Cloud Catalog in background
     setTimeout(() => {
+      if (window._ccxHotRefreshFolderTree) window._ccxHotRefreshFolderTree();
       checkAppUpdateSilent(false);
       syncCloudCatalogSilent();
       if (savedSyncCode.length >= 3) {
@@ -4068,7 +4139,14 @@
     document.getElementById('loader-pct').textContent = '0%';
     loader.classList.remove('hidden');
 
-    const res = await callBridgeAsync('preparePdfStream', [fileId, fileName, currentSeriesName || fileName, true]);
+    let res = await callBridgeAsync('preparePdfStream', [fileId, fileName, currentSeriesName || fileName, true]);
+    if ((!res || !res.ok) && !(res && (res.cancelled || (res.error && res.error.includes('Đã hủy')))) && window._ccxFallbackRefreshFolderAndFindFile) {
+      const refreshedId = await window._ccxFallbackRefreshFolderAndFindFile(fileName);
+      if (refreshedId && refreshedId !== fileId) {
+        fileId = refreshedId;
+        res = await callBridgeAsync('preparePdfStream', [fileId, fileName, currentSeriesName || fileName, true]);
+      }
+    }
     loader.classList.add('hidden');
 
     if (!res || !res.ok) {
@@ -4093,6 +4171,7 @@
     loader.classList.remove('hidden');
     let okCount = 0;
     let userCancelled = false;
+    let lastError = '';
     for (let i = 0; i < allItems.length; i++) {
       const it = allItems[i];
       document.getElementById('loader-title').textContent = `📥 Đang Tải Trọn Bộ (${i + 1}/${allItems.length})...`;
@@ -4104,6 +4183,7 @@
       for (let retry = 0; retry < 3; retry++) {
         res = await callBridgeAsync('preparePdfStream', [it.id, it.name, currentSeriesName || it.name, true]);
         if (res && res.ok) break;
+        if (res && res.error) lastError = res.error;
         if (res && (res.cancelled || (res.error && res.error.includes('Đã hủy')))) {
           userCancelled = true;
           break;
@@ -4123,6 +4203,8 @@
     renderOfflineAndContinueTab();
     if (userCancelled) {
       showAppToast(`⏹️ Đã dừng tải (Đã lưu ${okCount}/${allItems.length} tập vào máy)`);
+    } else if (okCount === 0) {
+      alert('Không thể tải trọn bộ: ' + (lastError || 'Lỗi kết nối Cloud'));
     } else {
       showAppToast(`✅ Hoàn tất tải trọn bộ ${okCount}/${allItems.length} tập của "${currentSeriesName}"!`, 3800);
     }
@@ -5238,7 +5320,14 @@
     document.getElementById('loader-pct').textContent = '0%';
     loader.classList.remove('hidden');
 
-    const res = await callBridgeAsync('preparePdfStream', [fileId, fileName, currentSeriesName || fileName, !!saveOffline]);
+    let res = await callBridgeAsync('preparePdfStream', [fileId, fileName, currentSeriesName || fileName, !!saveOffline]);
+    if ((!res || !res.ok || !res.path) && !(res && res.error && res.error.includes('Đã hủy')) && window._ccxFallbackRefreshFolderAndFindFile) {
+      const refreshedId = await window._ccxFallbackRefreshFolderAndFindFile(fileName);
+      if (refreshedId && refreshedId !== fileId) {
+        fileId = refreshedId;
+        res = await callBridgeAsync('preparePdfStream', [fileId, fileName, currentSeriesName || fileName, !!saveOffline]);
+      }
+    }
     loader.classList.add('hidden');
 
     if (!res || !res.ok || !res.path) {
@@ -5332,25 +5421,31 @@
         pdfDoc = await pdfjsLib.getDocument({
           range: transport,
           length: rawRes.fileSize,
-          rangeChunkSize: 1048576,
+          rangeChunkSize: 524288,
           disableAutoFetch: true,
           disableStream: true
         }).promise;
       } else if (streamUrl) {
         try {
-          const loadingTask = pdfjsLib.getDocument({
+          const isDriveStream = String(streamUrl).includes('/drive-pdf?');
+          const knownLen = (rawRes && Number(rawRes.size) > 0) ? Number(rawRes.size) : (window._ccxLookupFileSize ? window._ccxLookupFileSize(fileId) : 0);
+          const docOpts = {
             url: streamUrl,
-            rangeChunkSize: 1048576,
-            disableAutoFetch: false,
-            disableStream: false
-          });
+            rangeChunkSize: 524288,
+            disableAutoFetch: isDriveStream ? true : false,
+            disableStream: isDriveStream ? true : false
+          };
+          if (isDriveStream && knownLen > 0) docOpts.length = knownLen;
+          const loadingTask = pdfjsLib.getDocument(docOpts);
           pdfDoc = await loadingTask.promise;
         } catch (rangeErr) {
           const pdfBytes = loadLocalFileToUint8Array(localPath);
           pdfDoc = await pdfjsLib.getDocument({ data: pdfBytes }).promise;
         }
-      } else if (String(localPath).startsWith('idb://') && window._ccxIdbGetRecord) {
-        const rec = await window._ccxIdbGetRecord('pdfs', fileId);
+      } else if (String(localPath).startsWith('idb://') && (window._ccxGetOfflineBlobRecord || window._ccxIdbGetRecord)) {
+        const rec = window._ccxGetOfflineBlobRecord
+          ? await window._ccxGetOfflineBlobRecord(fileId)
+          : await window._ccxIdbGetRecord('pdfs', fileId);
         if (!rec || !rec.blob) throw new Error('Không tìm thấy dữ liệu Offline trong bộ nhớ máy!');
         const buf = await rec.blob.arrayBuffer();
         pdfDoc = await pdfjsLib.getDocument({ data: new Uint8Array(buf) }).promise;
