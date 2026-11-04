@@ -2006,12 +2006,12 @@
   </div>
 </div>
 
-<script src="catalog_data.js?v=3.6.2"></script>
-<script src="folder_tree.js?v=3.6.2"></script>
+<script src="catalog_data.js?v=3.6.5"></script>
+<script src="folder_tree.js?v=3.6.5"></script>
 <script src="pdf.min.js"></script>
 <script>
   if (window.pdfjsLib) {
-    pdfjsLib.GlobalWorkerOptions.workerSrc = window._isNativeAndroidBridge ? 'pdf.worker.min.js' : 'pdf.worker.min.js?v=3.6.2';
+    pdfjsLib.GlobalWorkerOptions.workerSrc = window._isNativeAndroidBridge ? 'pdf.worker.min.js' : 'pdf.worker.min.js?v=3.6.5';
   }
 
   // ============================================================================
@@ -2219,52 +2219,109 @@
       } catch (e) {}
     }
 
+    const _ccxRangeLruKeys = [];
+    const _ccxInFlightRanges = {};
+    let _ccxActiveRangeFetches = 0;
+    const _ccxRangeWaitQueue = []; // LIFO queue for range fetches
+
+    function _ccxPutRangeCache(key, bytes) {
+      if (!bytes || !window._ccxRangeRamCache) return;
+      if (!window._ccxRangeRamCache[key]) {
+        _ccxRangeLruKeys.push(key);
+        const maxChunks = window._isIosDevice ? 18 : 32;
+        while (_ccxRangeLruKeys.length > maxChunks) {
+          const oldK = _ccxRangeLruKeys.shift();
+          if (oldK) delete window._ccxRangeRamCache[oldK];
+        }
+      }
+      window._ccxRangeRamCache[key] = bytes;
+    }
+
+    function _ccxAcquireRangeSlot() {
+      const maxConc = window._isIosDevice ? 4 : 6;
+      if (_ccxActiveRangeFetches < maxConc) {
+        _ccxActiveRangeFetches++;
+        return Promise.resolve();
+      }
+      return new Promise(resolve => {
+        // Push to end and pop from end (LIFO) so the newest visible page gets network bandwidth first!
+        _ccxRangeWaitQueue.push(resolve);
+      });
+    }
+
+    function _ccxReleaseRangeSlot() {
+      if (_ccxRangeWaitQueue.length > 0) {
+        const nextResolve = _ccxRangeWaitQueue.pop();
+        nextResolve();
+      } else {
+        _ccxActiveRangeFetches = Math.max(0, _ccxActiveRangeFetches - 1);
+      }
+    }
+
     window._ccxFetchDriveByteRange = async function(fileId, startByte, endByte) {
       const cacheKey = `${fileId}:${startByte}:${endByte}`;
       if (window._ccxRangeRamCache && window._ccxRangeRamCache[cacheKey]) {
-        const hit = window._ccxRangeRamCache[cacheKey];
-        delete window._ccxRangeRamCache[cacheKey];
-        return hit;
+        return window._ccxRangeRamCache[cacheKey];
       }
-      const token = await getValidWebAccessToken();
-      if (!token) return null;
-      let effId = _tempCloneMap[fileId] || fileId;
-      let clonedTried = false;
-      const rangeStr = (endByte !== null && endByte !== undefined) ? `bytes=${startByte}-${endByte}` : `bytes=${startByte}-`;
-      for (let attempt = 0; attempt < 6; attempt++) {
-        const u = `https://www.googleapis.com/drive/v3/files/${encodeURIComponent(effId)}?alt=media&acknowledgeAbuse=true&supportsAllDrives=true`;
-        const r = await fetch(u, {
-          headers: {
-            'Authorization': 'Bearer ' + token,
-            'Range': rangeStr
+      if (_ccxInFlightRanges[cacheKey]) {
+        return _ccxInFlightRanges[cacheKey];
+      }
+      const jobPromise = (async () => {
+        await _ccxAcquireRangeSlot();
+        try {
+          if (window._ccxRangeRamCache && window._ccxRangeRamCache[cacheKey]) {
+            return window._ccxRangeRamCache[cacheKey];
           }
-        });
-        if (r.status === 200 || r.status === 206) {
-          const cr = r.headers.get('content-range') || '';
-          const m = cr.match(/\/([0-9]+)$/);
-          if (m && m[1]) {
-            window._ccxFileSizeCache[fileId] = Number(m[1]) || 0;
-          }
-          const ab = await r.arrayBuffer();
-          return new Uint8Array(ab);
-        }
-        if (r.status === 403 || r.status === 429) {
-          let errTxt = '';
-          try { errTxt = await r.text(); } catch (e) {}
-          if (!clonedTried && (errTxt.includes('downloadQuotaExceeded') || errTxt.includes('cannotDownloadFile'))) {
-            clonedTried = true;
-            const cloned = await createTempWebCloudClone(fileId, token);
-            if (cloned) {
-              effId = cloned;
+          const token = await getValidWebAccessToken();
+          if (!token) return null;
+          let effId = _tempCloneMap[fileId] || fileId;
+          let clonedTried = false;
+          const rangeStr = (endByte !== null && endByte !== undefined) ? `bytes=${startByte}-${endByte}` : `bytes=${startByte}-`;
+          for (let attempt = 0; attempt < 6; attempt++) {
+            const u = `https://www.googleapis.com/drive/v3/files/${encodeURIComponent(effId)}?alt=media&acknowledgeAbuse=true&supportsAllDrives=true`;
+            const r = await fetch(u, {
+              headers: {
+                'Authorization': 'Bearer ' + token,
+                'Range': rangeStr
+              }
+            });
+            if (r.status === 200 || r.status === 206) {
+              const cr = r.headers.get('content-range') || '';
+              const m = cr.match(/\/([0-9]+)$/);
+              if (m && m[1]) {
+                window._ccxFileSizeCache[fileId] = Number(m[1]) || 0;
+              }
+              const ab = await r.arrayBuffer();
+              const out = new Uint8Array(ab);
+              if (endByte !== null && endByte !== undefined && out.byteLength <= 1572864) {
+                _ccxPutRangeCache(cacheKey, out);
+              }
+              return out;
+            }
+            if (r.status === 403 || r.status === 429) {
+              let errTxt = '';
+              try { errTxt = await r.text(); } catch (e) {}
+              if (!clonedTried && (errTxt.includes('downloadQuotaExceeded') || errTxt.includes('cannotDownloadFile'))) {
+                clonedTried = true;
+                const cloned = await createTempWebCloudClone(fileId, token);
+                if (cloned) {
+                  effId = cloned;
+                  continue;
+                }
+              }
+              await new Promise(res => setTimeout(res, 750 * (attempt + 1)));
               continue;
             }
+            break;
           }
-          await new Promise(res => setTimeout(res, 750 * (attempt + 1)));
-          continue;
+          return null;
+        } finally {
+          _ccxReleaseRangeSlot();
+          delete _ccxInFlightRanges[cacheKey];
         }
-        break;
-      }
-      return null;
+      })();
+      _ccxInFlightRanges[cacheKey] = jobPromise;
+      return jobPromise;
     };
 
     // IndexedDB Offline Storage Engine for iOS / iPadOS / Web
@@ -2697,20 +2754,22 @@
           // 2. If reading online (!saveOffline), use Instant Zero-RAM HTTP 206 Byte-Range Streaming!
           if (!saveOffline) {
             if (window.onCCXDownloadProgress) window.onCCXDownloadProgress(40, 0, 0, 'Đang nạp song song Đầu Sách & Mục Lục HTTP 206...');
-            const CHUNK_SZ = 655360;
+            const CHUNK_SZ = 1048576; // 1 MB chunk for fast Manhwa/Webtoon streaming
             let knownSize = window._ccxFileSizeCache[fileId] || 0;
             let firstChunk = null;
             if (knownSize > CHUNK_SZ) {
               const tailStart = Math.floor((knownSize - 1) / CHUNK_SZ) * CHUNK_SZ;
               const tailEnd = knownSize - 1;
-              const [hChunk, tChunk] = await Promise.all([
+              const needPrevTail = (tailEnd - tailStart < 262144) && (tailStart >= CHUNK_SZ);
+              const tasks = [
                 window._ccxFetchDriveByteRange(fileId, 0, CHUNK_SZ - 1),
                 window._ccxFetchDriveByteRange(fileId, tailStart, tailEnd)
-              ]);
-              firstChunk = hChunk;
-              if (tChunk) {
-                window._ccxRangeRamCache[`${fileId}:${tailStart}:${tailEnd}`] = tChunk;
+              ];
+              if (needPrevTail) {
+                tasks.push(window._ccxFetchDriveByteRange(fileId, tailStart - CHUNK_SZ, tailStart - 1));
               }
+              const [hChunk, tChunk] = await Promise.all(tasks);
+              firstChunk = hChunk;
             } else {
               firstChunk = await window._ccxFetchDriveByteRange(fileId, 0, CHUNK_SZ - 1);
               knownSize = window._ccxFileSizeCache[fileId] || (firstChunk ? firstChunk.byteLength : 0);
@@ -2718,10 +2777,11 @@
                 const tailStart = Math.floor((knownSize - 1) / CHUNK_SZ) * CHUNK_SZ;
                 const tailEnd = knownSize - 1;
                 if (window.onCCXDownloadProgress) window.onCCXDownloadProgress(75, 0, 0, 'Đang đồng bộ Mục Lục Trang...');
-                const tChunk = await window._ccxFetchDriveByteRange(fileId, tailStart, tailEnd);
-                if (tChunk) {
-                  window._ccxRangeRamCache[`${fileId}:${tailStart}:${tailEnd}`] = tChunk;
+                const tasks = [window._ccxFetchDriveByteRange(fileId, tailStart, tailEnd)];
+                if ((tailEnd - tailStart < 262144) && (tailStart >= CHUNK_SZ)) {
+                  tasks.push(window._ccxFetchDriveByteRange(fileId, tailStart - CHUNK_SZ, tailStart - 1));
                 }
+                await Promise.all(tasks);
               }
             }
             const fileSize = window._ccxFileSizeCache[fileId] || knownSize || (firstChunk ? firstChunk.byteLength : 0);
@@ -5194,7 +5254,7 @@
         pdfDoc = await pdfjsLib.getDocument({
           range: transport,
           length: rawRes.fileSize,
-          rangeChunkSize: 655360,
+          rangeChunkSize: 1048576,
           disableAutoFetch: true,
           disableStream: true
         }).promise;
@@ -5202,7 +5262,7 @@
         try {
           const loadingTask = pdfjsLib.getDocument({
             url: streamUrl,
-            rangeChunkSize: 655360,
+            rangeChunkSize: 1048576,
             disableAutoFetch: false,
             disableStream: false
           });
@@ -6219,6 +6279,13 @@
     const vp = document.getElementById('reader-viewport');
     vp.innerHTML = '';
     renderedPages.clear();
+    if (_pageRenderWaitQueue && _pageRenderWaitQueue.length > 0) {
+      while (_pageRenderWaitQueue.length > 0) {
+        const it = _pageRenderWaitQueue.pop();
+        if (it && it.resolve) it.resolve(false);
+      }
+      _queuedPageSet.clear();
+    }
     if (pageObserver) {
       pageObserver.disconnect();
       pageObserver = null;
@@ -6324,11 +6391,23 @@
 
     const firstPage = await pdfDoc.getPage(1);
     const firstVp = firstPage.getViewport({ scale: 1.0 });
-    const aspect = firstVp.height / firstVp.width;
+    let aspect = firstVp.height / firstVp.width;
+    // In Webtoons like Bậc Thầy Thiết Kế Điền Trang, Page 1 can be a super-tall 4MB stitched strip while Pages 2+ are standard strips. Sample Page 2 as well so initial slot height doesn't jump wildly!
+    if (readerMode === 'webtoon' && totalPages >= 2 && aspect > 2.4) {
+      try {
+        const secondPage = await pdfDoc.getPage(2);
+        const secondVp = secondPage.getViewport({ scale: 1.0 });
+        const aspect2 = secondVp.height / secondVp.width;
+        if (aspect2 > 0.5 && aspect2 < aspect * 0.75) {
+          aspect = aspect2;
+        }
+      } catch (e) {}
+    }
     const screenW = getTargetPageRenderWidth();
-    const estH = Math.round(screenW * aspect);
+    const estH = Math.max(320, Math.min(2600, Math.round(screenW * aspect)));
 
     if (readerMode === 'webtoon') {
+      const frag = document.createDocumentFragment();
       for (let p = 1; p <= totalPages; p++) {
         const slot = document.createElement('div');
         slot.className = 'pdf-page-slot';
@@ -6336,8 +6415,9 @@
         slot.dataset.page = p;
         slot.style.minHeight = estH + 'px';
         slot.innerHTML = `<span class="page-num-watermark">${p} / ${totalPages}</span>`;
-        vp.appendChild(slot);
+        frag.appendChild(slot);
       }
+      vp.appendChild(frag);
 
       // Append Next/Prev Volume Quick Card at bottom of Webtoon scroll
       if (currentFolderPdfItems.length > 1) {
@@ -6355,23 +6435,24 @@
         }
       }
 
+      const obsMargin = (isEcoCoolMode || window._isIosDevice) ? '850px 0px 1050px 0px' : '1500px 0px 1500px 0px';
       pageObserver = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
           if (entry.isIntersecting) {
             const pNum = parseInt(entry.target.dataset.page, 10);
             renderSinglePdfPage(pNum);
             if (pNum + 1 <= totalPages) renderSinglePdfPage(pNum + 1);
-            if (pNum + 2 <= totalPages) renderSinglePdfPage(pNum + 2);
           }
         });
       }, {
         root: vp,
-        rootMargin: '1600px 0px 1600px 0px',
+        rootMargin: obsMargin,
         threshold: 0.01
       });
 
-      document.querySelectorAll('.pdf-page-slot').forEach(el => pageObserver.observe(el));
-      attachScrollTracker(vp);
+      const slotList = vp.querySelectorAll('.pdf-page-slot');
+      slotList.forEach(el => pageObserver.observe(el));
+      attachScrollTracker(vp, Array.from(slotList));
 
       if (currentPage > 1) {
         const targetEl = document.getElementById('page-slot-' + currentPage);
@@ -6380,6 +6461,7 @@
         }
       }
       renderSinglePdfPage(currentPage);
+      if (currentPage + 1 <= totalPages) renderSinglePdfPage(currentPage + 1);
     } else if (useSpread) {
       // 2-Page Open Book Spread Mode (Automatic on iPad/Tablet Landscape or Explicit 2-Page Mode)
       vp.onscroll = null;
@@ -6432,82 +6514,195 @@
     updateReaderStatusUI();
   }
 
-  function attachScrollTracker(vp) {
+  // Zero-Reflow rAF + O(log N) Binary Search Scroll Tracker (Eliminates 1,663-node layout thrashing on iOS!)
+  function attachScrollTracker(vp, cachedSlots) {
+    const slots = (cachedSlots && cachedSlots.length > 0) ? cachedSlots : Array.from(vp.querySelectorAll('.pdf-page-slot'));
+    let scrollTickPending = false;
+    let lastTrackTime = 0;
+
     vp.onscroll = () => {
-      const midY = vp.scrollTop + (vp.clientHeight * 0.4);
-      const slots = vp.querySelectorAll('.pdf-page-slot');
-      for (let i = 0; i < slots.length; i++) {
-        const s = slots[i];
-        if (s.offsetTop <= midY && (s.offsetTop + s.offsetHeight) >= midY) {
-          const p = parseInt(s.dataset.page, 10);
+      if (scrollTickPending) return;
+      const now = performance.now();
+      if (now - lastTrackTime < 110) return;
+      scrollTickPending = true;
+      requestAnimationFrame(() => {
+        scrollTickPending = false;
+        lastTrackTime = performance.now();
+        if (!slots || slots.length === 0) return;
+        const midY = vp.scrollTop + (vp.clientHeight * 0.38);
+        // O(log N) binary search across monotonic slot.offsetTop (only ~11 checks for 1,663 pages instead of 1,663!)
+        let lo = 0;
+        let hi = slots.length - 1;
+        let foundIdx = 0;
+        while (lo <= hi) {
+          const mid = (lo + hi) >> 1;
+          const s = slots[mid];
+          const top = s.offsetTop;
+          if (top <= midY) {
+            foundIdx = mid;
+            lo = mid + 1;
+          } else {
+            hi = mid - 1;
+          }
+        }
+        const matchedSlot = slots[foundIdx];
+        if (matchedSlot) {
+          const p = parseInt(matchedSlot.dataset.page, 10);
           if (p && p !== currentPage) {
             currentPage = p;
             updateReaderStatusUI();
             evictDistantCanvases(currentPage);
+            renderSinglePdfPage(currentPage);
+            if (currentPage + 1 <= totalPages) renderSinglePdfPage(currentPage + 1);
           }
-          break;
+        }
+      });
+    };
+  }
+
+  // LIFO Priority Render Queue + iOS Anti-Black-Screen Double-Buffering
+  let _activePageRenders = 0;
+  const _pageRenderWaitQueue = [];
+  const _queuedPageSet = new Set();
+
+  function _acquirePageRenderSlot(pNum, isSpreadHalf) {
+    const maxConc = (isEcoCoolMode || window._isIosDevice) ? 2 : 3;
+    if (_activePageRenders < maxConc || isSpreadHalf) {
+      _activePageRenders++;
+      return Promise.resolve(true);
+    }
+    if (_queuedPageSet.has(pNum)) return Promise.resolve(false);
+    _queuedPageSet.add(pNum);
+    return new Promise(resolve => {
+      _pageRenderWaitQueue.push({ pNum, resolve });
+    });
+  }
+
+  function _releasePageRenderSlot() {
+    while (_pageRenderWaitQueue.length > 0) {
+      // Pick the queued page closest to currentPage (LIFO + proximity priority)
+      let bestIdx = _pageRenderWaitQueue.length - 1;
+      let bestDist = Infinity;
+      for (let i = _pageRenderWaitQueue.length - 1; i >= 0; i--) {
+        const d = Math.abs(_pageRenderWaitQueue[i].pNum - currentPage);
+        if (d < bestDist) {
+          bestDist = d;
+          bestIdx = i;
         }
       }
-    };
+      const nextItem = _pageRenderWaitQueue.splice(bestIdx, 1)[0];
+      _queuedPageSet.delete(nextItem.pNum);
+      const maxSkipDist = (isEcoCoolMode || window._isIosDevice) ? 5 : 9;
+      if (readerMode === 'webtoon' && Math.abs(nextItem.pNum - currentPage) > maxSkipDist) {
+        // User already scrolled far past this page! Cancel it immediately so current page renders with 0 lag!
+        nextItem.resolve(false);
+        continue;
+      }
+      nextItem.resolve(true);
+      return;
+    }
+    _activePageRenders = Math.max(0, _activePageRenders - 1);
   }
 
   async function renderSinglePdfPage(pNum, isSpreadHalf) {
     if (!pdfDoc || renderedPages.has(pNum)) return;
     const slot = document.getElementById('page-slot-' + pNum);
     if (!slot) return;
+
+    const shouldRun = await _acquirePageRenderSlot(pNum, isSpreadHalf);
+    if (!shouldRun) return;
+
+    if (!pdfDoc || renderedPages.has(pNum)) {
+      _releasePageRenderSlot();
+      return;
+    }
+    const maxDist = (isEcoCoolMode || window._isIosDevice) ? 5 : 9;
+    if (readerMode === 'webtoon' && !isSpreadHalf && Math.abs(pNum - currentPage) > maxDist) {
+      _releasePageRenderSlot();
+      return;
+    }
+
     renderedPages.add(pNum);
 
     try {
       const page = await pdfDoc.getPage(pNum);
       const baseVp = page.getViewport({ scale: 1.0 });
       const isCool = isEcoCoolMode || !!window._isIosDevice;
-      const dpr = isCool
-        ? Math.min(window.devicePixelRatio || 1.5, 1.55)
-        : Math.min(window.devicePixelRatio || 2.0, 2.5);
+      let dpr = isCool
+        ? Math.min(window.devicePixelRatio || 1.5, 1.50)
+        : Math.min(window.devicePixelRatio || 2.0, 2.25);
       let displayW = getTargetPageRenderWidth();
       if (isSpreadHalf) {
         const maxSpreadH = Math.max(280, (window.innerHeight - 145) * zoomLevel);
         const wFromH = Math.floor(maxSpreadH * (baseVp.width / baseVp.height));
         displayW = Math.min(Math.floor((window.innerWidth * 0.46) * zoomLevel), wFromH);
       } else if (readerMode !== 'webtoon') {
-        // In 1-Page Book mode, leave 26px horizontal room & 140px vertical room so the book spine, stacked pages, and top/bottom edges sit cleanly between the bars!
         const maxBookW = Math.max(240, (window.innerWidth - 26) * zoomLevel);
         const maxBookH = Math.max(320, (window.innerHeight - 140) * zoomLevel);
         const widthFromHeight = Math.floor(maxBookH * (baseVp.width / baseVp.height));
         displayW = Math.min(displayW, maxBookW, widthFromHeight);
       }
       const cssScale = displayW / baseVp.width;
-      const renderVp = page.getViewport({ scale: cssScale * dpr });
+      const cssH = Math.floor(baseVp.height * cssScale);
 
-      const canvas = document.createElement('canvas');
-      canvas.width = Math.floor(renderVp.width);
-      canvas.height = Math.floor(renderVp.height);
-      if (!isSpreadHalf) {
-        canvas.style.width = displayW + 'px';
-        canvas.style.height = Math.floor(baseVp.height * cssScale) + 'px';
-        if (readerMode === 'webtoon') {
-          slot.style.minHeight = Math.floor(baseVp.height * cssScale) + 'px';
-        }
+      // Apple iOS WebKit GPU Canvas Guard: Never allow a single canvas to exceed height 3580px or area 5.2 MP on iOS (prevents black canvas invalidation on tall Webtoon strips!)
+      let targetScale = cssScale * dpr;
+      const rawW = baseVp.width * targetScale;
+      const rawH = baseVp.height * targetScale;
+      const maxH = isCool ? 3580 : 8192;
+      const maxArea = isCool ? 5200000 : 20000000;
+      if (rawH > maxH) {
+        targetScale = targetScale * (maxH / rawH);
+      }
+      if ((baseVp.width * targetScale) * (baseVp.height * targetScale) > maxArea) {
+        const areaRatio = Math.sqrt(maxArea / ((baseVp.width * targetScale) * (baseVp.height * targetScale)));
+        targetScale = targetScale * areaRatio;
       }
 
-      slot.innerHTML = '';
-      slot.appendChild(canvas);
+      const renderVp = page.getViewport({ scale: targetScale });
 
-      const wm = document.createElement('span');
-      wm.className = 'page-num-watermark';
-      wm.textContent = `${pNum} / ${totalPages}`;
-      slot.appendChild(wm);
+      // Double-Buffered Rendering: Render onto off-DOM canvas FIRST, then swap into slot so user NEVER sees a black unrendered canvas while waiting for network IO!
+      const canvas = document.createElement('canvas');
+      canvas.width = Math.max(1, Math.floor(renderVp.width));
+      canvas.height = Math.max(1, Math.floor(renderVp.height));
+      if (!isSpreadHalf) {
+        canvas.style.width = displayW + 'px';
+        canvas.style.height = cssH + 'px';
+      }
 
       const ctx = canvas.getContext('2d', { alpha: false });
+      ctx.fillStyle = '#0B101B';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
       await page.render({ canvasContext: ctx, viewport: renderVp }).promise;
+
+      const liveSlot = document.getElementById('page-slot-' + pNum);
+      if (liveSlot && renderedPages.has(pNum)) {
+        if (!isSpreadHalf && readerMode === 'webtoon') {
+          liveSlot.style.minHeight = cssH + 'px';
+        }
+        liveSlot.innerHTML = '';
+        liveSlot.appendChild(canvas);
+        const wm = document.createElement('span');
+        wm.className = 'page-num-watermark';
+        wm.textContent = `${pNum} / ${totalPages}`;
+        liveSlot.appendChild(wm);
+      } else {
+        canvas.width = 1;
+        canvas.height = 1;
+      }
+
       if (readerMode !== 'webtoon') {
         _ccxPaperPageCache.set(pNum, canvas);
       }
     } catch (e) {
       renderedPages.delete(pNum);
+    } finally {
+      _releasePageRenderSlot();
     }
   }
 
+  let _saveProgDebounce = null;
   function updateReaderStatusUI() {
     const isSpread = (readerMode !== 'webtoon') && isBookSpreadActive();
     const pageLabel = (isSpread && currentPage + 1 <= totalPages)
@@ -6523,13 +6718,15 @@
       const modeName = readerMode === 'webtoon' ? 'Cuộn Dọc' : (isSpread ? 'Sách 2T 3D' : 'Sách 1T 3D');
       document.getElementById('reader-doc-sub').textContent =
         `Trang ${pageLabel} • ${modeName} • ${currentReadingFile.source || 'Anti-Limit'}`;
-      saveReadingProgress(
-        currentReadingFile.id,
-        currentReadingFile.name,
-        currentReadingFile.seriesName,
-        currentPage,
-        totalPages
-      );
+      if (_saveProgDebounce) clearTimeout(_saveProgDebounce);
+      const fId = currentReadingFile.id;
+      const fName = currentReadingFile.name;
+      const fSeries = currentReadingFile.seriesName;
+      const pCur = currentPage;
+      const pTot = totalPages;
+      _saveProgDebounce = setTimeout(() => {
+        saveReadingProgress(fId, fName, fSeries, pCur, pTot);
+      }, 650);
     }
   }
 
