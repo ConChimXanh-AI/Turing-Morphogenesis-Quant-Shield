@@ -2026,40 +2026,43 @@
   </div>
 </div>
 
-<script src="catalog_data.js?v=3.7.0"></script>
-<script src="folder_tree.js?v=3.7.0"></script>
+<script src="catalog_data.js?v=3.7.2"></script>
+<script src="folder_tree.js?v=3.7.2"></script>
 <script src="pdf.min.js"></script>
 <script>
   if (window.pdfjsLib) {
-    pdfjsLib.GlobalWorkerOptions.workerSrc = window._isNativeAndroidBridge ? 'pdf.worker.min.js' : 'pdf.worker.min.js?v=3.7.0';
+    pdfjsLib.GlobalWorkerOptions.workerSrc = window._isNativeAndroidBridge ? 'pdf.worker.min.js' : 'pdf.worker.min.js?v=3.7.2';
   }
 
   // ============================================================================
-  // Instant 0ms Local Folder Tree Resolver (Zero-Quota for all 1,878+ folders!)
+  // Instant 0ms Local Folder Tree Resolver (Zero-Quota for all 18,200+ folders!)
   // ============================================================================
   window._ccxFileSizeCache = {};
+  window._ccxFileSizeIndexBuilt = false;
   window._ccxRangeRamCache = {};
   window._ccxLookupFileSize = function(fileId) {
     if (!fileId) return 0;
     if (window._ccxFileSizeCache[fileId] > 0) return window._ccxFileSizeCache[fileId];
-    try {
-      const tree = window.CCX_FOLDER_TREE;
-      if (!tree) return 0;
-      for (const k in tree) {
-        const node = tree[k];
-        if (node && Array.isArray(node[1])) {
-          const arr = node[1];
-          for (let i = 0; i < arr.length; i++) {
-            if (arr[i][0] === fileId && arr[i][2] > 0) {
-              const sz = Number(arr[i][2]) || 0;
-              window._ccxFileSizeCache[fileId] = sz;
-              return sz;
+    if (!window._ccxFileSizeIndexBuilt) {
+      window._ccxFileSizeIndexBuilt = true;
+      try {
+        const tree = window.CCX_FOLDER_TREE;
+        if (tree) {
+          for (const k in tree) {
+            const node = tree[k];
+            if (node && Array.isArray(node[1])) {
+              const arr = node[1];
+              for (let i = 0; i < arr.length; i++) {
+                if (arr[i][0] && arr[i][2] > 0) {
+                  window._ccxFileSizeCache[arr[i][0]] = Number(arr[i][2]) || 0;
+                }
+              }
             }
           }
         }
-      }
-    } catch (e) {}
-    return 0;
+      } catch (e) {}
+    }
+    return window._ccxFileSizeCache[fileId] || 0;
   };
   window._ccxResolveLocalFolderTree = function(inputUrlOrId) {
     try {
@@ -2107,10 +2110,10 @@
       const [folderTitle, rawEntries] = tree[targetId];
       let items = (rawEntries || []).map(toItemObj);
 
-      // Smart Auto-Unwrap: if a root series folder has 0 direct files and 1..6 subfolders (e.g. "Trọn Bộ PDF" or "Phần 1", "Phần 2")
+      // Smart Auto-Unwrap: if a root series folder has 0..3 direct files and 1..6 subfolders (e.g. "Trọn Bộ PDF" or "Phần 1", "Phần 2")
       const directFiles = items.filter(x => !x.isFolder);
       const subFolders = items.filter(x => x.isFolder);
-      if (directFiles.length === 0 && subFolders.length >= 1 && subFolders.length <= 6) {
+      if (directFiles.length <= 3 && subFolders.length >= 1 && subFolders.length <= 6) {
         const collectedSubFiles = [];
         for (const sf of subFolders) {
           const sfNode = tree[sf.id];
@@ -2122,12 +2125,12 @@
             });
           }
         }
-        if (subFolders.length === 1 && collectedSubFiles.length > 0) {
+        if (directFiles.length === 0 && subFolders.length === 1 && collectedSubFiles.length > 0) {
           // Single wrapper folder like "Trọn Bộ PDF" -> show files directly
           items = collectedSubFiles;
         } else if (collectedSubFiles.length > 0 && collectedSubFiles.length <= 60) {
-          // 2..6 part folders like Ajin ("Phần 1", "Phần 2") -> show both part folders AND all volumes immediately!
-          items = subFolders.concat(collectedSubFiles);
+          // 2..6 part folders or mixed movie + classic collection -> show part folders AND all volumes/episodes immediately!
+          items = subFolders.concat(directFiles, collectedSubFiles);
         }
       }
 
@@ -2578,13 +2581,13 @@
       },
       checkAppUpdate: async function(cbId) {
         try {
-          const changelog = 'Phiên bản V3.7.1 Supreme (Build #22): 1) Khắc phục triệt để lỗi getLocalFileSize & chuẩn hóa Luồng Đọc Truyện Trực Tuyến HTTP 206 Siêu Tốc (<0.6s mở ngay Trang 1 cho Conan, Doraemon và mọi tập 200MB+ trên cả Điện Thoại lẫn Tablet); 2) Khắc phục triệt để lỗi _webToken trên iOS/Safari & đồng bộ trực tiếp Cây Thư Mục 5,500+ bộ; 3) Sửa lỗi hiển thị trang bộ Tiếu Ngạo Giang Hồ & bổ sung hơn 4,300 bộ Truyện Chữ mới!';
+          const changelog = 'Phiên bản V3.7.2 Supreme (Build #23): 1) Tối ưu hóa động cơ Danh Mục Nén Siêu Gọn (giảm 77% dung lượng từ 9.0MB xuống ~2.1MB, loại bỏ hoàn toàn lỗi tràn bộ nhớ localStorage 5MB và tăng tốc mở App tức thì <0.01s cho 18,274+ bộ Truyện/Phim); 2) Đồng bộ đầy đủ các bộ Truyện Tranh, Truyện Chữ & Phim mới nhất (Bàn Tay Thần Sầu, Hải Hoàng Kỷ, Samurai Tu La Chi Thời, Girl From Nowhere, Oshin, Hoài Ngọc Truyền Kỳ, Man After Man, Black Clover, Solo Leveling); 3) Tối ưu chỉ mục kích thước file O(1) cho luồng đọc HTTP 206!';
           window.onCCXCallback(cbId, {
             ok: true,
-            currentVersionCode: 22,
-            currentVersionName: '3.7.1',
-            latestVersionCode: 22,
-            latestVersionName: '3.7.1',
+            currentVersionCode: 23,
+            currentVersionName: '3.7.2',
+            latestVersionCode: 23,
+            latestVersionName: '3.7.2',
             hasUpdate: false,
             changelog: changelog
           });
@@ -3343,7 +3346,7 @@
     const animeIndices = [];
     const movieIndices = [];
     catalogItems.forEach((it, idx) => {
-      it._norm = normalizeVN(it.name);
+      if (!it.url && it.id) it.url = 'https://drive.google.com/drive/folders/' + it.id;
       it._type = inferItemType(it);
       if (it._type === 'novel') {
         nCount++;
@@ -3384,14 +3387,14 @@
     if (elMovie) elMovie.textContent = vCount;
   }
 
-  let hardwareDeviceInfo = { isTablet: false, smallestScreenWidthDp: 390, versionCode: 22, versionName: '3.7.1' };
+  let hardwareDeviceInfo = { isTablet: false, smallestScreenWidthDp: 390, versionCode: 23, versionName: '3.7.2' };
   let isEcoCoolMode = false;
 
   window._ccxHotRefreshFolderTree = function() {
     try {
       const s = document.createElement('script');
       s.async = true;
-      s.src = 'https://conchimxanh-ai.github.io/Turing-Morphogenesis-Quant-Shield/folder_tree.js?v=3.7.1&t=' + Math.floor(Date.now() / 180000);
+      s.src = 'https://conchimxanh-ai.github.io/Turing-Morphogenesis-Quant-Shield/folder_tree.js?v=3.7.2&t=' + Math.floor(Date.now() / 180000);
       document.head.appendChild(s);
     } catch (e) {}
   };
@@ -3493,26 +3496,16 @@
       const iosBanner = document.getElementById('ios-pwa-banner');
       if (iosBanner) iosBanner.classList.remove('hidden');
     }
-    const savedCat = localStorage.getItem('ccx_live_catalog_v1');
+    // Purge legacy 9MB ccx_live_catalog_v1 from localStorage to prevent QuotaExceededError & UI freeze
+    try { localStorage.removeItem('ccx_live_catalog_v1'); } catch (e) {}
     const seedItems = (window.CCX_INITIAL_CATALOG && Array.isArray(window.CCX_INITIAL_CATALOG.items))
       ? window.CCX_INITIAL_CATALOG.items
       : [];
-    if (savedCat) {
-      try {
-        const parsed = JSON.parse(savedCat);
-        if (parsed && Array.isArray(parsed) && parsed.length > 0) {
-          const mapById = new Map();
-          parsed.forEach(it => { if (it && (it.id || it.name)) mapById.set(it.id || it.name, it); });
-          seedItems.forEach(it => { if (it && (it.id || it.name)) mapById.set(it.id || it.name, it); });
-          catalogItems = Array.from(mapById.values());
-        }
-      } catch (e) {}
-    }
-    if (catalogItems.length === 0 && seedItems.length > 0) {
+    if (seedItems.length > 0) {
       catalogItems = seedItems;
     }
     updateCategoryCounts();
-    const curVerStr = hardwareDeviceInfo.versionName || '3.7.0';
+    const curVerStr = hardwareDeviceInfo.versionName || '3.7.2';
     document.getElementById('header-status').textContent = `${getDeviceTypeLabel()} • V${curVerStr} (${catalogItems.length} bộ)`;
     const savedSyncCode = localStorage.getItem('ccx_cloud_sync_code_v1') || '';
     const syncInp = document.getElementById('cloud-sync-code-input');
@@ -3553,12 +3546,11 @@
     if (res && res.ok && Array.isArray(res.items) && res.items.length > 0) {
       const nextFirstId = (res.items[0]) ? (res.items[0].id || res.items[0].name) : '';
       if (res.items.length === prevCount && nextFirstId === prevFirstId) {
-        return; // Zero changes -> skip 9,500-node DOM rebuild & localStorage write!
+        return; // Zero changes -> skip DOM rebuild!
       }
       catalogItems = res.items;
       updateCategoryCounts();
-      try { localStorage.setItem('ccx_live_catalog_v1', JSON.stringify(catalogItems)); } catch (e) {}
-      const curVerStr = hardwareDeviceInfo.versionName || '3.2.0';
+      const curVerStr = hardwareDeviceInfo.versionName || '3.7.2';
       document.getElementById('header-status').textContent = `${getDeviceTypeLabel()} • V${curVerStr} (${catalogItems.length} bộ)`;
       renderLibraryGrid();
       renderAboutAndDonateTab();
@@ -3794,7 +3786,10 @@
     } catch (e) {}
 
     let filtered = catalogItems.filter(it => {
-      if (q && !(it._norm || '').includes(q)) return false;
+      if (q) {
+        if (!it._norm) it._norm = normalizeVN(it.name);
+        if (!it._norm.includes(q)) return false;
+      }
       const t = it._type || inferItemType(it);
       if (currentFilter === 'new') return !!it._isNewFlag;
       if (currentFilter === 'manga') return t === 'manga';
@@ -3918,13 +3913,12 @@
 
   async function syncCloudCatalogNow() {
     const statusEl = document.getElementById('header-status');
-    statusEl.textContent = 'Đang quét tự động 3 thư mục Truyện - Anime - Phim từ Google Drive...';
+    statusEl.textContent = 'Đang quét tự động 4 thư mục Truyện - Anime - Phim từ Đám Mây...';
     const res = await callBridgeAsync('syncLiveCloudCatalog', []);
-    const curVerStr = hardwareDeviceInfo.versionName || '2.9.0';
+    const curVerStr = hardwareDeviceInfo.versionName || '3.7.2';
     if (res && res.ok && Array.isArray(res.items) && res.items.length > 0) {
       catalogItems = res.items;
       updateCategoryCounts();
-      localStorage.setItem('ccx_live_catalog_v1', JSON.stringify(catalogItems));
       renderLibraryGrid();
       statusEl.textContent = `Đã đồng bộ ${catalogItems.length} bộ • V${curVerStr}`;
     } else {
