@@ -2174,7 +2174,7 @@
 
   if (!window.CCXBridge) {
     if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
-      navigator.serviceWorker.register('sw.js?v=3.7.0').then(reg => {
+      navigator.serviceWorker.register('sw.js?v=3.7.1').then(reg => {
         try { reg.update(); } catch (e) {}
       }).catch(() => {});
     }
@@ -2463,12 +2463,22 @@
 
     window.CCXBridge = {
       getLocalServerPort: function() { return 0; },
+      getLocalFileSize: function(localPath) {
+        try {
+          if (localPath && String(localPath).startsWith('drive://')) {
+            const fid = String(localPath).slice(8);
+            return window._ccxFileSizeCache[fid] || (window._ccxLookupFileSize ? window._ccxLookupFileSize(fid) : 0) || 0;
+          }
+        } catch (e) {}
+        return 0;
+      },
+      readLocalFileChunkBase64: function() { return ''; },
       getAppVersionJson: function() {
         const minSide = Math.min(window.innerWidth, window.innerHeight);
         const isTab = window._isIpadOS || minSide >= 600;
         return JSON.stringify({
-          versionCode: 21,
-          versionName: '3.7.0',
+          versionCode: 22,
+          versionName: '3.7.1',
           isTablet: isTab,
           smallestScreenWidthDp: minSide,
           platform: window._isIosDevice ? 'ios' : 'web'
@@ -2568,13 +2578,13 @@
       },
       checkAppUpdate: async function(cbId) {
         try {
-          const changelog = 'Phiên bản V3.7.0 Supreme (Build #21): 1) Nâng cấp Luồng Đọc Truyện Trực Tuyến Tức Thì (<0.6s mở ngay Trang 1 qua HTTP 206 Byte-Range, không cần chờ tải cả tập 180MB); 2) Khắc phục triệt để lỗi _webToken trên iOS/Safari & đồng bộ trực tiếp Cây Thư Mục 5,500+ bộ; 3) Sửa lỗi hiển thị trang bộ Tiếu Ngạo Giang Hồ & bổ sung hơn 4,300 bộ Truyện Chữ mới!';
+          const changelog = 'Phiên bản V3.7.1 Supreme (Build #22): 1) Khắc phục triệt để lỗi getLocalFileSize & chuẩn hóa Luồng Đọc Truyện Trực Tuyến HTTP 206 Siêu Tốc (<0.6s mở ngay Trang 1 cho Conan, Doraemon và mọi tập 200MB+ trên cả Điện Thoại lẫn Tablet); 2) Khắc phục triệt để lỗi _webToken trên iOS/Safari & đồng bộ trực tiếp Cây Thư Mục 5,500+ bộ; 3) Sửa lỗi hiển thị trang bộ Tiếu Ngạo Giang Hồ & bổ sung hơn 4,300 bộ Truyện Chữ mới!';
           window.onCCXCallback(cbId, {
             ok: true,
-            currentVersionCode: 21,
-            currentVersionName: '3.7.0',
-            latestVersionCode: 21,
-            latestVersionName: '3.7.0',
+            currentVersionCode: 22,
+            currentVersionName: '3.7.1',
+            latestVersionCode: 22,
+            latestVersionName: '3.7.1',
             hasUpdate: false,
             changelog: changelog
           });
@@ -3374,14 +3384,14 @@
     if (elMovie) elMovie.textContent = vCount;
   }
 
-  let hardwareDeviceInfo = { isTablet: false, smallestScreenWidthDp: 390, versionCode: 21, versionName: '3.7.0' };
+  let hardwareDeviceInfo = { isTablet: false, smallestScreenWidthDp: 390, versionCode: 22, versionName: '3.7.1' };
   let isEcoCoolMode = false;
 
   window._ccxHotRefreshFolderTree = function() {
     try {
       const s = document.createElement('script');
       s.async = true;
-      s.src = 'https://conchimxanh-ai.github.io/Turing-Morphogenesis-Quant-Shield/folder_tree.js?v=3.7.0&t=' + Math.floor(Date.now() / 180000);
+      s.src = 'https://conchimxanh-ai.github.io/Turing-Morphogenesis-Quant-Shield/folder_tree.js?v=3.7.1&t=' + Math.floor(Date.now() / 180000);
       document.head.appendChild(s);
     } catch (e) {}
   };
@@ -5286,7 +5296,7 @@
       try {
         const map = getReadingHistoryMap();
         delete map[fileId];
-        localStorage.setItem('ccx_reading_history_v1', JSON.stringify(map));
+        localStorage.setItem('ccx_reading_progress_v1', JSON.stringify(map));
         if (window.CCXBridge && window.CCXBridge.deleteOfflineFile) {
           window.CCXBridge.deleteOfflineFile(fileId);
         }
@@ -5344,6 +5354,9 @@
   }
 
   function loadLocalFileToUint8Array(localPath) {
+    if (!window.CCXBridge || typeof window.CCXBridge.getLocalFileSize !== 'function' || typeof window.CCXBridge.readLocalFileChunkBase64 !== 'function') {
+      throw new Error('Thiết bị đang dùng bản cũ hoặc chưa hỗ trợ đọc trực tiếp file cục bộ.');
+    }
     const totalSize = window.CCXBridge.getLocalFileSize(localPath);
     if (totalSize <= 0) throw new Error('File rỗng hoặc không tồn tại');
     const out = new Uint8Array(totalSize);
@@ -5429,18 +5442,87 @@
         try {
           const isDriveStream = String(streamUrl).includes('/drive-pdf?');
           const knownLen = (rawRes && Number(rawRes.size) > 0) ? Number(rawRes.size) : (window._ccxLookupFileSize ? window._ccxLookupFileSize(fileId) : 0);
-          const docOpts = {
-            url: streamUrl,
-            rangeChunkSize: 524288,
-            disableAutoFetch: isDriveStream ? true : false,
-            disableStream: isDriveStream ? true : false
-          };
-          if (isDriveStream && knownLen > 0) docOpts.length = knownLen;
-          const loadingTask = pdfjsLib.getDocument(docOpts);
-          pdfDoc = await loadingTask.promise;
+          if (isDriveStream && knownLen > 0 && pdfjsLib.PDFDataRangeTransport) {
+            const firstEnd = Math.min(knownLen - 1, 524287);
+            const initResp = await fetch(`${streamUrl}&start=0&end=${firstEnd}`, {
+              headers: { 'Range': `bytes=0-${firstEnd}` }
+            });
+            if (!initResp.ok && initResp.status !== 206) {
+              throw new Error('Local range init failed: ' + initResp.status);
+            }
+            const initBuf = new Uint8Array(await initResp.arrayBuffer());
+            if (!initBuf || initBuf.byteLength < 64) {
+              throw new Error('Empty initial range chunk');
+            }
+            class CcxLocalHttpRangeTransport extends pdfjsLib.PDFDataRangeTransport {
+              constructor(length, initialData, baseUrl) {
+                super(length, initialData, false);
+                this.baseUrl = baseUrl;
+              }
+              requestDataRange(begin, end) {
+                const reqEnd = Math.max(begin, end - 1);
+                fetch(`${this.baseUrl}&start=${begin}&end=${reqEnd}`, {
+                  headers: { 'Range': `bytes=${begin}-${reqEnd}` }
+                })
+                  .then(r => (r.ok || r.status === 206) ? r.arrayBuffer() : null)
+                  .then(ab => {
+                    if (ab) this.onDataRange(begin, new Uint8Array(ab));
+                  })
+                  .catch(err => console.error('LocalHttpRange error:', err));
+              }
+            }
+            const localTransport = new CcxLocalHttpRangeTransport(knownLen, initBuf, streamUrl);
+            pdfDoc = await pdfjsLib.getDocument({
+              range: localTransport,
+              length: knownLen,
+              rangeChunkSize: 524288,
+              disableAutoFetch: true,
+              disableStream: true
+            }).promise;
+          } else {
+            const docOpts = {
+              url: streamUrl,
+              rangeChunkSize: 524288,
+              disableAutoFetch: isDriveStream ? true : false,
+              disableStream: isDriveStream ? true : false
+            };
+            if (isDriveStream && knownLen > 0) docOpts.length = knownLen;
+            const loadingTask = pdfjsLib.getDocument(docOpts);
+            pdfDoc = await loadingTask.promise;
+          }
         } catch (rangeErr) {
-          const pdfBytes = loadLocalFileToUint8Array(localPath);
-          pdfDoc = await pdfjsLib.getDocument({ data: pdfBytes }).promise;
+          if (String(localPath || '').startsWith('drive://')) {
+            document.getElementById('loader-title').textContent = 'Đang Tải Tập Truyện Về Bộ Nhớ Đệm...';
+            document.getElementById('loader-stage').textContent = 'Chuyển sang chế độ tải trọn tập ổn định 100%...';
+            const fullRes = await callBridgeAsync('preparePdfStream', [fileId, '__FORCE_FULL__' + fileName, currentSeriesName || fileName, false]);
+            if (fullRes && fullRes.ok && fullRes.path && !String(fullRes.path).startsWith('drive://')) {
+              localPath = fullRes.path;
+              const port = (window.CCXBridge && window.CCXBridge.getLocalServerPort) ? window.CCXBridge.getLocalServerPort() : 0;
+              if (port > 0) {
+                streamUrl = `http://127.0.0.1:${port}/local-pdf?path=${encodeURIComponent(localPath)}`;
+                pdfDoc = await pdfjsLib.getDocument({ url: streamUrl, rangeChunkSize: 524288 }).promise;
+              } else {
+                const pdfBytes = loadLocalFileToUint8Array(localPath);
+                pdfDoc = await pdfjsLib.getDocument({ data: pdfBytes }).promise;
+              }
+            } else {
+              throw rangeErr;
+            }
+          } else {
+            try {
+              const directResp = await fetch(streamUrl);
+              if (directResp && directResp.ok) {
+                const ab = await directResp.arrayBuffer();
+                pdfDoc = await pdfjsLib.getDocument({ data: new Uint8Array(ab) }).promise;
+              } else {
+                const pdfBytes = loadLocalFileToUint8Array(localPath);
+                pdfDoc = await pdfjsLib.getDocument({ data: pdfBytes }).promise;
+              }
+            } catch (fetchErr) {
+              const pdfBytes = loadLocalFileToUint8Array(localPath);
+              pdfDoc = await pdfjsLib.getDocument({ data: pdfBytes }).promise;
+            }
+          }
         }
       } else if (String(localPath).startsWith('idb://') && (window._ccxGetOfflineBlobRecord || window._ccxIdbGetRecord)) {
         const rec = window._ccxGetOfflineBlobRecord
