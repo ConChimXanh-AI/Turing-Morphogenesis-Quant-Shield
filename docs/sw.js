@@ -1,9 +1,9 @@
-// Con Chim Xanh Hub V3.8.3 — iOS / iPadOS Standalone PWA Service Worker
+// Con Chim Xanh Hub V3.8.4 — iOS / iPadOS Standalone PWA Service Worker
 // Provides:
 // 1. Offline App Shell caching (index.html, pdf.min.js, pdf.worker.min.js, catalog_data.js, icons)
 // 2. HTTP 206 Byte-Range Proxy for /ccx-stream/video?id=... & /ccx-stream/img?id=... with Google Drive OAuth Bearer header + Auto-Clone Bypass
 
-const CACHE_NAME = 'ccx-hub-pwa-v3.8.3';
+const CACHE_NAME = 'ccx-hub-pwa-v3.8.4';
 const APP_SHELL_ASSETS = [
   './',
   './index.html',
@@ -152,7 +152,9 @@ async function handleDriveStreamProxy(request, fileId, isVideo) {
         headers: headers
       });
       if (upstream.status !== 403 && upstream.status !== 429) break;
-      if (!clonedTried) {
+      let errBody = '';
+      try { errBody = await upstream.clone().text(); } catch (e) {}
+      if (!clonedTried && (errBody.includes('downloadQuotaExceeded') || errBody.includes('cannotDownloadFile'))) {
         clonedTried = true;
         const cloned = await createTempSwCloudClone(fileId, token);
         if (cloned) {
@@ -160,7 +162,7 @@ async function handleDriveStreamProxy(request, fileId, isVideo) {
           continue;
         }
       }
-      await new Promise((r) => setTimeout(r, 700 * (attempt + 1)));
+      await new Promise((r) => setTimeout(r, 750 * (attempt + 1) + Math.floor(Math.random() * 250)));
     }
 
     const respHeaders = new Headers();
