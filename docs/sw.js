@@ -1,9 +1,9 @@
-// Con Chim Xanh Hub V3.7.2 — iOS / iPadOS Standalone PWA Service Worker
+// Con Chim Xanh Hub V3.8.1 — iOS / iPadOS Standalone PWA Service Worker
 // Provides:
 // 1. Offline App Shell caching (index.html, pdf.min.js, pdf.worker.min.js, catalog_data.js, icons)
-// 2. HTTP 206 Byte-Range Proxy for /ccx-stream/video?id=... & /ccx-stream/img?id=... with Google Drive OAuth Bearer header
+// 2. HTTP 206 Byte-Range Proxy for /ccx-stream/video?id=... & /ccx-stream/img?id=... with Google Drive OAuth Bearer header + Auto-Clone Bypass
 
-const CACHE_NAME = 'ccx-hub-pwa-v3.7.2';
+const CACHE_NAME = 'ccx-hub-pwa-v3.8.1';
 const APP_SHELL_ASSETS = [
   './',
   './index.html',
@@ -12,6 +12,7 @@ const APP_SHELL_ASSETS = [
   './pdf.worker.min.js',
   './catalog_data.js',
   './folder_tree.js',
+  './folder_tree_2.js',
   './icon.svg'
 ];
 
@@ -90,7 +91,7 @@ self.addEventListener('fetch', (event) => {
 
   // Network-first for HTML/Catalog so updates show immediately, fallback to cache when offline
   if (url.origin === self.location.origin) {
-    const isDynamicAsset = /\/($|index\.html|catalog_data\.js|folder_tree\.js|ccx_catalog\.json)/i.test(url.pathname);
+    const isDynamicAsset = /\/($|index\.html|catalog_data\.js|folder_tree(_2)?\.js|ccx_catalog\.json)/i.test(url.pathname);
     event.respondWith(
       fetch(event.request, isDynamicAsset ? { cache: 'no-cache' } : undefined)
         .then((netResp) => {
@@ -105,6 +106,30 @@ self.addEventListener('fetch', (event) => {
   }
 });
 
+const swTempCloneMap = {};
+
+async function createTempSwCloudClone(sourceFileId, token) {
+  if (swTempCloneMap[sourceFileId]) return swTempCloneMap[sourceFileId];
+  try {
+    const r = await fetch(`https://www.googleapis.com/drive/v3/files/${encodeURIComponent(sourceFileId)}/copy?fields=id&supportsAllDrives=true`, {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json; charset=UTF-8'
+      },
+      body: JSON.stringify({ name: 'ccx_sw_bypass_temp.bin' })
+    });
+    if (r.ok) {
+      const j = await r.json();
+      if (j && j.id) {
+        swTempCloneMap[sourceFileId] = j.id;
+        return j.id;
+      }
+    }
+  } catch (e) {}
+  return null;
+}
+
 async function handleDriveStreamProxy(request, fileId, isVideo) {
   try {
     const token = await getSwAccessToken();
@@ -117,14 +142,24 @@ async function handleDriveStreamProxy(request, fileId, isVideo) {
     } else if (isVideo) {
       headers['Range'] = 'bytes=0-';
     }
-    const driveUrl = `https://www.googleapis.com/drive/v3/files/${encodeURIComponent(fileId)}?alt=media&supportsAllDrives=true&acknowledgeAbuse=true`;
+    let effId = swTempCloneMap[fileId] || fileId;
+    let clonedTried = false;
     let upstream = null;
     for (let attempt = 0; attempt < 5; attempt++) {
+      const driveUrl = `https://www.googleapis.com/drive/v3/files/${encodeURIComponent(effId)}?alt=media&supportsAllDrives=true&acknowledgeAbuse=true`;
       upstream = await fetch(driveUrl, {
         method: 'GET',
         headers: headers
       });
       if (upstream.status !== 403 && upstream.status !== 429) break;
+      if (!clonedTried) {
+        clonedTried = true;
+        const cloned = await createTempSwCloudClone(fileId, token);
+        if (cloned) {
+          effId = cloned;
+          continue;
+        }
+      }
       await new Promise((r) => setTimeout(r, 700 * (attempt + 1)));
     }
 
