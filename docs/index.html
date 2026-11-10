@@ -1480,6 +1480,11 @@
     background: #05070B;
     position: relative;
   }
+  #reader-viewport.zoomed-webtoon .pdf-page-slot {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    justify-content: flex-start !important;
+  }
 
   .pdf-page-slot canvas {
     max-width: none;
@@ -1637,7 +1642,7 @@
       <div class="brand-logo">🦅</div>
       <div class="brand-text-wrap">
         <div class="brand-title">CON CHIM XANH HUB</div>
-        <div class="brand-sub" id="header-status">Android • iOS • Tablet • V3.8.3 Supreme</div>
+        <div class="brand-sub" id="header-status">Android • iOS • Tablet • V3.8.4 Supreme</div>
       </div>
     </div>
     <div class="header-actions">
@@ -1774,20 +1779,19 @@
           </div>
           <div style="background:#05070B; border:1px solid var(--border-cyber); border-radius:12px; padding:12px; margin-bottom:12px; font-size:12.5px; line-height:1.6;">
             <div>• <b>Tên ứng dụng:</b> <span style="color:var(--cyan-neon); font-weight:800;">App đọc truyện - ConChimXanh Hub (Supreme)</span></div>
-            <div>• <b>Phiên bản hiện tại:</b> <span style="color:#34D399; font-weight:800;" id="about-cur-ver">V3.8.3 Supreme (Build #27)</span></div>
+            <div>• <b>Phiên bản hiện tại:</b> <span style="color:#34D399; font-weight:800;" id="about-cur-ver">V3.8.4 Supreme (Build #28)</span></div>
             <div>• <b>Bản mới nhất trên Cloud:</b> <span style="color:var(--amber-neon); font-weight:800;" id="about-latest-ver">Đang kiểm tra...</span></div>
             <div>• <b>Nhận diện thiết bị:</b> <span style="color:#7DD3FC; font-weight:700;" id="about-device-mode">Đang phân tích màn hình...</span></div>
-            <div>• <b>Dữ liệu Kho Tổng Hợp:</b> <span style="color:#fff; font-weight:700;" id="about-catalog-stats">5,500+ Bộ (Truyện Tranh • Truyện Chữ • Anime • Phim)</span></div>
+            <div>• <b>Dữ liệu Kho Tổng Hợp:</b> <span style="color:#fff; font-weight:700;" id="about-catalog-stats">18,840+ Bộ (467 Truyện Tranh • 18,191 Truyện Chữ • 145 Anime • 46 Phim)</span></div>
           </div>
           <button class="btn-cyber btn-primary" style="width:100%; margin-bottom:10px;" onclick="manualCheckUpdateFromVersionTab()">
             ⚡ KIỂM TRA & CẬP NHẬT PHIÊN BẢN MỚI NGAY
           </button>
           <div style="font-size:12px; font-weight:800; color:var(--cyan-neon); margin-bottom:6px;">✨ Tính năng mới trong phiên bản này:</div>
           <div id="about-changelog-box" style="background:#05070B; border:1px solid rgba(255,255,255,0.07); border-radius:10px; padding:10px 12px; font-size:12px; color:var(--text-sub); line-height:1.5;">
+            • Zoom đúng tâm ngón tay (Focal-Point Pinch Zoom) ở cả Trang Trái, Trang Phải (2 Trang Đôi), 1 Trang & Cuộn Dọc — chấm dứt hoàn toàn hiện tượng nhảy tâm về gáy sách.<br>
             • Gỡ bỏ hoàn toàn chạm 1 ngón tự Zoom (Zoom chỉ kích hoạt khi Pinch 2 ngón tay hoặc bấm nút 🔍 Zoom), giúp 1 chạm mở/ẩn Menu điều khiển mượt 100%.<br>
-            • Tự động nhận diện Trang Đôi Khổ Ngang ("trang to đọc ngang") trải rộng toàn màn hình trong cả Chế Độ 2 Trang Đôi, 1 Trang & Cuộn Dọc.<br>
-            • Chống màn hình đen & chống sập khung trang khi lật trang nhanh.<br>
-            • Bộ Đếm Lượt Xem Thật 100% Thời Gian Thực trên Đám Mây cho Bảng Xếp Hạng 🏆 Top Đọc Nhiều.
+            • Tự động nhận diện Trang Đôi Khổ Ngang ("trang to đọc ngang") trải rộng toàn màn hình và gia cố chống nghẽn hạn mức Đám Mây khi Cập nhật OTA & Đồng bộ Lượt Xem Thật.
           </div>
         </div>
 
@@ -2118,12 +2122,12 @@
   </div>
 </div>
 
-<script src="catalog_data.js?v=3.8.3"></script>
-<script src="folder_tree.js?v=3.8.3"></script>
+<script src="catalog_data.js?v=3.8.4"></script>
+<script src="folder_tree.js?v=3.8.4"></script>
 <script src="pdf.min.js"></script>
 <script>
   if (window.pdfjsLib) {
-    pdfjsLib.GlobalWorkerOptions.workerSrc = window._isNativeAndroidBridge ? 'pdf.worker.min.js' : 'pdf.worker.min.js?v=3.8.3';
+    pdfjsLib.GlobalWorkerOptions.workerSrc = window._isNativeAndroidBridge ? 'pdf.worker.min.js' : 'pdf.worker.min.js?v=3.8.4';
   }
 
   // ============================================================================
@@ -2269,7 +2273,7 @@
 
   if (!window.CCXBridge) {
     if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
-      navigator.serviceWorker.register('sw.js?v=3.8.3').then(reg => {
+      navigator.serviceWorker.register('sw.js?v=3.8.4').then(reg => {
         try { reg.update(); } catch (e) {}
       }).catch(() => {});
     }
@@ -2593,8 +2597,8 @@
         const minSide = Math.min(window.innerWidth, window.innerHeight);
         const isTab = window._isIpadOS || minSide >= 600;
         return JSON.stringify({
-          versionCode: 27,
-          versionName: '3.8.3',
+          versionCode: 28,
+          versionName: '3.8.4',
           isTablet: isTab,
           smallestScreenWidthDp: minSide,
           platform: window._isIosDevice ? 'ios' : 'web'
@@ -2694,13 +2698,13 @@
       },
       checkAppUpdate: async function(cbId) {
         try {
-          const changelog = 'Phiên bản V3.8.1 Supreme (Build #25): 1) Khắc phục triệt để chế độ Zoom (1.4x/1.8x/2.3x, Pinch 2 ngón, Chạm đúp & Kéo 2D không mất mép trang trái) khi đọc Chế Độ 2 Trang Đôi trên cả Điện thoại & Tablet/iPad; 2) Bổ sung Bảng Xếp Hạng 🏆 Top Đọc Nhiều kèm 5 bộ lọc con (Top Tất Cả, Top Truyện Tranh, Top Truyện Chữ, Top Anime, Top Phim); 3) Tích hợp Engine Giải Mã Trực Tiếp .MKV -> fMP4 chuẩn ISO BMFF ngay trong trình phát <video> trên iOS/iPadOS & Web (xóa sổ hoàn toàn lỗi giới hạn lượt phát Google Drive); 4) Sửa dứt điểm nút ← Quay Lại góc trên bên trái & cử chỉ Back trên iOS Web/App!';
+          const changelog = 'Phiên bản V3.8.4 Supreme (Build #28): 1) Nâng cấp Zoom Đúng Tâm Ngón Tay (Focal-Point Pinch Zoom) ở cả Trang Trái, Trang Phải (2 Trang Đôi), 1 Trang & Cuộn Dọc — không còn bị nhảy tâm về gáy sách; 2) Gỡ bỏ hoàn toàn chạm 1 ngón tự Zoom để 1 chạm mở/ẩn Menu mượt 100%, tự động trải rộng Trang Đôi Khổ Ngang ("trang to đọc ngang") toàn màn hình; 3) Bảng Xếp Hạng 🏆 Top Đọc Nhiều dùng 100% Lượt Xem Thật thời gian thực trên Đám Mây; 4) Gia cố chống nghẽn hạn mức 403/429 khi Cập nhật OTA & Đồng bộ Đám Mây!';
           window.onCCXCallback(cbId, {
             ok: true,
-            currentVersionCode: 25,
-            currentVersionName: '3.8.1',
-            latestVersionCode: 25,
-            latestVersionName: '3.8.1',
+            currentVersionCode: 28,
+            currentVersionName: '3.8.4',
+            latestVersionCode: 28,
+            latestVersionName: '3.8.4',
             hasUpdate: false,
             changelog: changelog
           });
@@ -3088,17 +3092,22 @@
           let existingId = (cleanCode === 'global_views_v1') ? '1aMnrmz0f1tVJDaM_9CLxxeGIUrcOru8P' : null;
           if (!existingId) {
             const q = `'${CCX_OAUTH.otaRoot}' in parents and name = '${syncFileName}' and trashed = false`;
-            const findRes = await fetch(`https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(q)}&fields=files(id,name)&pageSize=1&supportsAllDrives=true&includeItemsFromAllDrives=true`, {
-              headers: { 'Authorization': 'Bearer ' + token }
-            });
-            if (findRes.ok) {
+            let findRes = null;
+            for (let att = 0; att < 4; att++) {
+              findRes = await fetch(`https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(q)}&fields=files(id,name)&pageSize=1&supportsAllDrives=true&includeItemsFromAllDrives=true`, {
+                headers: { 'Authorization': 'Bearer ' + token }
+              });
+              if (findRes.ok || (findRes.status !== 403 && findRes.status !== 429 && findRes.status < 500)) break;
+              await new Promise(r => setTimeout(r, 700 * (att + 1) + Math.floor(Math.random() * 250)));
+            }
+            if (findRes && findRes.ok) {
               const fj = await findRes.json();
               if (fj.files && fj.files.length > 0) existingId = fj.files[0].id;
             }
           }
           if (existingId) {
             let pr = null;
-            for (let att = 0; att < 3; att++) {
+            for (let att = 0; att < 5; att++) {
               pr = await fetch(`https://www.googleapis.com/upload/drive/v3/files/${existingId}?uploadType=media&supportsAllDrives=true`, {
                 method: 'PATCH',
                 headers: {
@@ -3107,8 +3116,8 @@
                 },
                 body: jsonPayload
               });
-              if (pr.ok || pr.status !== 403) break;
-              await new Promise(r => setTimeout(r, 650 * (att + 1)));
+              if (pr.ok || (pr.status !== 403 && pr.status !== 429 && pr.status < 500)) break;
+              await new Promise(r => setTimeout(r, 750 * (att + 1) + Math.floor(Math.random() * 300)));
             }
             window.onCCXCallback(cbId, { ok: !!(pr && pr.ok), syncCode: cleanCode });
             return;
@@ -3116,15 +3125,20 @@
           const boundary = '=======CCXWebSync' + Date.now();
           const meta = JSON.stringify({ name: syncFileName, parents: [CCX_OAUTH.otaRoot] });
           const multipartBody = `--${boundary}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n${meta}\r\n--${boundary}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n${jsonPayload}\r\n--${boundary}--\r\n`;
-          const cr = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&supportsAllDrives=true', {
-            method: 'POST',
-            headers: {
-              'Authorization': 'Bearer ' + token,
-              'Content-Type': 'multipart/related; boundary=' + boundary
-            },
-            body: multipartBody
-          });
-          window.onCCXCallback(cbId, { ok: cr.ok, syncCode: cleanCode });
+          let cr = null;
+          for (let att = 0; att < 5; att++) {
+            cr = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&supportsAllDrives=true', {
+              method: 'POST',
+              headers: {
+                'Authorization': 'Bearer ' + token,
+                'Content-Type': 'multipart/related; boundary=' + boundary
+              },
+              body: multipartBody
+            });
+            if (cr.ok || (cr.status !== 403 && cr.status !== 429 && cr.status < 500)) break;
+            await new Promise(r => setTimeout(r, 750 * (att + 1) + Math.floor(Math.random() * 300)));
+          }
+          window.onCCXCallback(cbId, { ok: !!(cr && cr.ok), syncCode: cleanCode });
         } catch (e) {
           window.onCCXCallback(cbId, { ok: false, error: e.message });
         }
@@ -3137,7 +3151,7 @@
             return;
           }
           const token = await getValidWebAccessToken();
-          if (!token) {
+          if (!token && cleanCode !== 'global_views_v1') {
             window.onCCXCallback(cbId, { ok: false, error: 'Không thể kết nối Đám Mây.' });
             return;
           }
@@ -3146,13 +3160,13 @@
             const syncFileName = 'ccx_sync_' + cleanCode + '.json';
             const q = `'${CCX_OAUTH.otaRoot}' in parents and name = '${syncFileName}' and trashed = false`;
             let findRes = null;
-            for (let att = 0; att < 3; att++) {
+            for (let att = 0; att < 5; att++) {
               findRes = await fetch(`https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(q)}&fields=files(id,name)&pageSize=1&orderBy=modifiedTime%20desc&supportsAllDrives=true&includeItemsFromAllDrives=true`, {
                 cache: 'no-store',
                 headers: { 'Authorization': 'Bearer ' + token }
               });
-              if (findRes.ok || findRes.status !== 403) break;
-              await new Promise(r => setTimeout(r, 650 * (att + 1)));
+              if (findRes.ok || (findRes.status !== 403 && findRes.status !== 429 && findRes.status < 500)) break;
+              await new Promise(r => setTimeout(r, 750 * (att + 1) + Math.floor(Math.random() * 250)));
             }
             if (!findRes || !findRes.ok) {
               window.onCCXCallback(cbId, { ok: false, error: 'Lỗi truy vấn Đám Mây.' });
@@ -3166,20 +3180,35 @@
             targetFileId = fj.files[0].id;
           }
           let dlRes = null;
-          for (let att = 0; att < 3; att++) {
-            dlRes = await fetch(`https://www.googleapis.com/drive/v3/files/${targetFileId}?alt=media&supportsAllDrives=true`, {
-              cache: 'no-store',
-              headers: { 'Authorization': 'Bearer ' + token }
-            });
-            if (dlRes.ok || dlRes.status !== 403) break;
-            await new Promise(r => setTimeout(r, 650 * (att + 1)));
+          if (token) {
+            for (let att = 0; att < 5; att++) {
+              dlRes = await fetch(`https://www.googleapis.com/drive/v3/files/${targetFileId}?alt=media&supportsAllDrives=true`, {
+                cache: 'no-store',
+                headers: { 'Authorization': 'Bearer ' + token }
+              });
+              if (dlRes.ok || (dlRes.status !== 403 && dlRes.status !== 429 && dlRes.status < 500)) break;
+              await new Promise(r => setTimeout(r, 750 * (att + 1) + Math.floor(Math.random() * 250)));
+            }
           }
           if (dlRes && dlRes.ok) {
             const data = await dlRes.json();
             window.onCCXCallback(cbId, { ok: true, syncCode: cleanCode, data: data });
-          } else {
-            window.onCCXCallback(cbId, { ok: false, error: 'Không đọc được dữ liệu đồng bộ.' });
+            return;
           }
+          // Zero-Quota Fallback via drive.usercontent.google.com if Google API project quota spikes
+          try {
+            const rawDirectUrl = `https://drive.usercontent.google.com/download?id=${encodeURIComponent(targetFileId)}&export=download&confirm=t&cb=${Date.now()}`;
+            const proxyUrl = `https://api.codetabs.com/v1/proxy/?quest=${encodeURIComponent(rawDirectUrl)}`;
+            const pRes = await fetch(proxyUrl, { cache: 'no-store' });
+            if (pRes && pRes.ok) {
+              const pData = await pRes.json();
+              if (pData && typeof pData === 'object') {
+                window.onCCXCallback(cbId, { ok: true, syncCode: cleanCode, data: pData });
+                return;
+              }
+            }
+          } catch (eFallback) {}
+          window.onCCXCallback(cbId, { ok: false, error: 'Không đọc được dữ liệu đồng bộ.' });
         } catch (e) {
           window.onCCXCallback(cbId, { ok: false, error: e.message });
         }
@@ -3964,14 +3993,14 @@
     if (elMovie) elMovie.textContent = vCount;
   }
 
-  let hardwareDeviceInfo = { isTablet: false, smallestScreenWidthDp: 390, versionCode: 27, versionName: '3.8.3' };
+  let hardwareDeviceInfo = { isTablet: false, smallestScreenWidthDp: 390, versionCode: 28, versionName: '3.8.4' };
   let isEcoCoolMode = false;
 
   window._ccxHotRefreshFolderTree = function() {
     try {
       const s = document.createElement('script');
       s.async = true;
-      s.src = 'https://conchimxanh-ai.github.io/Turing-Morphogenesis-Quant-Shield/folder_tree.js?v=3.8.3&t=' + Math.floor(Date.now() / 180000);
+      s.src = 'https://conchimxanh-ai.github.io/Turing-Morphogenesis-Quant-Shield/folder_tree.js?v=3.8.4&t=' + Math.floor(Date.now() / 180000);
       document.head.appendChild(s);
     } catch (e) {}
   };
@@ -4173,9 +4202,9 @@
     const catStatsEl = document.getElementById('about-catalog-stats');
     const logBox = document.getElementById('about-changelog-box');
 
-    const vName = (latestOtaInfo && latestOtaInfo.currentVersionName) || hardwareDeviceInfo.versionName || '2.9.0';
-    const vCode = (latestOtaInfo && latestOtaInfo.currentVersionCode) || hardwareDeviceInfo.versionCode || 11;
-    if (curVerEl) curVerEl.textContent = `V${vName} Beta (Build #${vCode})`;
+    const vName = (latestOtaInfo && latestOtaInfo.currentVersionName) || hardwareDeviceInfo.versionName || '3.8.4';
+    const vCode = (latestOtaInfo && latestOtaInfo.currentVersionCode) || hardwareDeviceInfo.versionCode || 28;
+    if (curVerEl) curVerEl.textContent = `V${vName} Supreme (Build #${vCode})`;
 
     if (latestVerEl) {
       if (latestOtaInfo) {
@@ -4184,14 +4213,22 @@
           : `✅ Đang là bản mới nhất (V${latestOtaInfo.latestVersionName})`;
         latestVerEl.style.color = latestOtaInfo.hasUpdate ? '#FBBF24' : '#34D399';
       } else {
-        latestVerEl.textContent = `V${vName} Beta`;
+        latestVerEl.textContent = `V${vName} Supreme`;
       }
     }
 
     if (devModeEl) {
-      devModeEl.textContent = hardwareDeviceInfo.isTablet
-        ? `📟 Máy Tính Bảng Tablet (${hardwareDeviceInfo.smallestScreenWidthDp}dp • Xoay Ngang & Đọc 2 Trang Đôi)`
-        : `📱 Điện Thoại Android (${hardwareDeviceInfo.smallestScreenWidthDp}dp • Khóa Dọc Chống Chồng Chéo UI)`;
+      if (window._isIpadOS) {
+        devModeEl.textContent = `📟 Máy Tính Bảng iPadOS (${hardwareDeviceInfo.smallestScreenWidthDp}dp • Xoay Ngang & Đọc 2 Trang Đôi)`;
+      } else if (window._isIosDevice) {
+        devModeEl.textContent = `📱 Điện Thoại iPhone iOS (${hardwareDeviceInfo.smallestScreenWidthDp}dp • Chuẩn Eco-Cool Mát Máy)`;
+      } else if (!window._isNativeAndroidBridge) {
+        devModeEl.textContent = `💻 Trình Duyệt Web / Tablet (${hardwareDeviceInfo.smallestScreenWidthDp}dp • Đọc 2 Trang Đôi & Xem Phim)`;
+      } else {
+        devModeEl.textContent = hardwareDeviceInfo.isTablet
+          ? `📟 Máy Tính Bảng Tablet Android (${hardwareDeviceInfo.smallestScreenWidthDp}dp • Xoay Ngang & Đọc 2 Trang Đôi)`
+          : `📱 Điện Thoại Android (${hardwareDeviceInfo.smallestScreenWidthDp}dp • Khóa Dọc Chống Chồng Chéo UI)`;
+      }
     }
 
     if (catStatsEl) {
@@ -7979,22 +8016,85 @@
     removeActiveCurlStage();
   }
 
-  function applyZoomLevel(newZoom, showToastFlag) {
+  let _skipWebtoonJumpOnce = false;
+
+  function applyZoomLevel(newZoom, showToastFlag, focalOpts) {
+    const vpBefore = document.getElementById('reader-viewport');
+    let fX = (focalOpts && typeof focalOpts.focalXRatio === 'number') ? focalOpts.focalXRatio : null;
+    let fY = (focalOpts && typeof focalOpts.focalYRatio === 'number') ? focalOpts.focalYRatio : null;
+    let anchorX = (focalOpts && typeof focalOpts.localAnchorX === 'number') ? focalOpts.localAnchorX : null;
+    let anchorY = (focalOpts && typeof focalOpts.localAnchorY === 'number') ? focalOpts.localAnchorY : null;
+
+    if (vpBefore && (fX === null || fY === null)) {
+      const vpRect0 = vpBefore.getBoundingClientRect();
+      if (readerMode === 'webtoon') {
+        anchorX = vpBefore.clientWidth * 0.5;
+        anchorY = vpBefore.clientHeight * 0.42;
+        fX = (vpBefore.scrollLeft + anchorX) / Math.max(1, vpBefore.scrollWidth);
+        fY = (vpBefore.scrollTop + anchorY) / Math.max(1, vpBefore.scrollHeight);
+      } else if (zoomLevel > 1.02) {
+        const curFrame = vpBefore.querySelector('.book-open-frame, .book-single-frame');
+        if (curFrame && curFrame.offsetWidth > 0 && curFrame.offsetHeight > 0) {
+          const fr0 = curFrame.getBoundingClientRect();
+          anchorX = vpBefore.clientWidth * 0.5;
+          anchorY = vpBefore.clientHeight * 0.5;
+          fX = Math.max(0, Math.min(1, ((vpRect0.left + anchorX) - fr0.left) / curFrame.offsetWidth));
+          fY = Math.max(0, Math.min(1, ((vpRect0.top + anchorY) - fr0.top) / curFrame.offsetHeight));
+        }
+      }
+    }
+
     zoomLevel = Math.max(1.0, Math.min(3.0, Math.round(newZoom * 100) / 100));
     const zBtn = document.getElementById('zoom-btn');
     if (zBtn) zBtn.textContent = `🔍 Zoom: ${zoomLevel.toFixed(1)}x`;
-    buildReaderViewport().then(() => {
+    if (readerMode === 'webtoon') _skipWebtoonJumpOnce = true;
+
+    return buildReaderViewport().then(() => {
+      _skipWebtoonJumpOnce = false;
       const vp = document.getElementById('reader-viewport');
-      if (vp && zoomLevel > 1.02 && readerMode !== 'webtoon') {
-        vp.scrollLeft = Math.max(0, Math.round((vp.scrollWidth - vp.clientWidth) * 0.5));
-        vp.scrollTop = Math.max(0, Math.round((vp.scrollHeight - vp.clientHeight) * 0.22));
+      if (!vp) return;
+      if (readerMode === 'webtoon') {
+        const ax = (anchorX !== null) ? anchorX : (vp.clientWidth * 0.5);
+        const ay = (anchorY !== null) ? anchorY : (vp.clientHeight * 0.42);
+        if (fY !== null) {
+          vp.scrollTop = Math.max(0, Math.min(Math.max(0, vp.scrollHeight - vp.clientHeight), Math.round(fY * vp.scrollHeight - ay)));
+        }
+        if (zoomLevel > 1.02 && fX !== null) {
+          vp.scrollLeft = Math.max(0, Math.min(Math.max(0, vp.scrollWidth - vp.clientWidth), Math.round(fX * vp.scrollWidth - ax)));
+        } else {
+          vp.scrollLeft = 0;
+        }
+        return;
+      }
+      if (zoomLevel > 1.02) {
+        const newFrame = vp.querySelector('.book-open-frame, .book-single-frame');
+        if (newFrame && newFrame.offsetWidth > 0 && newFrame.offsetHeight > 0 && fX !== null && fY !== null) {
+          const vpRect = vp.getBoundingClientRect();
+          const fRect = newFrame.getBoundingClientRect();
+          const frameLeftInScroll = (fRect.left - vpRect.left) + vp.scrollLeft;
+          const frameTopInScroll = (fRect.top - vpRect.top) + vp.scrollTop;
+          const ax = (anchorX !== null) ? anchorX : (vp.clientWidth * 0.5);
+          const ay = (anchorY !== null) ? anchorY : (vp.clientHeight * 0.5);
+          const targetScrollX = Math.round(frameLeftInScroll + fX * newFrame.offsetWidth - ax);
+          const targetScrollY = Math.round(frameTopInScroll + fY * newFrame.offsetHeight - ay);
+          vp.scrollLeft = Math.max(0, Math.min(Math.max(0, vp.scrollWidth - vp.clientWidth), targetScrollX));
+          vp.scrollTop = Math.max(0, Math.min(Math.max(0, vp.scrollHeight - vp.clientHeight), targetScrollY));
+        } else {
+          vp.scrollLeft = Math.max(0, Math.round((vp.scrollWidth - vp.clientWidth) * 0.5));
+          vp.scrollTop = Math.max(0, Math.round((vp.scrollHeight - vp.clientHeight) * 0.22));
+        }
+      } else {
+        vp.scrollLeft = 0;
+        vp.scrollTop = 0;
+      }
+    }).finally(() => {
+      _skipWebtoonJumpOnce = false;
+      if (showToastFlag) {
+        showAppToast(zoomLevel > 1.02
+          ? `🔍 Đã phóng to ${zoomLevel.toFixed(1)}x (Kéo 1 ngón để trượt xem, dùng 2 ngón hoặc nút 🔍 Zoom để thu nhỏ)`
+          : `🔍 Đã về kích thước chuẩn 1.0x`);
       }
     });
-    if (showToastFlag) {
-      showAppToast(zoomLevel > 1.02
-        ? `🔍 Đã phóng to ${zoomLevel.toFixed(1)}x (Kéo 1 ngón để trượt xem, dùng 2 ngón hoặc nút 🔍 Zoom để thu nhỏ)`
-        : `🔍 Đã về kích thước chuẩn 1.0x`);
-    }
   }
 
   function initReaderBookSwipeGestures() {
@@ -8020,6 +8120,8 @@
     let pinchStartDist = 0;
     let pinchStartZoom = 1.0;
     let pinchLastScale = 1.0;
+    let pinchMidClientX = 0;
+    let pinchMidClientY = 0;
     let lastTouchEventTs = 0;
 
     function beginPointer(clientX, clientY) {
@@ -8151,6 +8253,8 @@
         pinchStartDist = Math.max(20, Math.hypot(t1.clientX - t0.clientX, t1.clientY - t0.clientY));
         pinchStartZoom = zoomLevel;
         pinchLastScale = 1.0;
+        pinchMidClientX = (t0.clientX + t1.clientX) * 0.5;
+        pinchMidClientY = (t0.clientY + t1.clientY) * 0.5;
         return;
       }
       if (e.touches.length > 2) {
@@ -8170,9 +8274,18 @@
         const t1 = e.touches[1];
         const dist = Math.max(20, Math.hypot(t1.clientX - t0.clientX, t1.clientY - t0.clientY));
         pinchLastScale = Math.max(0.5, Math.min(2.6, dist / pinchStartDist));
-        const frame = vp.querySelector('.book-open-frame, .book-single-frame');
+        pinchMidClientX = (t0.clientX + t1.clientX) * 0.5;
+        pinchMidClientY = (t0.clientY + t1.clientY) * 0.5;
+        const frame = vp.querySelector('.book-open-frame, .book-single-frame') || vp.querySelector('#page-slot-' + currentPage);
         if (frame) {
-          frame.style.transformOrigin = 'center center';
+          const fr = frame.getBoundingClientRect();
+          if (fr.width > 0 && fr.height > 0) {
+            const ox = Math.max(0, Math.min(100, ((pinchMidClientX - fr.left) / fr.width) * 100));
+            const oy = Math.max(0, Math.min(100, ((pinchMidClientY - fr.top) / fr.height) * 100));
+            frame.style.transformOrigin = `${ox.toFixed(1)}% ${oy.toFixed(1)}%`;
+          } else {
+            frame.style.transformOrigin = 'center center';
+          }
           frame.style.transform = `scale(${pinchLastScale.toFixed(3)})`;
         }
         window._ccxLastSwipeAt = Date.now();
@@ -8189,13 +8302,29 @@
       if (pinchActive && (!e.touches || e.touches.length < 2)) {
         pinchActive = false;
         window._ccxLastSwipeAt = Date.now();
-        const frame = vp.querySelector('.book-open-frame, .book-single-frame');
+        const frame = vp.querySelector('.book-open-frame, .book-single-frame') || vp.querySelector('#page-slot-' + currentPage);
         if (frame) {
           frame.style.transform = '';
+          frame.style.transformOrigin = '';
         }
         const targetZoom = Math.max(1.0, Math.min(3.0, pinchStartZoom * pinchLastScale));
         if (Math.abs(targetZoom - zoomLevel) >= 0.06) {
-          applyZoomLevel(targetZoom, true);
+          const vpRect = vp.getBoundingClientRect();
+          const localAnchorX = Math.max(0, Math.min(vp.clientWidth, pinchMidClientX - vpRect.left));
+          const localAnchorY = Math.max(0, Math.min(vp.clientHeight, pinchMidClientY - vpRect.top));
+          let focalOpts = { localAnchorX, localAnchorY };
+          if (readerMode === 'webtoon') {
+            focalOpts.focalXRatio = Math.max(0, Math.min(1, (vp.scrollLeft + localAnchorX) / Math.max(1, vp.scrollWidth)));
+            focalOpts.focalYRatio = Math.max(0, Math.min(1, (vp.scrollTop + localAnchorY) / Math.max(1, vp.scrollHeight)));
+          } else {
+            const bookFrame = vp.querySelector('.book-open-frame, .book-single-frame');
+            if (bookFrame && bookFrame.offsetWidth > 0 && bookFrame.offsetHeight > 0) {
+              const fRect = bookFrame.getBoundingClientRect();
+              focalOpts.focalXRatio = Math.max(0, Math.min(1, (pinchMidClientX - fRect.left) / bookFrame.offsetWidth));
+              focalOpts.focalYRatio = Math.max(0, Math.min(1, (pinchMidClientY - fRect.top) / bookFrame.offsetHeight));
+            }
+          }
+          applyZoomLevel(targetZoom, true, focalOpts);
         }
         return;
       }
@@ -8230,6 +8359,7 @@
     initReaderBookSwipeGestures();
     const vp = document.getElementById('reader-viewport');
     vp.classList.toggle('zoomed-active', zoomLevel > 1.02 && readerMode !== 'webtoon');
+    vp.classList.toggle('zoomed-webtoon', zoomLevel > 1.02 && readerMode === 'webtoon');
     if (_pageRenderWaitQueue && _pageRenderWaitQueue.length > 0) {
       while (_pageRenderWaitQueue.length > 0) {
         const it = _pageRenderWaitQueue.pop();
@@ -8277,6 +8407,7 @@
           slot.id = 'page-slot-' + p;
           slot.dataset.page = p;
           slot.style.minHeight = Math.round(displayW * 1.42) + 'px';
+          if (zoomLevel > 1.02) slot.style.minWidth = displayW + 'px';
           const img = document.createElement('img');
           img.loading = 'lazy';
           attachDriveImageSource(img, imgItem.id, port);
@@ -8298,7 +8429,7 @@
         });
         vp.replaceChildren(frag);
         attachScrollTracker(vp);
-        if (currentPage > 1) {
+        if (currentPage > 1 && !_skipWebtoonJumpOnce) {
           const targetEl = document.getElementById('page-slot-' + currentPage);
           if (targetEl) setTimeout(() => targetEl.scrollIntoView({ behavior: 'instant' }), 50);
         }
@@ -8422,6 +8553,7 @@
         slot.id = 'page-slot-' + p;
         slot.dataset.page = p;
         slot.style.minHeight = estH + 'px';
+        if (zoomLevel > 1.02) slot.style.minWidth = screenW + 'px';
         slot.innerHTML = `<span class="page-num-watermark">${p} / ${totalPages}</span>`;
         frag.appendChild(slot);
       }
@@ -8462,13 +8594,13 @@
       slotList.forEach(el => pageObserver.observe(el));
       attachScrollTracker(vp, Array.from(slotList));
 
-      if (currentPage > 1) {
+      if (currentPage > 1 && !_skipWebtoonJumpOnce) {
         const targetEl = document.getElementById('page-slot-' + currentPage);
         if (targetEl) {
           setTimeout(() => { targetEl.scrollIntoView({ behavior: 'instant' }); }, 50);
         }
       }
-      renderSinglePdfPage(currentPage, false, myGen);
+      await renderSinglePdfPage(currentPage, false, myGen);
       if (currentPage + 1 <= totalPages) renderSinglePdfPage(currentPage + 1, false, myGen);
     } else if (useSpread) {
       // 2-Page Open Book Spread Mode with Auto Wide-Page Detection ("trang to đọc ngang")
