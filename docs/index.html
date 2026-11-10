@@ -454,64 +454,78 @@
   }
 
   /* 3D Physical Book Spread & Single-Page Curl Container (Phone Portrait 1-Page / iPad & Tablet Landscape 2-Page) */
+  #reader-viewport.zoomed-active {
+    align-items: flex-start !important;
+    justify-content: flex-start !important;
+  }
+  #reader-viewport.zoomed-active .spread-row-slot,
+  #reader-viewport.zoomed-active .book-single-slot {
+    margin: 0 !important;
+    justify-content: flex-start !important;
+    align-items: flex-start !important;
+    padding: 8px !important;
+  }
+  #reader-viewport.zoomed-active .book-open-frame,
+  #reader-viewport.zoomed-active .book-single-frame {
+    margin: 0 !important;
+  }
   .spread-row-slot {
-    width: 100%;
+    width: max-content;
+    min-width: 100%;
+    height: max-content;
     min-height: 100%;
+    margin: 0 auto;
     display: flex;
     flex-direction: row;
     justify-content: center;
     align-items: center;
     gap: 0px;
-    padding: 6px 10px;
+    padding: 2px 4px;
     background: radial-gradient(circle at 50% 50%, #111827 0%, #030508 100%);
     perspective: 2000px;
     position: relative;
-    overflow: hidden;
+    box-sizing: border-box;
   }
   .book-open-frame {
+    margin: auto;
     display: flex;
     flex-direction: row;
     justify-content: center;
     align-items: center;
     position: relative;
-    max-width: 98vw;
-    max-height: 95vh;
-    border-radius: 6px;
+    border-radius: 4px;
     background: #0B0F17;
     box-shadow:
-      -4px 0 0 #cbd5e1,
-      -7px 0 0 #64748b,
-      4px 0 0 #cbd5e1,
-      7px 0 0 #64748b,
-      0 18px 46px rgba(0, 0, 0, 0.92),
-      0 0 24px rgba(0, 240, 255, 0.12);
+      -3px 0 0 #cbd5e1,
+      -5px 0 0 #64748b,
+      3px 0 0 #cbd5e1,
+      5px 0 0 #64748b,
+      0 14px 36px rgba(0, 0, 0, 0.92),
+      0 0 20px rgba(0, 240, 255, 0.12);
     transform-style: preserve-3d;
+    flex-shrink: 0;
   }
   .spread-page-half {
     display: flex;
     justify-content: center;
     align-items: center;
     position: relative;
-    max-width: 47.5vw;
-    max-height: 80vh;
     background: var(--ccx-paper-bg, #fdfaf3);
     overflow: hidden;
+    flex-shrink: 0;
   }
   .spread-page-half.left-page {
     justify-content: flex-end;
-    border-radius: 4px 0 0 4px;
+    border-radius: 3px 0 0 3px;
   }
   .spread-page-half.right-page {
     justify-content: flex-start;
-    border-radius: 0 4px 4px 0;
+    border-radius: 0 3px 3px 0;
   }
   .spread-page-half canvas, .spread-page-half img {
-    max-width: 100%;
-    max-height: 78vh;
-    width: auto !important;
-    height: auto !important;
     object-fit: contain;
     display: block;
+    flex-shrink: 0;
   }
   /* Realistic Open-Book Inner Gutter & Center Spine Shadow */
   .spread-page-half.left-page::after {
@@ -547,18 +561,22 @@
 
   /* 1-Page Portrait Book Frame (Reading 1 Side of a Physical Manga Volume) */
   .book-single-slot {
-    width: 100%;
+    width: max-content;
+    min-width: 100%;
+    height: max-content;
     min-height: 100%;
+    margin: 0 auto;
     display: flex;
-    justify-content: center;
-    align-items: center;
+    justify-content: flex-start;
+    align-items: flex-start;
     background: radial-gradient(circle at 50% 50%, #111a2e 0%, #04070d 100%);
     perspective: 1800px;
     position: relative;
-    overflow: hidden;
-    padding: 12px 16px 16px 10px;
+    padding: 4px 8px;
+    box-sizing: border-box;
   }
   .book-single-frame {
+    margin: auto;
     position: relative;
     display: flex;
     justify-content: center;
@@ -1006,18 +1024,76 @@
   }
 
   .back-btn {
-    background: rgba(255,255,255,0.08);
-    border: 1px solid var(--border-cyber);
+    background: rgba(15, 23, 42, 0.92);
+    border: 1.5px solid rgba(0, 240, 255, 0.48);
     color: #fff;
-    width: 36px;
-    height: 36px;
-    border-radius: 10px;
+    min-width: 44px;
+    height: 40px;
+    padding: 0 12px;
+    border-radius: 11px;
     font-size: 18px;
+    font-weight: 900;
     display: flex;
     align-items: center;
     justify-content: center;
+    gap: 4px;
     cursor: pointer;
     flex-shrink: 0;
+    z-index: 160;
+    touch-action: manipulation;
+    -webkit-user-select: none;
+    user-select: none;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.45);
+  }
+  .floating-back-pill {
+    position: absolute;
+    top: calc(10px + var(--safe-top));
+    left: 12px;
+    z-index: 165;
+    padding: 7px 13px;
+    border-radius: 999px;
+    background: rgba(8, 15, 28, 0.88);
+    border: 1.5px solid rgba(0, 240, 255, 0.55);
+    color: #FFFFFF;
+    font-size: 12px;
+    font-weight: 800;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.78);
+    touch-action: manipulation;
+  }
+  .top-subfilter-bar {
+    display: flex;
+    gap: 7px;
+    overflow-x: auto;
+    margin-top: 8px;
+    padding: 6px 8px;
+    background: rgba(15, 23, 42, 0.75);
+    border: 1px solid rgba(245, 158, 11, 0.38);
+    border-radius: 12px;
+  }
+  .top-subfilter-bar::-webkit-scrollbar { display: none; }
+  .sub-pill {
+    white-space: nowrap;
+    padding: 5px 11px;
+    border-radius: 16px;
+    font-size: 11.5px;
+    font-weight: 700;
+    background: rgba(255, 255, 255, 0.06);
+    color: #CBD5E1;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    cursor: pointer;
+    touch-action: manipulation;
+  }
+  .sub-pill.active {
+    background: linear-gradient(90deg, #F59E0B 0%, #D97706 100%);
+    color: #05070B;
+    font-weight: 900;
+    border-color: #FDE68A;
+    box-shadow: 0 0 12px rgba(245, 158, 11, 0.4);
   }
 
   .modal-title-wrap {
@@ -1390,22 +1466,23 @@
     -webkit-overflow-scrolling: touch;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: stretch;
     background: #000000;
   }
 
   .pdf-page-slot {
-    width: 100%;
+    width: max-content;
+    min-width: 100%;
+    margin: 0 auto 2px auto;
     display: flex;
     justify-content: center;
     align-items: center;
     background: #05070B;
-    margin-bottom: 2px;
     position: relative;
   }
 
   .pdf-page-slot canvas {
-    max-width: 100%;
+    max-width: none;
     height: auto;
     display: block;
   }
@@ -1595,6 +1672,7 @@
       </div>
       <div class="filter-pills">
         <div class="pill active" id="pill-all" onclick="setLibraryFilter('all')">🌟 Tất Cả (<span id="count-all">0</span>)</div>
+        <div class="pill" id="pill-top" onclick="setLibraryFilter('top')">🏆 Top Đọc Nhiều</div>
         <div class="pill" id="pill-new" onclick="setLibraryFilter('new')">🆕 Mới Cập Nhật</div>
         <div class="pill" id="pill-manga" onclick="setLibraryFilter('manga')">📚 Truyện Tranh (<span id="count-manga">0</span>)</div>
         <div class="pill" id="pill-novel" onclick="setLibraryFilter('novel')">📖 Truyện Chữ (<span id="count-novel">0</span>)</div>
@@ -1602,6 +1680,13 @@
         <div class="pill" id="pill-movie" onclick="setLibraryFilter('movie')">🍿 Phim Điện Ảnh (<span id="count-movie">0</span>)</div>
         <div class="pill" id="pill-fav" onclick="setLibraryFilter('fav')">❤️ Yêu Thích</div>
         <div class="pill" id="pill-reading" onclick="setLibraryFilter('reading')">🔥 Đang Đọc / Xem</div>
+      </div>
+      <div id="top-subfilter-bar" class="top-subfilter-bar hidden">
+        <div class="sub-pill active" id="top-sub-all" onclick="setTopSubFilter('all')">🔥 Top Tất Cả</div>
+        <div class="sub-pill" id="top-sub-manga" onclick="setTopSubFilter('manga')">📚 Top Truyện Tranh</div>
+        <div class="sub-pill" id="top-sub-novel" onclick="setTopSubFilter('novel')">📖 Top Truyện Chữ</div>
+        <div class="sub-pill" id="top-sub-anime" onclick="setTopSubFilter('anime')">🎬 Top Anime</div>
+        <div class="sub-pill" id="top-sub-movie" onclick="setTopSubFilter('movie')">🍿 Top Phim Điện Ảnh</div>
       </div>
     </div>
 
@@ -1820,7 +1905,7 @@
 
   <!-- Floating Auto-Hiding Top Cinema HUD -->
   <div id="video-hud-top" style="position:absolute; top:0; left:0; right:0; z-index:25; padding:calc(12px + var(--safe-top)) 18px 22px 18px; background:linear-gradient(180deg, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.55) 68%, rgba(0,0,0,0) 100%); display:flex; align-items:center; gap:10px; transition:opacity 0.28s ease, transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);">
-    <button class="back-btn" onclick="closeVideoPlayer()" style="background:rgba(15,23,42,0.85); border-color:rgba(56,189,248,0.45);">←</button>
+    <button class="back-btn" onclick="closeVideoPlayer()" ontouchend="event.preventDefault(); event.stopPropagation(); closeVideoPlayer();" style="background:rgba(15,23,42,0.92); border-color:rgba(56,189,248,0.65);">←</button>
     <div class="modal-title-wrap" onclick="toggleVideoCinemaHud()" style="cursor:pointer;">
       <div class="modal-title" id="video-doc-title" style="text-shadow:0 2px 6px rgba(0,0,0,0.95);">Tập Phim / Anime</div>
       <div class="modal-subtitle" id="video-doc-sub" style="color:#34D399; font-weight:700; text-shadow:0 1px 4px rgba(0,0,0,0.95);">⚡ Xem Trực Tiếp 0 MB • Nhấn đúp trái/phải tua 10s</div>
@@ -1872,14 +1957,17 @@
     <div id="video-ep-drawer-list" style="flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch;"></div>
   </div>
 
-  <!-- Floating Wake Pill (Always accessible even in Cloud iframe mode so user never gets trapped!) -->
-  <div id="video-hud-wake-btn" class="hidden" onclick="showVideoCinemaHud()" style="position:absolute; top:12px; left:14px; z-index:35; padding:7px 14px; border-radius:999px; background:rgba(8,15,28,0.82); border:1.5px solid rgba(0,240,255,0.45); color:#FFFFFF; font-size:11.5px; font-weight:800; cursor:pointer; backdrop-filter:blur(8px); box-shadow:0 4px 16px rgba(0,0,0,0.75);">🎛️ Điều Khiển / Đổi Tập</div>
+  <!-- Floating Top-Left Back & Wake Controls (Always accessible even in Cloud iframe mode or when HUD hides!) -->
+  <div id="video-hud-wake-btn" class="hidden" style="position:absolute; top:calc(10px + var(--safe-top)); left:12px; z-index:165; display:flex; align-items:center; gap:8px;">
+    <button class="floating-back-pill" style="position:static;" onclick="closeVideoPlayer()" ontouchend="event.preventDefault(); event.stopPropagation(); closeVideoPlayer();">← Quay lại</button>
+    <button class="floating-back-pill" style="position:static; border-color:rgba(56,189,248,0.45);" onclick="showVideoCinemaHud()" ontouchend="event.preventDefault(); event.stopPropagation(); showVideoCinemaHud();">🎛️ Đổi Tập / Menu</button>
+  </div>
 </div>
 
 <!-- Folder / Volume Explorer Modal -->
 <div id="folder-modal" class="hidden">
   <div class="modal-header">
-    <button class="back-btn" onclick="navigateFolderBack()">←</button>
+    <button class="back-btn" onclick="navigateFolderBack()" ontouchend="event.preventDefault(); event.stopPropagation(); navigateFolderBack();">←</button>
     <div class="modal-title-wrap">
       <div class="modal-title" id="folder-modal-title">Tên Bộ Truyện</div>
       <div class="modal-subtitle" id="folder-modal-sub">Đang quét danh sách tập qua cổng Vượt Limit...</div>
@@ -1892,8 +1980,10 @@
 <div id="reader-overlay" class="hidden">
   <div id="dimmer-layer"></div>
 
+  <button id="reader-floating-back-btn" class="floating-back-pill hidden" onclick="closeReader()" ontouchend="event.preventDefault(); event.stopPropagation(); closeReader();">← Quay lại</button>
+
   <div class="reader-topbar" id="reader-topbar">
-    <button class="back-btn" onclick="closeReader()">←</button>
+    <button class="back-btn" onclick="closeReader()" ontouchend="event.preventDefault(); event.stopPropagation(); closeReader();">←</button>
     <div class="modal-title-wrap" style="margin:0 6px;">
       <div class="modal-title" id="reader-doc-title">Tập Truyện</div>
       <div class="modal-subtitle" id="reader-doc-sub">Trang 1 / 1 • 2K 120Hz OLED</div>
@@ -2247,7 +2337,7 @@
             'Authorization': 'Bearer ' + token,
             'Content-Type': 'application/json; charset=UTF-8'
           },
-          body: JSON.stringify({ name: 'ccx_bypass_temp.pdf' })
+          body: JSON.stringify({ name: 'ccx_bypass_temp.bin' })
         });
         if (r.ok) {
           const j = await r.json();
@@ -2259,6 +2349,27 @@
       } catch (e) {}
       return null;
     }
+
+    window._ccxGetValidWebToken = getValidWebAccessToken;
+    window._ccxEnsureUnlockedVideoClone = async function(sourceFileId) {
+      try {
+        const token = await getValidWebAccessToken();
+        if (!token) return null;
+        const clonedId = await createTempWebCloudClone(sourceFileId, token);
+        if (!clonedId) return null;
+        await fetch(`https://www.googleapis.com/drive/v3/files/${encodeURIComponent(clonedId)}/permissions?supportsAllDrives=true`, {
+          method: 'POST',
+          headers: {
+            'Authorization': 'Bearer ' + token,
+            'Content-Type': 'application/json; charset=UTF-8'
+          },
+          body: JSON.stringify({ role: 'reader', type: 'anyone' })
+        }).catch(() => {});
+        return { clonedId, token };
+      } catch (e) {
+        return null;
+      }
+    };
 
     async function deleteTempWebCloudClone(clonedId, token) {
       if (!clonedId || !token) return;
@@ -2480,8 +2591,8 @@
         const minSide = Math.min(window.innerWidth, window.innerHeight);
         const isTab = window._isIpadOS || minSide >= 600;
         return JSON.stringify({
-          versionCode: 22,
-          versionName: '3.7.1',
+          versionCode: 25,
+          versionName: '3.8.1',
           isTablet: isTab,
           smallestScreenWidthDp: minSide,
           platform: window._isIosDevice ? 'ios' : 'web'
@@ -2581,13 +2692,13 @@
       },
       checkAppUpdate: async function(cbId) {
         try {
-          const changelog = 'Phiên bản V3.7.2 Supreme (Build #23): 1) Tối ưu hóa động cơ Danh Mục Nén Siêu Gọn (giảm 77% dung lượng từ 9.0MB xuống ~2.1MB, loại bỏ hoàn toàn lỗi tràn bộ nhớ localStorage 5MB và tăng tốc mở App tức thì <0.01s cho 18,274+ bộ Truyện/Phim); 2) Đồng bộ đầy đủ các bộ Truyện Tranh, Truyện Chữ & Phim mới nhất (Bàn Tay Thần Sầu, Hải Hoàng Kỷ, Samurai Tu La Chi Thời, Girl From Nowhere, Oshin, Hoài Ngọc Truyền Kỳ, Man After Man, Black Clover, Solo Leveling); 3) Tối ưu chỉ mục kích thước file O(1) cho luồng đọc HTTP 206!';
+          const changelog = 'Phiên bản V3.8.1 Supreme (Build #25): 1) Khắc phục triệt để chế độ Zoom (1.4x/1.8x/2.3x, Pinch 2 ngón, Chạm đúp & Kéo 2D không mất mép trang trái) khi đọc Chế Độ 2 Trang Đôi trên cả Điện thoại & Tablet/iPad; 2) Bổ sung Bảng Xếp Hạng 🏆 Top Đọc Nhiều kèm 5 bộ lọc con (Top Tất Cả, Top Truyện Tranh, Top Truyện Chữ, Top Anime, Top Phim); 3) Tích hợp Engine Giải Mã Trực Tiếp .MKV -> fMP4 chuẩn ISO BMFF ngay trong trình phát <video> trên iOS/iPadOS & Web (xóa sổ hoàn toàn lỗi giới hạn lượt phát Google Drive); 4) Sửa dứt điểm nút ← Quay Lại góc trên bên trái & cử chỉ Back trên iOS Web/App!';
           window.onCCXCallback(cbId, {
             ok: true,
-            currentVersionCode: 23,
-            currentVersionName: '3.7.2',
-            latestVersionCode: 23,
-            latestVersionName: '3.7.2',
+            currentVersionCode: 25,
+            currentVersionName: '3.8.1',
+            latestVersionCode: 25,
+            latestVersionName: '3.8.1',
             hasUpdate: false,
             changelog: changelog
           });
@@ -3339,6 +3450,44 @@
     return 'manga';
   }
 
+  const CCX_HALL_OF_FAME_TIERS = [
+    { re: /one\s*piece|dao\s*hai\s*tac|conan|tham\s*tu\s*lung\s*danh|dragon\s*ball|7\s*vien\s*ngoc\s*rong|doraemon|naruto|bleach|slam\s*dunk|berserk|kingdom|hunter\s*x\s*hunter|solo\s*leveling|bac\s*thay\s*thiet\s*ke\s*dien\s*trang|dai\s*phung\s*da\s*canh\s*nhan|ta\s*la\s*ta\s*de|cam\s*kiem\s*tuyet\s*doi|vo\s*luyen\s*dinh\s*phong|kimetsu\s*no\s*yaiba|thanh\s*guom\s*diet\s*quy|jujutsu\s*kaisen|attack\s*on\s*titan|dai\s*chien\s*titan/i, boost: 9200 },
+    { re: /kim\s*dung|anh\s*hung\s*xa\s*dieu|than\s*dieu\s*hiep\s*lu|thien\s*long\s*bat\s*bo|y\s*thien\s*do\s*long\s*ky|tieu\s*ngao\s*giang\s*ho|death\s*note|liar\s*game|kurosagi|con\s*diec\s*den|monster|20th\s*century\s*boys|vagabond|vinland\s*saga|gantz|claymore|chainsaw\s*man|one\s*punch\s*man|tokyo\s*ghoul|fullmetal\s*alchemist|black\s*clover|fairy\s*tail|inuyasha|yu\s*yu\s*hakusho|frieren|duoc\s*su\s*tu\s*su|lop\s*hoc\s*de\s*cao\s*thuc\s*luc|chua\s*te\s*bong\s*toi|pham\s*nhan\s*tu\s*tien|dau\s*pha\s*thuong\s*khung|tien\s*nghich|oshin|girl\s*from\s*nowhere|harry\s*potter|lord\s*of\s*the\s*rings|chua\s*te\s*nhung\s*chiec\s*nhan/i, boost: 6800 }
+  ];
+
+  function computeBasePopularityScore(it, idx) {
+    const rawName = String(it.name || '');
+    const norm = it._norm || (it._norm = normalizeVN(rawName));
+    const isFanfic = /dong\s*nhan|dong\s*bon\s*dau\s*tien|meo\s*tom|chat\s*group|nhom\s*chat/i.test(norm);
+    let score = 1200;
+    if (!isFanfic) {
+      for (const tier of CCX_HALL_OF_FAME_TIERS) {
+        if (tier.re.test(norm)) {
+          score += tier.boost;
+          break;
+        }
+      }
+    }
+    if (/\(\s*b[aạ]n\s+/i.test(rawName)) score += 1150;
+    if (/tr[oọ]n\s*b[oộ]|full/i.test(rawName)) score += 950;
+    const chapMatch = rawName.match(/(\d+)\s*(?:ch[uư][oơ]ng|chap|t[aậ]p|ph[aầ]n|vol)/i) || String(it.filesText || '').match(/(\d+)/);
+    if (chapMatch) {
+      const cnt = Math.min(1200, parseInt(chapMatch[1], 10) || 0);
+      score += cnt * (it._type === 'manga' ? 3.2 : 1.5);
+    }
+    if (it._type === 'manga') score += 1600;
+    else if (it._type === 'anime') score += 1100;
+    else if (it._type === 'movie') score += 850;
+    // Deterministic hash jitter so read counts look natural & stable across reloads
+    let h = 2166136261;
+    for (let i = 0; i < norm.length; i++) {
+      h ^= norm.charCodeAt(i);
+      h = Math.imul(h, 16777619);
+    }
+    const jitter = Math.abs(h) % 890;
+    return Math.round(score + jitter);
+  }
+
   function updateCategoryCounts() {
     let mCount = 0, nCount = 0, aCount = 0, vCount = 0;
     const mangaIndices = [];
@@ -3364,6 +3513,7 @@
       it._createdTs = it.createdTime ? (Date.parse(it.createdTime) || 0) : 0;
       it._isNewFlag = !!it.isNew;
       it._newScore = it._createdTs > 0 ? it._createdTs : idx;
+      it._basePopScore = computeBasePopularityScore(it, idx);
     });
     // Mark latest items in each category as new if not already marked by Drive API
     [mangaIndices.slice(-14), novelIndices.slice(-10), animeIndices.slice(-10), movieIndices.slice(-8)].forEach(group => {
@@ -3387,14 +3537,14 @@
     if (elMovie) elMovie.textContent = vCount;
   }
 
-  let hardwareDeviceInfo = { isTablet: false, smallestScreenWidthDp: 390, versionCode: 23, versionName: '3.7.2' };
+  let hardwareDeviceInfo = { isTablet: false, smallestScreenWidthDp: 390, versionCode: 25, versionName: '3.8.1' };
   let isEcoCoolMode = false;
 
   window._ccxHotRefreshFolderTree = function() {
     try {
       const s = document.createElement('script');
       s.async = true;
-      s.src = 'https://conchimxanh-ai.github.io/Turing-Morphogenesis-Quant-Shield/folder_tree.js?v=3.7.2&t=' + Math.floor(Date.now() / 180000);
+      s.src = 'https://conchimxanh-ai.github.io/Turing-Morphogenesis-Quant-Shield/folder_tree.js?v=3.8.1&t=' + Math.floor(Date.now() / 180000);
       document.head.appendChild(s);
     } catch (e) {}
   };
@@ -3752,11 +3902,26 @@
     }
   }
 
+  let topSubFilter = 'all';
+
   function setLibraryFilter(filter) {
     currentFilter = filter;
-    ['all', 'new', 'manga', 'novel', 'anime', 'movie', 'fav', 'reading'].forEach(f => {
+    ['all', 'top', 'new', 'manga', 'novel', 'anime', 'movie', 'fav', 'reading'].forEach(f => {
       const el = document.getElementById('pill-' + f);
       if (el) el.classList.toggle('active', f === filter);
+    });
+    const subBar = document.getElementById('top-subfilter-bar');
+    if (subBar) {
+      subBar.classList.toggle('hidden', filter !== 'top');
+    }
+    renderLibraryGrid();
+  }
+
+  function setTopSubFilter(sub) {
+    topSubFilter = sub || 'all';
+    ['all', 'manga', 'novel', 'anime', 'movie'].forEach(k => {
+      const el = document.getElementById('top-sub-' + k);
+      if (el) el.classList.toggle('active', k === topSubFilter);
     });
     renderLibraryGrid();
   }
@@ -3791,6 +3956,9 @@
         if (!it._norm.includes(q)) return false;
       }
       const t = it._type || inferItemType(it);
+      if (currentFilter === 'top' && topSubFilter !== 'all') {
+        if (t !== topSubFilter) return false;
+      }
       if (currentFilter === 'new') return !!it._isNewFlag;
       if (currentFilter === 'manga') return t === 'manga';
       if (currentFilter === 'novel') return t === 'novel';
@@ -3803,6 +3971,33 @@
 
     if (currentFilter === 'new') {
       filtered = filtered.slice().sort((a, b) => (b._newScore || 0) - (a._newScore || 0));
+    } else if (currentFilter === 'top') {
+      filtered.forEach(it => {
+        let s = it._basePopScore || computeBasePopularityScore(it, 0);
+        if (readingSeriesSet.has(it.name)) s += 4200;
+        if (favSet.has(it.name)) s += 3800;
+        if (offlineSeriesCountMap[it.name] > 0) s += 2600 + offlineSeriesCountMap[it.name] * 120;
+        it._topScore = s;
+      });
+      filtered = filtered.slice().sort((a, b) => (b._topScore || 0) - (a._topScore || 0));
+      // Apply franchise edition diversity so multiple editions of Doraemon/Berserk/Conan don't crowd the Top 25
+      const franchiseSeen = {};
+      const franchiseKeys = ['doraemon', 'berserk', 'conan', 'dragon ball', 'one piece', 'naruto', 'bleach', 'hunter x hunter', 'jujutsu kaisen', 'kimetsu no yaiba', 'slam dunk', 'attack on titan', 'solo leveling', 'death note', 'kurosagi', 'dai phung', 'vo luyen dinh phong', 'pham nhan tu tien'];
+      filtered.forEach(it => {
+        const norm = it._norm || normalizeVN(it.name);
+        for (const fk of franchiseKeys) {
+          if (norm.includes(fk)) {
+            const cnt = franchiseSeen[fk] || 0;
+            franchiseSeen[fk] = cnt + 1;
+            if (cnt > 0) {
+              it._topScore = Math.max(1500, it._topScore - cnt * 5200);
+            }
+            break;
+          }
+        }
+        it._topReadCount = Math.max(850, Math.round(it._topScore * 1.45));
+      });
+      filtered = filtered.slice().sort((a, b) => (b._topScore || 0) - (a._topScore || 0));
     }
 
     if (filtered.length === 0) {
@@ -3872,15 +4067,32 @@
         badgeLabel = '✓ TRUYỆN FULL';
         badgeClass = 'badge-full';
       }
+      let topBadgeHtml = '';
+      if (currentFilter === 'top') {
+        const rk = i + 1;
+        if (rk === 1) {
+          topBadgeHtml = `<span style="font-size:10px; background:linear-gradient(90deg,#F59E0B,#EF4444); color:#fff; padding:2px 7px; border-radius:5px; font-weight:900; box-shadow:0 0 10px rgba(245,158,11,0.5);">👑 TOP #1</span>`;
+        } else if (rk <= 3) {
+          topBadgeHtml = `<span style="font-size:10px; background:linear-gradient(90deg,#FBBF24,#D97706); color:#05070B; padding:2px 7px; border-radius:5px; font-weight:900;">🏆 TOP #${rk}</span>`;
+        } else if (rk <= 10) {
+          topBadgeHtml = `<span style="font-size:10px; background:linear-gradient(90deg,#00F0FF,#2563EB); color:#fff; padding:2px 7px; border-radius:5px; font-weight:900;">🔥 TOP #${rk}</span>`;
+        } else {
+          topBadgeHtml = `<span style="font-size:9.5px; background:rgba(56,189,248,0.18); border:1px solid var(--cyan-neon); color:var(--cyan-neon); padding:1px 6px; border-radius:5px; font-weight:800;">⭐ #${rk}</span>`;
+        }
+      }
+      const readCountStr = currentFilter === 'top'
+        ? `<span style="color:#FBBF24; font-weight:800;">🔥 ${(it._topReadCount || 1500).toLocaleString('vi-VN')} lượt đọc</span> • `
+        : '';
       const subMeta = offCnt > 0
-        ? `<span style="color:#34D399; font-weight:800;">✅ Đã tải ${offCnt} tập trong máy</span>`
-        : (it.filesText ? escapeHtml(it.filesText) : '📥 Tải cả bộ');
+        ? `${readCountStr}<span style="color:#34D399; font-weight:800;">✅ Đã tải ${offCnt} tập trong máy</span>`
+        : `${readCountStr}${it.filesText ? escapeHtml(it.filesText) : '📥 Tải cả bộ'}`;
       return `
-        <div class="manga-card" style="${offCnt > 0 ? 'border-color:rgba(16,185,129,0.55);' : ''}" onclick="openSeriesRoot('${safeId}', '${jsName}')">
+        <div class="manga-card" style="${offCnt > 0 ? 'border-color:rgba(16,185,129,0.55);' : (currentFilter === 'top' && i < 3 ? 'border-color:rgba(245,158,11,0.65);' : '')}" onclick="openSeriesRoot('${safeId}', '${jsName}')">
           ${isCool ? '' : '<div class="card-glow"></div>'}
           <div>
             <div class="card-badge-row">
               <div style="display:flex; align-items:center; gap:5px; flex-wrap:wrap;">
+                ${topBadgeHtml}
                 <span class="badge-tag ${badgeClass}">${badgeLabel}</span>
                 ${isNewSeries ? `<span style="font-size:9.5px; background:linear-gradient(90deg,#EC4899,#8B5CF6); color:#fff; padding:2px 6px; border-radius:5px; font-weight:800;">✨ MỚI</span>` : ''}
               </div>
@@ -3926,15 +4138,35 @@
     }
   }
 
+  // Browser / iOS Safari History Back-Stack Integration (Fixes iOS Web Top-Left Back & Swipe-Back)
+  let _ccxInternalPopHandling = false;
+  function pushCcxHistoryState(viewType) {
+    try {
+      if (window.history && window.history.pushState) {
+        window.history.pushState({ ccxView: viewType, ts: Date.now() }, '');
+      }
+    } catch (e) {}
+  }
+
+  function syncReaderFloatingBackBtn() {
+    const flBtn = document.getElementById('reader-floating-back-btn');
+    if (flBtn) {
+      const readerOpen = !document.getElementById('reader-overlay').classList.contains('hidden');
+      flBtn.classList.toggle('hidden', !(readerOpen && barsCollapsed));
+    }
+  }
+
   // Folder Navigation
   async function openSeriesRoot(idOrUrl, seriesName) {
     currentSeriesName = seriesName;
     folderStack = [{ id: idOrUrl, title: seriesName }];
+    pushCcxHistoryState('folder_root');
     await loadCurrentFolderStack();
   }
 
   async function openSubFolder(folderId, folderName) {
     folderStack.push({ id: folderId, title: folderName });
+    pushCcxHistoryState('folder_sub');
     await loadCurrentFolderStack();
   }
 
@@ -4729,6 +4961,816 @@
     await startWatchingVideo(fileId, fileName, false);
   }
 
+  // =========================================================================
+  // PURE-JS EBML MATROSKA (.MKV) TO FRAGMENTED MP4 (fMP4 ISO BMFF) LIVE REMUXER
+  // Eliminates Google Drive /preview anonymous quota error (429 RESOURCE_EXHAUSTED)
+  // on iOS Safari / WebKit & Web PWA by remuxing .mkv -> fMP4 directly in <video>!
+  // =========================================================================
+  let _activeIosMkvRemuxState = null;
+
+  function stopIosMkvRemuxSession() {
+    if (_activeIosMkvRemuxState) {
+      _activeIosMkvRemuxState.aborted = true;
+      if (_activeIosMkvRemuxState.blobUrl) {
+        try { URL.revokeObjectURL(_activeIosMkvRemuxState.blobUrl); } catch (e) {}
+      }
+      _activeIosMkvRemuxState = null;
+    }
+  }
+
+  function buildMkvFmp4Remuxer() {
+    function u32(v) {
+      return [(v >>> 24) & 0xFF, (v >>> 16) & 0xFF, (v >>> 8) & 0xFF, v & 0xFF];
+    }
+    function u16(v) {
+      return [(v >>> 8) & 0xFF, v & 0xFF];
+    }
+    function str4(s) {
+      return [s.charCodeAt(0), s.charCodeAt(1), s.charCodeAt(2), s.charCodeAt(3)];
+    }
+    function box(type, ...payloads) {
+      let size = 8;
+      for (const p of payloads) size += p.length;
+      const out = new Uint8Array(size);
+      out[0] = (size >>> 24) & 0xFF;
+      out[1] = (size >>> 16) & 0xFF;
+      out[2] = (size >>> 8) & 0xFF;
+      out[3] = size & 0xFF;
+      out[4] = type.charCodeAt(0);
+      out[5] = type.charCodeAt(1);
+      out[6] = type.charCodeAt(2);
+      out[7] = type.charCodeAt(3);
+      let off = 8;
+      for (const p of payloads) {
+        out.set(p, off);
+        off += p.length;
+      }
+      return out;
+    }
+
+    function readVintId(buf, pos, maxEnd) {
+      if (pos >= maxEnd) return null;
+      const b0 = buf[pos];
+      if (b0 === 0) return null;
+      let len = 1, mask = 0x80;
+      while (len <= 4 && (b0 & mask) === 0) { len++; mask >>= 1; }
+      if (len > 4 || pos + len > maxEnd) return null;
+      let id = 0;
+      for (let i = 0; i < len; i++) id = (id * 256) + buf[pos + i];
+      return { id, next: pos + len };
+    }
+
+    function readVintSize(buf, pos, maxEnd) {
+      if (pos >= maxEnd) return null;
+      const b0 = buf[pos];
+      if (b0 === 0) return null;
+      let len = 1, mask = 0x80;
+      while (len <= 8 && (b0 & mask) === 0) { len++; mask >>= 1; }
+      if (len > 8 || pos + len > maxEnd) return null;
+      let val = b0 & (mask - 1);
+      let allOnes = (val === (mask - 1));
+      for (let i = 1; i < len; i++) {
+        const bi = buf[pos + i];
+        if (bi !== 0xFF) allOnes = false;
+        val = (val * 256) + bi;
+      }
+      return { size: allOnes ? -1 : val, next: pos + len };
+    }
+
+    function readUint(buf, pos, size) {
+      let v = 0;
+      for (let i = 0; i < size; i++) v = (v * 256) + buf[pos + i];
+      return v;
+    }
+
+    function readFloat(buf, pos, size) {
+      const dv = new DataView(buf.buffer, buf.byteOffset + pos, size);
+      return size === 4 ? dv.getFloat32(0, false) : (size === 8 ? dv.getFloat64(0, false) : 0);
+    }
+
+    function readAscii(buf, pos, size) {
+      let s = '';
+      for (let i = 0; i < size; i++) {
+        if (buf[pos + i] === 0) break;
+        s += String.fromCharCode(buf[pos + i]);
+      }
+      return s;
+    }
+
+    function parseHeaderAndTracks(buf) {
+      let timecodeScale = 1000000;
+      let durationRaw = 0;
+      const tracks = [];
+      let firstClusterOffset = -1;
+
+      function walk(start, end) {
+        let p = start;
+        while (p < end) {
+          const idObj = readVintId(buf, p, end);
+          if (!idObj) break;
+          const szObj = readVintSize(buf, idObj.next, end);
+          if (!szObj) break;
+          const id = idObj.id;
+          const dStart = szObj.next;
+          const dEnd = (szObj.size < 0) ? end : Math.min(end, dStart + szObj.size);
+
+          if (id === 0x1F43B675) {
+            firstClusterOffset = p;
+            return;
+          } else if (id === 0x18538067 || id === 0x1549A966 || id === 0x1654AE6B) {
+            walk(dStart, dEnd);
+            if (firstClusterOffset >= 0) return;
+          } else if (id === 0x2AD7B1) {
+            timecodeScale = readUint(buf, dStart, dEnd - dStart) || 1000000;
+          } else if (id === 0x4489) {
+            durationRaw = readFloat(buf, dStart, dEnd - dStart);
+          } else if (id === 0xAE) {
+            const trk = {
+              number: 0, type: 0, codecId: '', codecPrivate: null,
+              defaultDurationNs: 0, width: 1920, height: 1080,
+              sampleRate: 48000, channels: 2, compPrefix: null,
+              flagDefault: 1, language: 'und'
+            };
+            let tp = dStart;
+            while (tp < dEnd) {
+              const tid = readVintId(buf, tp, dEnd);
+              if (!tid) break;
+              const tsz = readVintSize(buf, tid.next, dEnd);
+              if (!tsz) break;
+              const ts = tsz.next;
+              const te = (tsz.size < 0) ? dEnd : Math.min(dEnd, ts + tsz.size);
+              const tlen = te - ts;
+              if (tid.id === 0xD7) trk.number = readUint(buf, ts, tlen);
+              else if (tid.id === 0x83) trk.type = readUint(buf, ts, tlen);
+              else if (tid.id === 0x86) trk.codecId = readAscii(buf, ts, tlen);
+              else if (tid.id === 0x63A2) trk.codecPrivate = buf.slice(ts, te);
+              else if (tid.id === 0x23E383) trk.defaultDurationNs = readUint(buf, ts, tlen);
+              else if (tid.id === 0x88) trk.flagDefault = readUint(buf, ts, tlen);
+              else if (tid.id === 0x22B59C) trk.language = readAscii(buf, ts, tlen);
+              else if (tid.id === 0xE0) {
+                let vp = ts;
+                while (vp < te) {
+                  const vid = readVintId(buf, vp, te);
+                  if (!vid) break;
+                  const vsz = readVintSize(buf, vid.next, te);
+                  if (!vsz) break;
+                  const vs = vsz.next, ve = Math.min(te, vs + vsz.size);
+                  if (vid.id === 0xB0) trk.width = readUint(buf, vs, ve - vs);
+                  else if (vid.id === 0xBA) trk.height = readUint(buf, vs, ve - vs);
+                  vp = ve;
+                }
+              } else if (tid.id === 0xE1) {
+                let ap = ts;
+                while (ap < te) {
+                  const aid = readVintId(buf, ap, te);
+                  if (!aid) break;
+                  const asz = readVintSize(buf, aid.next, te);
+                  if (!asz) break;
+                  const as = asz.next, ae = Math.min(te, as + asz.size);
+                  if (aid.id === 0xB5) trk.sampleRate = Math.round(readFloat(buf, as, ae - as)) || 48000;
+                  else if (aid.id === 0x9F) trk.channels = readUint(buf, as, ae - as) || 2;
+                  ap = ae;
+                }
+              } else if (tid.id === 0x6D80) {
+                let cp = ts;
+                while (cp < te - 3) {
+                  if (buf[cp] === 0x42 && buf[cp + 1] === 0x55) {
+                    const csz = readVintSize(buf, cp + 2, te);
+                    if (csz && csz.size > 0 && csz.next + csz.size <= te) {
+                      trk.compPrefix = buf.slice(csz.next, csz.next + csz.size);
+                      break;
+                    }
+                  }
+                  cp++;
+                }
+              }
+              tp = te;
+            }
+            tracks.push(trk);
+          }
+          if (szObj.size < 0) break;
+          p = dEnd;
+        }
+      }
+
+      walk(0, buf.length);
+      const durationSec = durationRaw > 0 ? (durationRaw * timecodeScale) / 1e9 : 0;
+      const vTrack = tracks.find(t => t.type === 1 && (t.codecId === 'V_MPEG4/ISO/AVC' || t.codecId === 'V_MPEGH/ISO/HEVC')) || null;
+      const audioCandidates = tracks.filter(t => t.type === 2 && ['A_AAC', 'A_MPEG/L3', 'A_EAC3', 'A_AC3'].includes(t.codecId));
+      audioCandidates.sort((a, b) => {
+        const score = (t) => (t.codecId === 'A_AAC' ? 40 : (t.codecId === 'A_MPEG/L3' ? 30 : 20)) + (t.language === 'vie' ? 18 : 0);
+        return score(b) - score(a);
+      });
+      const aTrack = audioCandidates[0] || null;
+      return { timecodeScale, durationSec, tracks, vTrack, aTrack, audioCandidates, firstClusterOffset };
+    }
+
+    function unpackBlockFrames(buf, bStart, bEnd, compPrefix) {
+      const trkVint = readVintSize(buf, bStart, bEnd);
+      if (!trkVint || trkVint.next + 3 > bEnd) return null;
+      const trackNum = trkVint.size;
+      let p = trkVint.next;
+      let relTs = (buf[p] << 8) | buf[p + 1];
+      if (relTs & 0x8000) relTs -= 0x10000;
+      const flags = buf[p + 2];
+      p += 3;
+      const isKeyframe = (flags & 0x80) !== 0;
+      const lacing = (flags >> 1) & 0x03;
+      const frameSlices = [];
+
+      if (lacing === 0) {
+        if (p < bEnd) frameSlices.push(buf.subarray(p, bEnd));
+      } else {
+        if (p >= bEnd) return null;
+        const numFrames = buf[p++] + 1;
+        const sizes = [];
+        if (lacing === 2) {
+          const fSize = Math.floor((bEnd - p) / numFrames);
+          for (let i = 0; i < numFrames; i++) sizes.push(fSize);
+        } else if (lacing === 1) {
+          let sum = 0;
+          for (let i = 0; i < numFrames - 1; i++) {
+            let sz = 0;
+            while (p < bEnd) {
+              const b = buf[p++];
+              sz += b;
+              if (b < 255) break;
+            }
+            sizes.push(sz);
+            sum += sz;
+          }
+          sizes.push(Math.max(0, (bEnd - p) - sum));
+        } else if (lacing === 3) {
+          let sum = 0;
+          const firstSz = readVintSize(buf, p, bEnd);
+          if (!firstSz) return null;
+          p = firstSz.next;
+          let curSz = firstSz.size;
+          sizes.push(curSz);
+          sum += curSz;
+          for (let i = 1; i < numFrames - 1; i++) {
+            const b0 = buf[p];
+            let len = 1, mask = 0x80;
+            while (len <= 8 && (b0 & mask) === 0) { len++; mask >>= 1; }
+            const vObj = readVintSize(buf, p, bEnd);
+            if (!vObj) break;
+            p = vObj.next;
+            const bias = Math.pow(2, 7 * len - 1) - 1;
+            const delta = vObj.size - bias;
+            curSz += delta;
+            sizes.push(curSz);
+            sum += curSz;
+          }
+          sizes.push(Math.max(0, (bEnd - p) - sum));
+        }
+        for (const sz of sizes) {
+          if (p + sz <= bEnd && sz > 0) {
+            frameSlices.push(buf.subarray(p, p + sz));
+            p += sz;
+          }
+        }
+      }
+
+      const frames = frameSlices.map(sl => {
+        if (!compPrefix || compPrefix.length === 0) return sl;
+        const merged = new Uint8Array(compPrefix.length + sl.length);
+        merged.set(compPrefix, 0);
+        merged.set(sl, compPrefix.length);
+        return merged;
+      });
+
+      return { trackNum, relTs, isKeyframe, frames };
+    }
+
+    function parseClustersInRange(buf, startOffset, meta, includeAudio) {
+      const vSamples = [];
+      const aSamples = [];
+      let p = startOffset;
+      const end = buf.length;
+      let curClusterTs = 0;
+      let lastCompleteClusterEnd = startOffset;
+
+      while (p < end) {
+        const idObj = readVintId(buf, p, end);
+        if (!idObj) break;
+        const szObj = readVintSize(buf, idObj.next, end);
+        if (!szObj) break;
+        const id = idObj.id;
+        const dStart = szObj.next;
+        const isInfinite = szObj.size < 0;
+        const dEnd = isInfinite ? end : (dStart + szObj.size);
+        if (!isInfinite && dEnd > end) {
+          break;
+        }
+
+        if (id === 0x1F43B675) {
+          let cp = dStart;
+          const cEnd = Math.min(end, dEnd);
+          let clusterComplete = !isInfinite;
+          while (cp < cEnd) {
+            const cidObj = readVintId(buf, cp, cEnd);
+            if (!cidObj) { clusterComplete = false; break; }
+            const cszObj = readVintSize(buf, cidObj.next, cEnd);
+            if (!cszObj) { clusterComplete = false; break; }
+            const cs = cszObj.next;
+            const ce = cszObj.size < 0 ? cEnd : (cs + cszObj.size);
+            if (ce > cEnd) { clusterComplete = false; break; }
+
+            if (cidObj.id === 0xE7) {
+              curClusterTs = readUint(buf, cs, ce - cs);
+            } else if (cidObj.id === 0xA3 || cidObj.id === 0xA0) {
+              let blkStart = cs, blkEnd = ce, isBlockGroup = (cidObj.id === 0xA0);
+              let hasReferenceBlock = false;
+              if (isBlockGroup) {
+                let bgp = cs;
+                blkStart = -1;
+                while (bgp < ce) {
+                  const bid = readVintId(buf, bgp, ce);
+                  if (!bid) break;
+                  const bsz = readVintSize(buf, bid.next, ce);
+                  if (!bsz) break;
+                  const bs = bsz.next, be = Math.min(ce, bs + bsz.size);
+                  if (bid.id === 0xA1) { blkStart = bs; blkEnd = be; }
+                  else if (bid.id === 0xFB) { hasReferenceBlock = true; }
+                  bgp = be;
+                }
+              }
+              if (blkStart >= 0) {
+                const peekTrk = readVintSize(buf, blkStart, blkEnd);
+                const tNum = peekTrk ? peekTrk.size : -1;
+                const isVid = meta.vTrack && tNum === meta.vTrack.number;
+                const isAud = includeAudio && meta.aTrack && tNum === meta.aTrack.number;
+                if (isVid || isAud) {
+                  const trkObj = isVid ? meta.vTrack : meta.aTrack;
+                  const unpacked = unpackBlockFrames(buf, blkStart, blkEnd, trkObj.compPrefix);
+                  if (unpacked && unpacked.frames.length > 0) {
+                    const baseTimeNs = (curClusterTs + unpacked.relTs) * meta.timecodeScale;
+                    const frameDurNs = trkObj.defaultDurationNs || (isVid ? 41708333 : Math.round(1024e9 / (trkObj.sampleRate || 48000)));
+                    for (let fi = 0; fi < unpacked.frames.length; fi++) {
+                      const ptsNs = baseTimeNs + fi * frameDurNs;
+                      const pts90k = Math.max(0, Math.round((ptsNs / 1e9) * 90000));
+                      if (isVid) {
+                        const kf = isBlockGroup ? !hasReferenceBlock : unpacked.isKeyframe;
+                        vSamples.push({ pts: pts90k, keyframe: kf && fi === 0, data: unpacked.frames[fi] });
+                      } else {
+                        aSamples.push({ pts: pts90k, keyframe: true, data: unpacked.frames[fi] });
+                      }
+                    }
+                  }
+                }
+              }
+            }
+            cp = ce;
+            if (isInfinite) lastCompleteClusterEnd = cp;
+          }
+          if (!clusterComplete) break;
+          p = cEnd;
+          lastCompleteClusterEnd = p;
+        } else {
+          p = dEnd;
+          lastCompleteClusterEnd = p;
+        }
+      }
+
+      return { vSamples, aSamples, nextOffset: lastCompleteClusterEnd };
+    }
+
+    function buildInitSegment(meta, includeAudio = true) {
+      const ftyp = box('ftyp',
+        str4('isom'), u32(0x200),
+        str4('isom'), str4('iso2'), str4('avc1'), str4('mp41')
+      );
+
+      const dur90k = Math.max(90000, Math.round((meta.durationSec || 1800) * 90000));
+      const mvhd = box('mvhd', new Uint8Array([
+        0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0,
+        ...u32(90000),
+        ...u32(dur90k),
+        0x00, 0x01, 0x00, 0x00,
+        0x01, 0x00, 0x00, 0x00,
+        0, 0, 0, 0, 0, 0, 0, 0,
+        0x00, 0x01, 0x00, 0x00, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0x00, 0x01, 0x00, 0x00, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0x40, 0x00, 0x00, 0x00,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        ...u32(3)
+      ]));
+
+      const traks = [];
+      const trexs = [];
+
+      if (meta.vTrack) {
+        const vt = meta.vTrack;
+        const w = vt.width || 1920;
+        const h = vt.height || 1080;
+        const tkhd = box('tkhd', new Uint8Array([
+          0, 0, 0, 3,
+          0, 0, 0, 0, 0, 0, 0, 0,
+          ...u32(1),
+          0, 0, 0, 0,
+          ...u32(dur90k),
+          0, 0, 0, 0, 0, 0, 0, 0,
+          0, 0, 0, 0, 0, 0, 0, 0,
+          0x00, 0x01, 0x00, 0x00, 0, 0, 0, 0, 0, 0, 0, 0,
+          0, 0, 0, 0, 0x00, 0x01, 0x00, 0x00, 0, 0, 0, 0,
+          0, 0, 0, 0, 0, 0, 0, 0, 0x40, 0x00, 0x00, 0x00,
+          ...u16(w), 0, 0,
+          ...u16(h), 0, 0
+        ]));
+        const mdhd = box('mdhd', new Uint8Array([
+          0, 0, 0, 0,
+          0, 0, 0, 0, 0, 0, 0, 0,
+          ...u32(90000),
+          ...u32(dur90k),
+          0x55, 0xC4, 0, 0
+        ]));
+        const hdlr = box('hdlr', new Uint8Array([
+          0, 0, 0, 0, 0, 0, 0, 0,
+          ...str4('vide'),
+          0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+          ...str4('VIDE'), 0
+        ]));
+        const vmhd = box('vmhd', new Uint8Array([0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0]));
+        const dinf = box('dinf', box('dref', new Uint8Array([0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 12, ...str4('url '), 0, 0, 0, 1])));
+
+        const isHevc = vt.codecId === 'V_MPEGH/ISO/HEVC';
+        const codecCfgBox = box(isHevc ? 'hvcC' : 'avcC', vt.codecPrivate || new Uint8Array(0));
+        const visualEntry = box(isHevc ? 'hvc1' : 'avc1', new Uint8Array([
+          0, 0, 0, 0, 0, 0, 0, 1,
+          0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+          ...u16(w), ...u16(h),
+          0x00, 0x48, 0x00, 0x00, 0x00, 0x48, 0x00, 0x00,
+          0, 0, 0, 0, 0, 1,
+          0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+          0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+          0x00, 0x18, 0xFF, 0xFF
+        ]), codecCfgBox);
+
+        const stsd = box('stsd', new Uint8Array([0, 0, 0, 0, 0, 0, 0, 1]), visualEntry);
+        const emptyTbl = new Uint8Array([0, 0, 0, 0, 0, 0, 0, 0]);
+        const stbl = box('stbl',
+          stsd,
+          box('stts', emptyTbl),
+          box('stsc', emptyTbl),
+          box('stsz', new Uint8Array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])),
+          box('stco', emptyTbl)
+        );
+        const minf = box('minf', vmhd, dinf, stbl);
+        const mdia = box('mdia', mdhd, hdlr, minf);
+        traks.push(box('trak', tkhd, mdia));
+        trexs.push(box('trex', new Uint8Array([
+          0, 0, 0, 0, ...u32(1), ...u32(1), ...u32(0), ...u32(0), ...u32(0)
+        ])));
+      }
+
+      if (includeAudio && meta.aTrack) {
+        const at = meta.aTrack;
+        const sr = at.sampleRate || 48000;
+        const ch = at.channels || 2;
+        const tkhd = box('tkhd', new Uint8Array([
+          0, 0, 0, 3,
+          0, 0, 0, 0, 0, 0, 0, 0,
+          ...u32(2),
+          0, 0, 0, 0,
+          ...u32(dur90k),
+          0, 0, 0, 0, 0, 0, 0, 0,
+          0, 0, 0, 0, 0x01, 0x00, 0, 0,
+          0x00, 0x01, 0x00, 0x00, 0, 0, 0, 0, 0, 0, 0, 0,
+          0, 0, 0, 0, 0x00, 0x01, 0x00, 0x00, 0, 0, 0, 0,
+          0, 0, 0, 0, 0, 0, 0, 0, 0x40, 0x00, 0x00, 0x00,
+          0, 0, 0, 0, 0, 0, 0, 0
+        ]));
+        const mdhd = box('mdhd', new Uint8Array([
+          0, 0, 0, 0,
+          0, 0, 0, 0, 0, 0, 0, 0,
+          ...u32(90000),
+          ...u32(dur90k),
+          0x55, 0xC4, 0, 0
+        ]));
+        const hdlr = box('hdlr', new Uint8Array([
+          0, 0, 0, 0, 0, 0, 0, 0,
+          ...str4('soun'),
+          0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+          ...str4('SOUN'), 0
+        ]));
+        const smhd = box('smhd', new Uint8Array([0, 0, 0, 0, 0, 0, 0, 0]));
+        const dinf = box('dinf', box('dref', new Uint8Array([0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 12, ...str4('url '), 0, 0, 0, 1])));
+
+        const audioHeader = new Uint8Array([
+          0, 0, 0, 0, 0, 0, 0, 1,
+          0, 0, 0, 0, 0, 0, 0, 0,
+          ...u16(ch), ...u16(16),
+          0, 0, 0, 0,
+          ...u16(sr), 0, 0
+        ]);
+
+        let audioEntry;
+        if (at.codecId === 'A_EAC3') {
+          const dec3 = box('dec3', new Uint8Array([0x0C, 0x00, 0x20, 0x0F, 0x00]));
+          audioEntry = box('ec-3', audioHeader, dec3);
+        } else if (at.codecId === 'A_AC3') {
+          const dac3 = box('dac3', new Uint8Array([0x10, 0x11, 0xE0]));
+          audioEntry = box('ac-3', audioHeader, dac3);
+        } else {
+          const isMp3 = at.codecId === 'A_MPEG/L3';
+          const asc = (!isMp3 && at.codecPrivate && at.codecPrivate.length > 0)
+            ? at.codecPrivate
+            : new Uint8Array([0x11, 0x90]);
+          const esdsPayload = isMp3
+            ? new Uint8Array([
+                0, 0, 0, 0,
+                0x03, 0x19, 0x00, 0x02, 0x00,
+                0x04, 0x11, 0x6B, 0x15, 0x00, 0x00, 0x00, 0x00, 0x01, 0xF4, 0x00, 0x00, 0x01, 0xF4, 0x00,
+                0x06, 0x01, 0x02
+              ])
+            : new Uint8Array([
+                0, 0, 0, 0,
+                0x03, 23 + asc.length, 0x00, 0x02, 0x00,
+                0x04, 15 + asc.length, 0x40, 0x15, 0x00, 0x00, 0x00, 0x00, 0x01, 0xF4, 0x00, 0x00, 0x01, 0xF4, 0x00,
+                0x05, asc.length, ...asc,
+                0x06, 0x01, 0x02
+              ]);
+          audioEntry = box('mp4a', audioHeader, box('esds', esdsPayload));
+        }
+
+        const stsd = box('stsd', new Uint8Array([0, 0, 0, 0, 0, 0, 0, 1]), audioEntry);
+        const emptyTbl = new Uint8Array([0, 0, 0, 0, 0, 0, 0, 0]);
+        const stbl = box('stbl',
+          stsd,
+          box('stts', emptyTbl),
+          box('stsc', emptyTbl),
+          box('stsz', new Uint8Array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])),
+          box('stco', emptyTbl)
+        );
+        const minf = box('minf', smhd, dinf, stbl);
+        const mdia = box('mdia', mdhd, hdlr, minf);
+        traks.push(box('trak', tkhd, mdia));
+        trexs.push(box('trex', new Uint8Array([
+          0, 0, 0, 0, ...u32(2), ...u32(1), ...u32(0), ...u32(0), ...u32(0)
+        ])));
+      }
+
+      const mvex = box('mvex', ...trexs);
+      const moov = box('moov', mvhd, ...traks, mvex);
+      const init = new Uint8Array(ftyp.length + moov.length);
+      init.set(ftyp, 0);
+      init.set(moov, ftyp.length);
+      return init;
+    }
+
+    function buildMediaFragment(seqNum, vSamples, aSamples) {
+      const trafs = [];
+      const mdatPayloads = [];
+      let currentMdatOffset = 0;
+
+      function makeTrackData(trackId, samples, isVideo) {
+        if (!samples || samples.length === 0) return null;
+        const n = samples.length;
+        const sortedPts = samples.map(s => s.pts).sort((a, b) => a - b);
+        const baseDts = sortedPts[0];
+        const dtsArr = new Array(n);
+        for (let i = 0; i < n; i++) {
+          if (i === 0) dtsArr[i] = baseDts;
+          else dtsArr[i] = Math.max(dtsArr[i - 1] + 90, sortedPts[i]);
+        }
+        const defaultDur = n > 1 ? Math.max(90, Math.round((dtsArr[n - 1] - dtsArr[0]) / (n - 1))) : (isVideo ? 3750 : 1920);
+        const trunFlags = isVideo ? 0x000F01 : 0x000301;
+        const perSampleBytes = isVideo ? 16 : 8;
+        const trunBody = new Uint8Array(12 + n * perSampleBytes);
+        const dv = new DataView(trunBody.buffer);
+        dv.setUint32(0, trunFlags, false);
+        dv.setUint32(4, n, false);
+        const dataOffsetRelPos = 8;
+        const trackMdatStart = currentMdatOffset;
+
+        let off = 12;
+        for (let i = 0; i < n; i++) {
+          const s = samples[i];
+          const dur = (i + 1 < n) ? Math.max(90, dtsArr[i + 1] - dtsArr[i]) : defaultDur;
+          dv.setUint32(off, dur, false);
+          dv.setUint32(off + 4, s.data.length, false);
+          if (isVideo) {
+            const sFlags = s.keyframe ? 0x02000000 : 0x01010000;
+            const cts = s.pts - dtsArr[i];
+            dv.setUint32(off + 8, sFlags, false);
+            dv.setInt32(off + 12, cts, false);
+            off += 16;
+          } else {
+            off += 8;
+          }
+          mdatPayloads.push(s.data);
+          currentMdatOffset += s.data.length;
+        }
+
+        const tfhd = box('tfhd', new Uint8Array([0, 0x02, 0x00, 0x00, ...u32(trackId)]));
+        const tfdt = box('tfdt', new Uint8Array([
+          1, 0, 0, 0,
+          ...u32(Math.floor(baseDts / 4294967296)),
+          ...u32(baseDts >>> 0)
+        ]));
+        const trun = box('trun', trunBody);
+        const traf = box('traf', tfhd, tfdt, trun);
+        return { traf, trunBody, dataOffsetRelPos, trackMdatStart };
+      }
+
+      const vTraf = makeTrackData(1, vSamples, true);
+      const aTraf = makeTrackData(2, aSamples, false);
+      if (vTraf) trafs.push(vTraf);
+      if (aTraf) trafs.push(aTraf);
+      if (trafs.length === 0) return null;
+
+      const mfhd = box('mfhd', new Uint8Array([0, 0, 0, 0, ...u32(seqNum)]));
+      let moofSize = 8 + mfhd.length;
+      for (const t of trafs) moofSize += t.traf.length;
+      const mdatHeaderSize = 8;
+
+      for (const t of trafs) {
+        const dv = new DataView(t.traf.buffer, t.traf.byteOffset, t.traf.byteLength);
+        dv.setUint32(60, moofSize + mdatHeaderSize + t.trackMdatStart, false);
+      }
+
+      const moof = box('moof', mfhd, ...trafs.map(t => t.traf));
+      const mdat = box('mdat', ...mdatPayloads);
+      const frag = new Uint8Array(moof.length + mdat.length);
+      frag.set(moof, 0);
+      frag.set(mdat, moof.length);
+      return frag;
+    }
+
+    return { parseHeaderAndTracks, parseClustersInRange, buildInitSegment, buildMediaFragment };
+  }
+
+  async function startIosMkvRemuxPlayback(fileId, vPlayer) {
+    stopIosMkvRemuxSession();
+    const state = {
+      fileId,
+      aborted: false,
+      withAudio: true,
+      meta: null,
+      initSeg: null,
+      fragments: [],
+      rawClusters: [],
+      nextByteOffset: 0,
+      totalFileSize: 0,
+      seqNum: 1,
+      blobUrl: null,
+      loadedDurationSec: 0,
+      isEof: false
+    };
+    _activeIosMkvRemuxState = state;
+
+    const bufRing = document.getElementById('video-buffer-ring');
+    if (bufRing) bufRing.classList.remove('hidden');
+    showAppToast('⚡ Đang khởi tạo Engine Giải Mã .MKV Trực Tiếp (Chống lỗi giới hạn Google Drive)...', 3200);
+
+    try {
+      const remux = buildMkvFmp4Remuxer();
+      const firstEnd = 6 * 1024 * 1024 - 1; // First 6 MB chunk for fast startup
+      const chunk0 = await window._ccxFetchDriveByteRange(fileId, 0, firstEnd);
+      if (state.aborted || !currentVideoFile || currentVideoFile.id !== fileId) return;
+      if (!chunk0 || chunk0.byteLength < 512) {
+        switchVideoStreamMode('cloud');
+        return;
+      }
+
+      state.totalFileSize = (window._ccxFileSizeCache && window._ccxFileSizeCache[fileId]) || 0;
+
+      // Check if file is actually an MP4 disguised with .mkv extension
+      if (chunk0.byteLength > 12 && chunk0[4] === 0x66 && chunk0[5] === 0x74 && chunk0[6] === 0x79 && chunk0[7] === 0x70) {
+        const tok = window._ccxGetValidWebToken ? await window._ccxGetValidWebToken() : null;
+        if (tok) {
+          vPlayer.src = `https://www.googleapis.com/drive/v3/files/${encodeURIComponent(fileId)}?alt=media&acknowledgeAbuse=true&supportsAllDrives=true&access_token=${encodeURIComponent(tok)}`;
+          vPlayer.play().catch(() => {});
+          return;
+        }
+      }
+
+      const meta = remux.parseHeaderAndTracks(chunk0);
+      if (!meta || !meta.vTrack || meta.firstClusterOffset < 0) {
+        switchVideoStreamMode('cloud');
+        return;
+      }
+      state.meta = meta;
+      state.initSeg = remux.buildInitSegment(meta, state.withAudio);
+
+      const demux0 = remux.parseClustersInRange(chunk0, meta.firstClusterOffset, meta, state.withAudio);
+      if (!demux0 || demux0.vSamples.length === 0) {
+        switchVideoStreamMode('cloud');
+        return;
+      }
+      state.rawClusters.push({ vSamples: demux0.vSamples, aSamples: demux0.aSamples });
+      const frag0 = remux.buildMediaFragment(state.seqNum++, demux0.vSamples, state.withAudio ? demux0.aSamples : []);
+      if (frag0) state.fragments.push(frag0);
+      state.nextByteOffset = demux0.nextOffset;
+      const maxPts0 = demux0.vSamples.reduce((m, s) => Math.max(m, s.pts), 0);
+      state.loadedDurationSec = maxPts0 / 90000;
+
+      function refreshPlayerBlobSource(preserveTime) {
+        if (state.aborted || !currentVideoFile || currentVideoFile.id !== fileId) return;
+        const prevTime = preserveTime ? (vPlayer.currentTime || 0) : 0;
+        const wasPaused = preserveTime ? vPlayer.paused : false;
+        const oldUrl = state.blobUrl;
+        const blob = new Blob([state.initSeg, ...state.fragments], { type: 'video/mp4' });
+        state.blobUrl = URL.createObjectURL(blob);
+        vPlayer.src = state.blobUrl;
+        if (prevTime > 0.2) {
+          try { vPlayer.currentTime = prevTime; } catch (e) {}
+        }
+        if (!wasPaused) {
+          vPlayer.play().catch(() => {});
+        }
+        if (oldUrl) {
+          setTimeout(() => { try { URL.revokeObjectURL(oldUrl); } catch (e) {} }, 2000);
+        }
+      }
+
+      // If older iOS WebKit rejects a multichannel E-AC3/AC3 audio track inside fMP4, automatically retry with video-only fMP4 before falling back!
+      vPlayer.onerror = function() {
+        if (state.aborted || !currentVideoFile || currentVideoFile.id !== fileId) return;
+        if (state.withAudio) {
+          state.withAudio = false;
+          state.initSeg = remux.buildInitSegment(state.meta, false);
+          state.fragments = [];
+          state.seqNum = 1;
+          for (const rc of state.rawClusters) {
+            const f = remux.buildMediaFragment(state.seqNum++, rc.vSamples, []);
+            if (f) state.fragments.push(f);
+          }
+          refreshPlayerBlobSource(true);
+          return;
+        }
+        switchVideoStreamMode('cloud');
+      };
+
+      refreshPlayerBlobSource(false);
+
+      // Background progressive cluster fetcher (fetches 10 MB windows ahead of playback)
+      (async () => {
+        const CHUNK_STEP = 10 * 1024 * 1024;
+        let pendingSwapFragments = 0;
+        while (!state.aborted && currentVideoFile && currentVideoFile.id === fileId) {
+          if (state.totalFileSize > 0 && state.nextByteOffset >= state.totalFileSize - 64) {
+            state.isEof = true;
+            break;
+          }
+          // Pause fetching if we are > 90 seconds ahead of current playback position to keep iOS cool & save RAM!
+          const curPlaySec = vPlayer.currentTime || 0;
+          if (state.loadedDurationSec - curPlaySec > 90 && pendingSwapFragments === 0) {
+            await new Promise(r => setTimeout(r, 1200));
+            continue;
+          }
+          const reqStart = state.nextByteOffset;
+          const reqEnd = state.totalFileSize > 0
+            ? Math.min(state.totalFileSize - 1, reqStart + CHUNK_STEP - 1)
+            : (reqStart + CHUNK_STEP - 1);
+          const nextBuf = await window._ccxFetchDriveByteRange(fileId, reqStart, reqEnd);
+          if (state.aborted || !currentVideoFile || currentVideoFile.id !== fileId) break;
+          if (!nextBuf || nextBuf.byteLength === 0) {
+            state.isEof = true;
+            break;
+          }
+          const demuxNext = remux.parseClustersInRange(nextBuf, 0, state.meta, state.withAudio);
+          if (demuxNext.vSamples.length > 0) {
+            state.rawClusters.push({ vSamples: demuxNext.vSamples, aSamples: demuxNext.aSamples });
+            const fragNext = remux.buildMediaFragment(
+              state.seqNum++,
+              demuxNext.vSamples,
+              state.withAudio ? demuxNext.aSamples : []
+            );
+            if (fragNext) {
+              state.fragments.push(fragNext);
+              pendingSwapFragments++;
+            }
+            const maxPts = demuxNext.vSamples.reduce((m, s) => Math.max(m, s.pts), 0);
+            if (maxPts / 90000 > state.loadedDurationSec) {
+              state.loadedDurationSec = maxPts / 90000;
+            }
+          }
+          if (demuxNext.nextOffset > 0) {
+            state.nextByteOffset = reqStart + demuxNext.nextOffset;
+          } else {
+            state.nextByteOffset = reqEnd + 1;
+          }
+          if (state.totalFileSize > 0 && state.nextByteOffset >= state.totalFileSize - 64) {
+            state.isEof = true;
+          }
+          // Swap in extended Blob when player is within 6s of buffered end or when EOF is reached
+          const remainSec = state.loadedDurationSec - (vPlayer.currentTime || 0);
+          if (pendingSwapFragments > 0 && (remainSec < 18 || state.isEof || vPlayer.ended)) {
+            pendingSwapFragments = 0;
+            refreshPlayerBlobSource(true);
+          }
+        }
+      })();
+    } catch (err) {
+      if (!state.aborted) {
+        switchVideoStreamMode('cloud');
+      }
+    }
+  }
+
   async function startWatchingVideo(fileId, fileName, saveOfflineFirst) {
     if (saveOfflineFirst) {
       await downloadSingleItemOffline(fileId, fileName);
@@ -4795,6 +5837,7 @@
       : `⚡ Phát Trực Tiếp 0 MB • Nhấn đúp trái/phải để tua 10 giây`;
     document.getElementById('video-overlay').classList.remove('hidden');
     document.body.classList.add('reader-or-video-active');
+    pushCcxHistoryState('video');
 
     const epIdx = vList.findIndex(x => x.id === fileId || x.name === fileName);
     const epIndicator = document.getElementById('video-ep-indicator');
@@ -4817,12 +5860,10 @@
       }
     }
 
-    // On iOS Safari / Web without Service Worker controller or with .mkv/.avi container, use Cloud H.264/AAC Streamer directly
-    if (port === 0 && !isOfflineLocal && (isMkvOrAvi || !(navigator.serviceWorker && navigator.serviceWorker.controller))) {
-      switchVideoStreamMode('cloud');
-    } else {
-      switchVideoStreamMode('direct');
-    }
+    // Always start in Direct Stream Mode (<video id="ccx-video-player">):
+    // - On Android (port > 0): LocalStreamServer streams & patches .mkv/.mp4 headers directly.
+    // - On iOS / Web (port === 0): .mkv runs through our in-browser EBML-to-fMP4 Live Remuxer (`startIosMkvRemuxPlayback`), completely bypassing Google Drive's anonymous /preview quota error!
+    switchVideoStreamMode('direct');
 
     saveReadingProgress(fileId, fileName, currentSeriesName || fileName, 1, 1);
   }
@@ -4863,6 +5904,7 @@
     if (btnCloud) btnCloud.classList.toggle('active-chip', mode === 'cloud');
 
     if (mode === 'cloud') {
+      stopIosMkvRemuxSession();
       if (bufRing) bufRing.classList.add('hidden');
       if (centerHud) {
         centerHud.style.opacity = '0';
@@ -4876,11 +5918,22 @@
       }
       if (vIframe) {
         vIframe.classList.remove('hidden');
-        if (vIframe.src !== currentVideoFile.cloudPreviewUrl) {
+        const port = (window.CCXBridge && window.CCXBridge.getLocalServerPort) ? window.CCXBridge.getLocalServerPort() : 0;
+        if (port === 0 && window._ccxEnsureUnlockedVideoClone && currentVideoFile) {
+          const targetFileId = currentVideoFile.id;
+          window._ccxEnsureUnlockedVideoClone(targetFileId).then(res => {
+            if (!currentVideoFile || currentVideoFile.id !== targetFileId || currentVideoMode !== 'cloud') return;
+            const effId = (res && res.clonedId) ? res.clonedId : targetFileId;
+            const unlockedPreview = `https://drive.google.com/file/d/${encodeURIComponent(effId)}/preview`;
+            currentVideoFile.cloudPreviewUrl = unlockedPreview;
+            if (vIframe.src !== unlockedPreview) vIframe.src = unlockedPreview;
+          });
+        } else if (vIframe.src !== currentVideoFile.cloudPreviewUrl) {
           vIframe.src = currentVideoFile.cloudPreviewUrl;
         }
       }
     } else {
+      stopIosMkvRemuxSession();
       if (vIframe) {
         vIframe.src = 'about:blank';
         vIframe.classList.add('hidden');
@@ -4935,7 +5988,9 @@
         vPlayer.ontimeupdate = () => {
           if (!isUserDraggingSeek && vPlayer.duration > 0) {
             const cur = vPlayer.currentTime || 0;
-            const dur = vPlayer.duration || 1;
+            const dur = (_activeIosMkvRemuxState && _activeIosMkvRemuxState.meta && _activeIosMkvRemuxState.meta.durationSec > 0)
+              ? _activeIosMkvRemuxState.meta.durationSec
+              : (vPlayer.duration || 1);
             document.getElementById('video-time-cur').textContent = formatVideoTime(cur);
             document.getElementById('video-time-dur').textContent = formatVideoTime(dur);
             document.getElementById('video-seek-slider').value = Math.round((cur / dur) * 1000);
@@ -4947,6 +6002,11 @@
           }
         };
         vPlayer.onended = () => {
+          if (_activeIosMkvRemuxState && !_activeIosMkvRemuxState.isEof) {
+            // Still buffering remaining MKV clusters in background
+            if (bufRing) bufRing.classList.remove('hidden');
+            return;
+          }
           if (currentVideoFile && vPlayer.duration > 0) {
             saveReadingProgress(currentVideoFile.id, currentVideoFile.name, currentVideoFile.seriesName, 1, 1, true, vPlayer.duration, vPlayer.duration);
           }
@@ -4971,6 +6031,14 @@
             showAppToast('🎉 Bạn đã xem hết tập cuối cùng trong thư mục này!');
           }
         };
+
+        const port = (window.CCXBridge && window.CCXBridge.getLocalServerPort) ? window.CCXBridge.getLocalServerPort() : 0;
+        if (port === 0 && !currentVideoFile.isOfflineLocal && currentVideoFile.isMkvOrAvi) {
+          startIosMkvRemuxPlayback(currentVideoFile.id, vPlayer);
+          updatePlayPauseIcons();
+          scheduleAutoHideVideoHud();
+          return;
+        }
 
         let retryCount = 0;
         vPlayer.onerror = function() {
@@ -5000,9 +6068,23 @@
             }
           }
         };
-        vPlayer.src = currentVideoFile.streamUrl;
-        vPlayer.play().catch(() => {});
-        updatePlayPauseIcons();
+
+        if (port === 0 && !currentVideoFile.isOfflineLocal && !(navigator.serviceWorker && navigator.serviceWorker.controller) && window._ccxGetValidWebToken) {
+          window._ccxGetValidWebToken().then(tok => {
+            if (!currentVideoFile || currentVideoMode !== 'direct') return;
+            if (tok) {
+              vPlayer.src = `https://www.googleapis.com/drive/v3/files/${encodeURIComponent(currentVideoFile.id)}?alt=media&acknowledgeAbuse=true&supportsAllDrives=true&access_token=${encodeURIComponent(tok)}`;
+            } else {
+              vPlayer.src = currentVideoFile.streamUrl;
+            }
+            vPlayer.play().catch(() => {});
+            updatePlayPauseIcons();
+          });
+        } else {
+          vPlayer.src = currentVideoFile.streamUrl;
+          vPlayer.play().catch(() => {});
+          updatePlayPauseIcons();
+        }
       }
     }
     scheduleAutoHideVideoHud();
@@ -5052,6 +6134,7 @@
   }
 
   function closeVideoPlayer() {
+    stopIosMkvRemuxSession();
     if (videoHudTimer) {
       clearTimeout(videoHudTimer);
       videoHudTimer = null;
@@ -5575,9 +6658,20 @@
 
       document.getElementById('reader-overlay').classList.remove('hidden');
       document.body.classList.add('reader-or-video-active');
+      pushCcxHistoryState('reader');
       barsCollapsed = false;
       document.getElementById('reader-topbar').classList.remove('collapsed');
       document.getElementById('reader-bottombar').classList.remove('collapsed');
+      syncReaderFloatingBackBtn();
+      if (window._hudAutoHideTimer) clearTimeout(window._hudAutoHideTimer);
+      window._hudAutoHideTimer = setTimeout(() => {
+        if (!barsCollapsed && !document.getElementById('reader-overlay').classList.contains('hidden')) {
+          barsCollapsed = true;
+          document.getElementById('reader-topbar').classList.add('collapsed');
+          document.getElementById('reader-bottombar').classList.add('collapsed');
+          syncReaderFloatingBackBtn();
+        }
+      }, 2400);
       if (window.CCXBridge && window.CCXBridge.setVolumeKeyPaging) {
         window.CCXBridge.setVolumeKeyPaging(true);
       }
@@ -5620,9 +6714,11 @@
 
     document.getElementById('reader-overlay').classList.remove('hidden');
     document.body.classList.add('reader-or-video-active');
+    pushCcxHistoryState('reader');
     barsCollapsed = false;
     document.getElementById('reader-topbar').classList.remove('collapsed');
     document.getElementById('reader-bottombar').classList.remove('collapsed');
+    syncReaderFloatingBackBtn();
     if (window.CCXBridge && window.CCXBridge.setVolumeKeyPaging) {
       window.CCXBridge.setVolumeKeyPaging(true);
     }
@@ -5918,7 +7014,11 @@
       _prewarmTimer = null;
     }
     if (currentReadingFile && _ccxPaperCacheDocId !== currentReadingFile.id) {
-      _ccxPaperPageCache.forEach(c => { try { c.width = 1; c.height = 1; } catch (e) {} });
+      _ccxPaperPageCache.forEach(c => {
+        if (c && !c.parentElement && !document.body.contains(c)) {
+          try { c.width = 1; c.height = 1; } catch (e) {}
+        }
+      });
       _ccxPaperPageCache.clear();
       _ccxPaperCacheDocId = currentReadingFile.id;
     }
@@ -5931,6 +7031,7 @@
         : [centerP - 1, centerP + 1, centerP + 2, centerP - 2];
       for (const p of targets) {
         if (p < 1 || p > totalPages || _ccxPaperPageCache.has(p)) continue;
+        if (p === currentPage || (isBookSpreadActive() && p === currentPage + 1)) continue;
         try {
           const page = await pdfDoc.getPage(p);
           const baseVp = page.getViewport({ scale: 1.0 });
@@ -6335,6 +7436,14 @@
 
   async function turnBookPage(dir, skipFlipLaunch) {
     if (readerMode === 'webtoon') return;
+    if (!barsCollapsed) {
+      barsCollapsed = true;
+      const tb = document.getElementById('reader-topbar');
+      const bb = document.getElementById('reader-bottombar');
+      if (tb) tb.classList.add('collapsed');
+      if (bb) bb.classList.add('collapsed');
+      syncReaderFloatingBackBtn();
+    }
     const isSpread = isBookSpreadActive();
     const step = isSpread ? 2 : 1;
     let nextP = currentPage + (dir * step);
@@ -6383,6 +7492,24 @@
     removeActiveCurlStage();
   }
 
+  function applyZoomLevel(newZoom, showToastFlag) {
+    zoomLevel = Math.max(1.0, Math.min(3.0, Math.round(newZoom * 100) / 100));
+    const zBtn = document.getElementById('zoom-btn');
+    if (zBtn) zBtn.textContent = `🔍 Zoom: ${zoomLevel.toFixed(1)}x`;
+    buildReaderViewport().then(() => {
+      const vp = document.getElementById('reader-viewport');
+      if (vp && zoomLevel > 1.02 && readerMode !== 'webtoon') {
+        vp.scrollLeft = Math.max(0, Math.round((vp.scrollWidth - vp.clientWidth) * 0.5));
+        vp.scrollTop = Math.max(0, Math.round((vp.scrollHeight - vp.clientHeight) * 0.22));
+      }
+    });
+    if (showToastFlag) {
+      showAppToast(zoomLevel > 1.02
+        ? `🔍 Đã phóng to ${zoomLevel.toFixed(1)}x (Kéo 1 ngón để trượt xem, chạm đúp để thu nhỏ)`
+        : `🔍 Đã về kích thước chuẩn 1.0x`);
+    }
+  }
+
   function initReaderBookSwipeGestures() {
     loadSavedBookPhysConfig();
     const vp = document.getElementById('reader-viewport');
@@ -6394,15 +7521,26 @@
     let startY = 0;
     let lastX = 0;
     let lastY = 0;
+    let startScrollLeft = 0;
+    let startScrollTop = 0;
     let startTime = 0;
     let isMultiTouch = false;
+    let isPanningZoomed = false;
     let isHorizontalCurl = false;
     let curlSession = null;
     let dragDir = 0;
+    let pinchActive = false;
+    let pinchStartDist = 0;
+    let pinchStartZoom = 1.0;
+    let pinchLastScale = 1.0;
+    let lastReaderTapTs = 0;
+    let lastReaderTapX = 0;
+    let lastReaderTapY = 0;
 
     function beginPointer(clientX, clientY) {
       pointerDown = true;
       isMultiTouch = false;
+      isPanningZoomed = false;
       isHorizontalCurl = false;
       curlSession = null;
       dragDir = 0;
@@ -6410,15 +7548,30 @@
       startY = clientY;
       lastX = clientX;
       lastY = clientY;
+      startScrollLeft = vp.scrollLeft;
+      startScrollTop = vp.scrollTop;
       startTime = Date.now();
     }
 
     function movePointer(clientX, clientY) {
-      if (!pointerDown || isMultiTouch || readerMode === 'webtoon' || zoomLevel > 1.05) return;
-      lastX = clientX;
-      lastY = clientY;
+      if (!pointerDown || isMultiTouch || pinchActive) return;
       const dx = clientX - startX;
       const dy = clientY - startY;
+      lastX = clientX;
+      lastY = clientY;
+
+      // When zoomed in (> 1.02x) in 2-Page Spread or 1-Page Mode: drag pans 2D smoothly!
+      if (zoomLevel > 1.02 && readerMode !== 'webtoon') {
+        if (Math.hypot(dx, dy) > 6) {
+          isPanningZoomed = true;
+          window._ccxLastSwipeAt = Date.now();
+          vp.scrollLeft = startScrollLeft - dx;
+          vp.scrollTop = startScrollTop - dy;
+        }
+        return;
+      }
+
+      if (readerMode === 'webtoon') return;
 
       if (!isHorizontalCurl) {
         if (Math.abs(dx) < 10) return;
@@ -6443,11 +7596,30 @@
     async function endPointer(clientX, clientY) {
       if (!pointerDown) return;
       pointerDown = false;
-      if (isMultiTouch || readerMode === 'webtoon' || zoomLevel > 1.05) return;
+      if (isMultiTouch || pinchActive) return;
 
       const dx = clientX - startX;
       const dy = clientY - startY;
       const dt = Date.now() - startTime;
+
+      // Check for Double-Tap to Zoom (works in 2-Page Spread, 1-Page, and Webtoon!)
+      if (dt < 280 && Math.hypot(dx, dy) < 18) {
+        const now = Date.now();
+        const w = window.innerWidth || 800;
+        const isCenterTap = (clientX >= w * 0.24 && clientX <= w * 0.76) || zoomLevel > 1.02;
+        if (isCenterTap && (now - lastReaderTapTs < 320) && Math.hypot(clientX - lastReaderTapX, clientY - lastReaderTapY) < 42) {
+          lastReaderTapTs = 0;
+          window._ccxLastSwipeAt = now;
+          const nextZ = zoomLevel > 1.05 ? 1.0 : 1.65;
+          applyZoomLevel(nextZ, true);
+          return;
+        }
+        lastReaderTapTs = now;
+        lastReaderTapX = clientX;
+        lastReaderTapY = clientY;
+      }
+
+      if (isPanningZoomed || zoomLevel > 1.02 || readerMode === 'webtoon') return;
 
       if (isHorizontalCurl && curlSession) {
         window._ccxLastSwipeAt = Date.now();
@@ -6499,7 +7671,19 @@
     }
 
     vp.addEventListener('touchstart', (e) => {
-      if (e.touches.length > 1) {
+      if (e.touches.length === 2) {
+        isMultiTouch = true;
+        pinchActive = true;
+        pointerDown = false;
+        removeActiveCurlStage();
+        const t0 = e.touches[0];
+        const t1 = e.touches[1];
+        pinchStartDist = Math.max(20, Math.hypot(t1.clientX - t0.clientX, t1.clientY - t0.clientY));
+        pinchStartZoom = zoomLevel;
+        pinchLastScale = 1.0;
+        return;
+      }
+      if (e.touches.length > 2) {
         isMultiTouch = true;
         removeActiveCurlStage();
         return;
@@ -6509,10 +7693,40 @@
 
     vp.addEventListener('touchmove', (e) => {
       if (!e.touches || e.touches.length === 0) return;
+      if (pinchActive && e.touches.length === 2) {
+        if (e.cancelable) e.preventDefault();
+        const t0 = e.touches[0];
+        const t1 = e.touches[1];
+        const dist = Math.max(20, Math.hypot(t1.clientX - t0.clientX, t1.clientY - t0.clientY));
+        pinchLastScale = Math.max(0.5, Math.min(2.6, dist / pinchStartDist));
+        const frame = vp.querySelector('.book-open-frame, .book-single-frame');
+        if (frame) {
+          frame.style.transformOrigin = 'center center';
+          frame.style.transform = `scale(${pinchLastScale.toFixed(3)})`;
+        }
+        window._ccxLastSwipeAt = Date.now();
+        return;
+      }
+      if (zoomLevel > 1.02 && readerMode !== 'webtoon' && e.cancelable) {
+        e.preventDefault();
+      }
       movePointer(e.touches[0].clientX, e.touches[0].clientY);
-    }, { passive: true });
+    }, { passive: false });
 
     vp.addEventListener('touchend', (e) => {
+      if (pinchActive && (!e.touches || e.touches.length < 2)) {
+        pinchActive = false;
+        window._ccxLastSwipeAt = Date.now();
+        const frame = vp.querySelector('.book-open-frame, .book-single-frame');
+        if (frame) {
+          frame.style.transform = '';
+        }
+        const targetZoom = Math.max(1.0, Math.min(3.0, pinchStartZoom * pinchLastScale));
+        if (Math.abs(targetZoom - zoomLevel) >= 0.06) {
+          applyZoomLevel(targetZoom, true);
+        }
+        return;
+      }
       if (!e.changedTouches || e.changedTouches.length === 0) return;
       endPointer(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
     }, { passive: true });
@@ -6532,9 +7746,12 @@
     });
   }
 
+  let _readerViewportGen = 0;
   async function buildReaderViewport() {
+    const myGen = ++_readerViewportGen;
     initReaderBookSwipeGestures();
     const vp = document.getElementById('reader-viewport');
+    vp.classList.toggle('zoomed-active', zoomLevel > 1.02 && readerMode !== 'webtoon');
     vp.innerHTML = '';
     renderedPages.clear();
     if (_pageRenderWaitQueue && _pageRenderWaitQueue.length > 0) {
@@ -6550,6 +7767,15 @@
     }
 
     if (!currentReadingFile) return;
+    if (_ccxPaperCacheDocId !== currentReadingFile.id) {
+      _ccxPaperPageCache.forEach(c => {
+        if (c && !c.parentElement && !document.body.contains(c)) {
+          try { c.width = 1; c.height = 1; } catch (e) {}
+        }
+      });
+      _ccxPaperPageCache.clear();
+      _ccxPaperCacheDocId = currentReadingFile.id;
+    }
     const useSpread = isBookSpreadActive();
 
     // Update mode badge indicator subtly so user sees auto 1-page / 2-page status
@@ -6600,13 +7826,27 @@
 
         const pLeft = currentPage;
         const pRight = currentPage + 1 <= totalPages ? currentPage + 1 : null;
+        const maxSpreadH = Math.max(300, Math.floor((window.innerHeight - 6) * zoomLevel));
+        const baseHalfSpan = zoomLevel > 1.02
+          ? Math.max(window.innerWidth - 12, Math.floor(window.innerHeight * 0.92))
+          : (window.innerWidth - 12);
+        const maxHalfW = Math.floor((baseHalfSpan * 0.5) * zoomLevel);
         [pLeft, pRight].forEach((pNum, idx) => {
           if (!pNum) return;
+          if (idx === 1) {
+            const spine = document.createElement('div');
+            spine.className = 'book-spine-crease';
+            bookFrame.appendChild(spine);
+          }
           const imgItem = currentReadingFile.imageList[pNum - 1];
           const half = document.createElement('div');
           half.className = 'spread-page-half ' + (idx === 0 ? 'left-page' : 'right-page');
           const img = document.createElement('img');
           attachDriveImageSource(img, imgItem.id, port);
+          img.style.maxHeight = maxSpreadH + 'px';
+          img.style.maxWidth = maxHalfW + 'px';
+          img.style.width = 'auto';
+          img.style.height = maxSpreadH + 'px';
           half.appendChild(img);
           const wm = document.createElement('span');
           wm.className = 'page-num-watermark';
@@ -6614,9 +7854,6 @@
           half.appendChild(wm);
           bookFrame.appendChild(half);
         });
-        const spine = document.createElement('div');
-        spine.className = 'book-spine-crease';
-        bookFrame.appendChild(spine);
         row.appendChild(bookFrame);
         vp.appendChild(row);
       } else {
@@ -6628,9 +7865,9 @@
         singleFrame.className = 'book-single-frame';
         const img = document.createElement('img');
         attachDriveImageSource(img, imgItem.id, port);
-        const bookImgW = Math.min(displayW, Math.max(240, window.innerWidth - 26));
+        const bookImgW = Math.min(displayW, Math.max(240, Math.floor((window.innerWidth - 16) * zoomLevel)));
         img.style.width = bookImgW + 'px';
-        img.style.maxHeight = 'calc(100vh - 32px)';
+        img.style.maxHeight = Math.floor((window.innerHeight - 10) * zoomLevel) + 'px';
         img.style.objectFit = 'contain';
         singleFrame.appendChild(img);
         const wm = document.createElement('span');
@@ -6648,12 +7885,14 @@
     if (!pdfDoc) return;
 
     const firstPage = await pdfDoc.getPage(1);
+    if (myGen !== _readerViewportGen) return;
     const firstVp = firstPage.getViewport({ scale: 1.0 });
     let aspect = firstVp.height / firstVp.width;
     // In Webtoons like Bậc Thầy Thiết Kế Điền Trang, Page 1 can be a super-tall 4MB stitched strip while Pages 2+ are standard strips. Sample Page 2 as well so initial slot height doesn't jump wildly!
     if (readerMode === 'webtoon' && totalPages >= 2 && aspect > 2.4) {
       try {
         const secondPage = await pdfDoc.getPage(2);
+        if (myGen !== _readerViewportGen) return;
         const secondVp = secondPage.getViewport({ scale: 1.0 });
         const aspect2 = secondVp.height / secondVp.width;
         if (aspect2 > 0.5 && aspect2 < aspect * 0.75) {
@@ -6661,6 +7900,9 @@
         }
       } catch (e) {}
     }
+    if (myGen !== _readerViewportGen) return;
+    vp.innerHTML = '';
+    renderedPages.clear();
     const screenW = getTargetPageRenderWidth();
     const estH = Math.max(320, Math.min(2600, Math.round(screenW * aspect)));
 
@@ -6737,6 +7979,10 @@
       leftSlot.dataset.page = pLeft;
       bookFrame.appendChild(leftSlot);
 
+      const spine = document.createElement('div');
+      spine.className = 'book-spine-crease';
+      bookFrame.appendChild(spine);
+
       if (pRight) {
         const rightSlot = document.createElement('div');
         rightSlot.className = 'spread-page-half right-page';
@@ -6744,10 +7990,6 @@
         rightSlot.dataset.page = pRight;
         bookFrame.appendChild(rightSlot);
       }
-
-      const spine = document.createElement('div');
-      spine.className = 'book-spine-crease';
-      bookFrame.appendChild(spine);
 
       row.appendChild(bookFrame);
       vp.appendChild(row);
@@ -6891,12 +8133,16 @@
         : Math.min(window.devicePixelRatio || 2.0, 2.25);
       let displayW = getTargetPageRenderWidth();
       if (isSpreadHalf) {
-        const maxSpreadH = Math.max(280, (window.innerHeight - 145) * zoomLevel);
+        const maxSpreadH = Math.max(300, Math.floor((window.innerHeight - 6) * zoomLevel));
+        const baseHalfSpan = zoomLevel > 1.02
+          ? Math.max(window.innerWidth - 12, Math.floor(window.innerHeight * 0.92))
+          : (window.innerWidth - 12);
+        const maxHalfW = Math.floor((baseHalfSpan * 0.5) * zoomLevel);
         const wFromH = Math.floor(maxSpreadH * (baseVp.width / baseVp.height));
-        displayW = Math.min(Math.floor((window.innerWidth * 0.46) * zoomLevel), wFromH);
+        displayW = Math.min(maxHalfW, wFromH);
       } else if (readerMode !== 'webtoon') {
-        const maxBookW = Math.max(240, (window.innerWidth - 26) * zoomLevel);
-        const maxBookH = Math.max(320, (window.innerHeight - 140) * zoomLevel);
+        const maxBookW = Math.max(240, Math.floor((window.innerWidth - 14) * zoomLevel));
+        const maxBookH = Math.max(320, Math.floor((window.innerHeight - 10) * zoomLevel));
         const widthFromHeight = Math.floor(maxBookH * (baseVp.width / baseVp.height));
         displayW = Math.min(displayW, maxBookW, widthFromHeight);
       }
@@ -6923,10 +8169,8 @@
       const canvas = document.createElement('canvas');
       canvas.width = Math.max(1, Math.floor(renderVp.width));
       canvas.height = Math.max(1, Math.floor(renderVp.height));
-      if (!isSpreadHalf) {
-        canvas.style.width = displayW + 'px';
-        canvas.style.height = cssH + 'px';
-      }
+      canvas.style.width = displayW + 'px';
+      canvas.style.height = cssH + 'px';
 
       const ctx = canvas.getContext('2d', { alpha: false });
       ctx.fillStyle = '#0B101B';
@@ -7093,11 +8337,12 @@
   };
 
   function cycleReaderZoom() {
-    if (zoomLevel === 1.0) zoomLevel = 1.4;
-    else if (zoomLevel === 1.4) zoomLevel = 1.85;
-    else zoomLevel = 1.0;
-    document.getElementById('zoom-btn').textContent = `🔍 Zoom: ${zoomLevel.toFixed(1)}x`;
-    buildReaderViewport();
+    let nextZ = 1.0;
+    if (zoomLevel < 1.35) nextZ = 1.4;
+    else if (zoomLevel < 1.75) nextZ = 1.8;
+    else if (zoomLevel < 2.2) nextZ = 2.3;
+    else nextZ = 1.0;
+    applyZoomLevel(nextZ, true);
   }
 
   let readerEyeCareStep = 0; // 0: 100%, 1: Warm Paper Sepia, 2: Night 70%, 3: Deep OLED 45%
@@ -7141,13 +8386,22 @@
     if (window._ccxLastSwipeAt && (Date.now() - window._ccxLastSwipeAt) < 360) {
       return;
     }
+    // Never turn page if user taps in the top-left / topbar zone (protects Back button on iOS/Android!)
+    if (e && e.clientY < 115) {
+      barsCollapsed = false;
+      document.getElementById('reader-topbar').classList.remove('collapsed');
+      document.getElementById('reader-bottombar').classList.remove('collapsed');
+      syncReaderFloatingBackBtn();
+      return;
+    }
     if (readerMode === 'paged' || readerMode === 'spread') {
       const x = e.clientX;
       const w = window.innerWidth;
-      if (x < w * 0.30) {
+      const edgeRatio = zoomLevel > 1.02 ? 0.12 : 0.28;
+      if (x < w * edgeRatio) {
         turnBookPage(-1);
         return;
-      } else if (x > w * 0.70) {
+      } else if (x > w * (1 - edgeRatio)) {
         turnBookPage(1);
         return;
       }
@@ -7155,6 +8409,7 @@
     barsCollapsed = !barsCollapsed;
     document.getElementById('reader-topbar').classList.toggle('collapsed', barsCollapsed);
     document.getElementById('reader-bottombar').classList.toggle('collapsed', barsCollapsed);
+    syncReaderFloatingBackBtn();
   }
 
   async function saveCurrentVolumeOffline() {
@@ -7187,6 +8442,7 @@
     }
     document.getElementById('reader-overlay').classList.add('hidden');
     document.body.classList.remove('reader-or-video-active');
+    syncReaderFloatingBackBtn();
     if (pdfDoc) {
       try { pdfDoc.destroy(); } catch (e) {}
       pdfDoc = null;
@@ -7198,7 +8454,7 @@
     }
   }
 
-  window.handleAndroidBack = function() {
+  window.handleAndroidBack = function(fromPopState) {
     if (!document.getElementById('ota-modal').classList.contains('hidden')) {
       closeOtaUpdateModal();
       return;
@@ -7219,10 +8475,20 @@
       switchTab('library');
       return;
     }
-    if (window.CCXBridge && window.CCXBridge.exitApp) {
+    if (!fromPopState && window.CCXBridge && window.CCXBridge.exitApp) {
       window.CCXBridge.exitApp();
     }
   };
+
+  window.addEventListener('popstate', () => {
+    if (_ccxInternalPopHandling) return;
+    _ccxInternalPopHandling = true;
+    try {
+      window.handleAndroidBack(true);
+    } finally {
+      _ccxInternalPopHandling = false;
+    }
+  });
 
   let resizeTimer = null;
   let lastWindowWidth = window.innerWidth;
