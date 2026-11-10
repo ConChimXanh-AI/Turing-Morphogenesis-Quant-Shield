@@ -1687,6 +1687,8 @@
         <div class="sub-pill" id="top-sub-novel" onclick="setTopSubFilter('novel')">📖 Top Truyện Chữ</div>
         <div class="sub-pill" id="top-sub-anime" onclick="setTopSubFilter('anime')">🎬 Top Anime</div>
         <div class="sub-pill" id="top-sub-movie" onclick="setTopSubFilter('movie')">🍿 Top Phim Điện Ảnh</div>
+        <div class="sub-pill" id="top-refresh-views-btn" style="border-color:rgba(16,185,129,0.55); color:#34D399;" onclick="syncGlobalRealViewsWithCloud(true)">🔄 Làm Mới Lượt Xem Thật</div>
+        <div id="top-real-summary-pill" style="font-size:10.5px; color:var(--cyan-neon); font-weight:800; padding:3px 6px; white-space:nowrap;"></div>
       </div>
     </div>
 
@@ -2591,8 +2593,8 @@
         const minSide = Math.min(window.innerWidth, window.innerHeight);
         const isTab = window._isIpadOS || minSide >= 600;
         return JSON.stringify({
-          versionCode: 25,
-          versionName: '3.8.1',
+          versionCode: 26,
+          versionName: '3.8.2',
           isTablet: isTab,
           smallestScreenWidthDp: minSide,
           platform: window._isIosDevice ? 'ios' : 'web'
@@ -3083,25 +3085,32 @@
             return;
           }
           const syncFileName = 'ccx_sync_' + cleanCode + '.json';
-          const q = `'${CCX_OAUTH.otaRoot}' in parents and name = '${syncFileName}' and trashed = false`;
-          const findRes = await fetch(`https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(q)}&fields=files(id,name)&pageSize=1&supportsAllDrives=true&includeItemsFromAllDrives=true`, {
-            headers: { 'Authorization': 'Bearer ' + token }
-          });
-          let existingId = null;
-          if (findRes.ok) {
-            const fj = await findRes.json();
-            if (fj.files && fj.files.length > 0) existingId = fj.files[0].id;
+          let existingId = (cleanCode === 'global_views_v1') ? '1aMnrmz0f1tVJDaM_9CLxxeGIUrcOru8P' : null;
+          if (!existingId) {
+            const q = `'${CCX_OAUTH.otaRoot}' in parents and name = '${syncFileName}' and trashed = false`;
+            const findRes = await fetch(`https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(q)}&fields=files(id,name)&pageSize=1&supportsAllDrives=true&includeItemsFromAllDrives=true`, {
+              headers: { 'Authorization': 'Bearer ' + token }
+            });
+            if (findRes.ok) {
+              const fj = await findRes.json();
+              if (fj.files && fj.files.length > 0) existingId = fj.files[0].id;
+            }
           }
           if (existingId) {
-            const pr = await fetch(`https://www.googleapis.com/upload/drive/v3/files/${existingId}?uploadType=media&supportsAllDrives=true`, {
-              method: 'PATCH',
-              headers: {
-                'Authorization': 'Bearer ' + token,
-                'Content-Type': 'application/json; charset=UTF-8'
-              },
-              body: jsonPayload
-            });
-            window.onCCXCallback(cbId, { ok: pr.ok, syncCode: cleanCode });
+            let pr = null;
+            for (let att = 0; att < 3; att++) {
+              pr = await fetch(`https://www.googleapis.com/upload/drive/v3/files/${existingId}?uploadType=media&supportsAllDrives=true`, {
+                method: 'PATCH',
+                headers: {
+                  'Authorization': 'Bearer ' + token,
+                  'Content-Type': 'application/json; charset=UTF-8'
+                },
+                body: jsonPayload
+              });
+              if (pr.ok || pr.status !== 403) break;
+              await new Promise(r => setTimeout(r, 650 * (att + 1)));
+            }
+            window.onCCXCallback(cbId, { ok: !!(pr && pr.ok), syncCode: cleanCode });
             return;
           }
           const boundary = '=======CCXWebSync' + Date.now();
@@ -3132,24 +3141,40 @@
             window.onCCXCallback(cbId, { ok: false, error: 'Không thể kết nối Đám Mây.' });
             return;
           }
-          const syncFileName = 'ccx_sync_' + cleanCode + '.json';
-          const q = `'${CCX_OAUTH.otaRoot}' in parents and name = '${syncFileName}' and trashed = false`;
-          const findRes = await fetch(`https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(q)}&fields=files(id,name)&pageSize=1&orderBy=modifiedTime%20desc&supportsAllDrives=true&includeItemsFromAllDrives=true`, {
-            headers: { 'Authorization': 'Bearer ' + token }
-          });
-          if (!findRes.ok) {
-            window.onCCXCallback(cbId, { ok: false, error: 'Lỗi truy vấn Đám Mây.' });
-            return;
+          let targetFileId = (cleanCode === 'global_views_v1') ? '1aMnrmz0f1tVJDaM_9CLxxeGIUrcOru8P' : null;
+          if (!targetFileId) {
+            const syncFileName = 'ccx_sync_' + cleanCode + '.json';
+            const q = `'${CCX_OAUTH.otaRoot}' in parents and name = '${syncFileName}' and trashed = false`;
+            let findRes = null;
+            for (let att = 0; att < 3; att++) {
+              findRes = await fetch(`https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(q)}&fields=files(id,name)&pageSize=1&orderBy=modifiedTime%20desc&supportsAllDrives=true&includeItemsFromAllDrives=true`, {
+                cache: 'no-store',
+                headers: { 'Authorization': 'Bearer ' + token }
+              });
+              if (findRes.ok || findRes.status !== 403) break;
+              await new Promise(r => setTimeout(r, 650 * (att + 1)));
+            }
+            if (!findRes || !findRes.ok) {
+              window.onCCXCallback(cbId, { ok: false, error: 'Lỗi truy vấn Đám Mây.' });
+              return;
+            }
+            const fj = await findRes.json();
+            if (!fj.files || fj.files.length === 0) {
+              window.onCCXCallback(cbId, { ok: false, notFound: true, error: 'Chưa có dữ liệu lưu trên Đám Mây cho mã: ' + cleanCode });
+              return;
+            }
+            targetFileId = fj.files[0].id;
           }
-          const fj = await findRes.json();
-          if (!fj.files || fj.files.length === 0) {
-            window.onCCXCallback(cbId, { ok: false, notFound: true, error: 'Chưa có dữ liệu lưu trên Đám Mây cho mã: ' + cleanCode });
-            return;
+          let dlRes = null;
+          for (let att = 0; att < 3; att++) {
+            dlRes = await fetch(`https://www.googleapis.com/drive/v3/files/${targetFileId}?alt=media&supportsAllDrives=true`, {
+              cache: 'no-store',
+              headers: { 'Authorization': 'Bearer ' + token }
+            });
+            if (dlRes.ok || dlRes.status !== 403) break;
+            await new Promise(r => setTimeout(r, 650 * (att + 1)));
           }
-          const dlRes = await fetch(`https://www.googleapis.com/drive/v3/files/${fj.files[0].id}?alt=media&supportsAllDrives=true`, {
-            headers: { 'Authorization': 'Bearer ' + token }
-          });
-          if (dlRes.ok) {
+          if (dlRes && dlRes.ok) {
             const data = await dlRes.json();
             window.onCCXCallback(cbId, { ok: true, syncCode: cleanCode, data: data });
           } else {
@@ -3440,6 +3465,7 @@
       localStorage.setItem('ccx_fav_series_v1', JSON.stringify(Array.from(set)));
       scheduleSilentCloudSync();
     } catch (e) {}
+    recordRealSeriesActivity(seriesName, null, 'fav');
     renderLibraryGrid();
   }
 
@@ -3450,42 +3476,442 @@
     return 'manga';
   }
 
-  const CCX_HALL_OF_FAME_TIERS = [
-    { re: /one\s*piece|dao\s*hai\s*tac|conan|tham\s*tu\s*lung\s*danh|dragon\s*ball|7\s*vien\s*ngoc\s*rong|doraemon|naruto|bleach|slam\s*dunk|berserk|kingdom|hunter\s*x\s*hunter|solo\s*leveling|bac\s*thay\s*thiet\s*ke\s*dien\s*trang|dai\s*phung\s*da\s*canh\s*nhan|ta\s*la\s*ta\s*de|cam\s*kiem\s*tuyet\s*doi|vo\s*luyen\s*dinh\s*phong|kimetsu\s*no\s*yaiba|thanh\s*guom\s*diet\s*quy|jujutsu\s*kaisen|attack\s*on\s*titan|dai\s*chien\s*titan/i, boost: 9200 },
-    { re: /kim\s*dung|anh\s*hung\s*xa\s*dieu|than\s*dieu\s*hiep\s*lu|thien\s*long\s*bat\s*bo|y\s*thien\s*do\s*long\s*ky|tieu\s*ngao\s*giang\s*ho|death\s*note|liar\s*game|kurosagi|con\s*diec\s*den|monster|20th\s*century\s*boys|vagabond|vinland\s*saga|gantz|claymore|chainsaw\s*man|one\s*punch\s*man|tokyo\s*ghoul|fullmetal\s*alchemist|black\s*clover|fairy\s*tail|inuyasha|yu\s*yu\s*hakusho|frieren|duoc\s*su\s*tu\s*su|lop\s*hoc\s*de\s*cao\s*thuc\s*luc|chua\s*te\s*bong\s*toi|pham\s*nhan\s*tu\s*tien|dau\s*pha\s*thuong\s*khung|tien\s*nghich|oshin|girl\s*from\s*nowhere|harry\s*potter|lord\s*of\s*the\s*rings|chua\s*te\s*nhung\s*chiec\s*nhan/i, boost: 6800 }
-  ];
+  // =========================================================================
+  // 100% REAL-TIME MULTI-DEVICE CLOUD VIEW COUNTER (ZERO FAKE / ZERO HEURISTIC)
+  // Synced via `ccx_sync_global_views_v1.json` on Google Drive Cloud (`OTA_FOLDER_ID`)
+  // =========================================================================
+  const INITIAL_VERIFIED_CLOUD_ACTORS = {
+    "u_tamlm": {
+      "views": { "Captain Kid - Hoàng Tử Cướp Biển (Hoàng Tử Hải Tặc - Trọn Bộ Full)": 1 },
+      "chaps": { "Captain Kid - Hoàng Tử Cướp Biển (Hoàng Tử Hải Tặc - Trọn Bộ Full)": ["11KEY8sS8Lamoh99LQKsyDifpRwgR7FJu"] },
+      "favs": [],
+      "lastAt": { "Captain Kid - Hoàng Tử Cướp Biển (Hoàng Tử Hải Tặc - Trọn Bộ Full)": 1794234943564 },
+      "updatedAt": 1794234946064
+    },
+    "u_nstxst": {
+      "views": {
+        "Cuộc Chiến Của Người Và Thần": 1,
+        "1-00 AM - 1 Giờ Sáng (Hwang Mi Ri - Trọn Bộ 12 Tập Tiếng Việt Full)": 2,
+        "Ám Hành Ngự Sử - Blade Of The Phantom Master (Trọn Bộ 195 Chương Tiếng Việt)": 1,
+        "Bậc Thầy Thiết Kế Điền Trang - The Greatest Estate Developer (Manhwa Bản FULL HD)": 1,
+        "Bác Sĩ Quái Dị - Black Jack (Bản Màu Đẹp Full 18 Tập PDF) - ( Bạn Ziin )": 1,
+        "Barakamon - Nghệ Thuật Viết Chữ (Trọn Bộ Full)": 1,
+        "Chàng trai hào hiệp - Hwang Miri (Trọn Bộ PDF) - ( Bạn Nguyễn Minh Tuấn )": 3
+      },
+      "chaps": {
+        "Cuộc Chiến Của Người Và Thần": ["1nOQxmhajKwNZxgw4otqI6xSEnHDr7v4q"],
+        "1-00 AM - 1 Giờ Sáng (Hwang Mi Ri - Trọn Bộ 12 Tập Tiếng Việt Full)": ["1ZONRgbnzZkaMxsYKibfjR9l9X6eowO1t", "1xuibHfhGr_mRpD2udgW-3QW6JChTeHmL"],
+        "Ám Hành Ngự Sử - Blade Of The Phantom Master (Trọn Bộ 195 Chương Tiếng Việt)": ["1g79lns45wmn2nWVh54U2vd-CDoJLdxZX"],
+        "Bậc Thầy Thiết Kế Điền Trang - The Greatest Estate Developer (Manhwa Bản FULL HD)": ["1lk6WaA3eZmS2zg1BOAyYtOWMhBbm4Zdk"],
+        "Bác Sĩ Quái Dị - Black Jack (Bản Màu Đẹp Full 18 Tập PDF) - ( Bạn Ziin )": ["1eLlPknRAQwe5xRPAgK6_Br2OrB2Sf9JK"],
+        "Barakamon - Nghệ Thuật Viết Chữ (Trọn Bộ Full)": ["1YXJCce588gPfqV6kogFIZIhb2X42NRT4"],
+        "Chàng trai hào hiệp - Hwang Miri (Trọn Bộ PDF) - ( Bạn Nguyễn Minh Tuấn )": ["1oZ-V9axk1bBgRDMycr3AwGfo1cQ_ydJ4", "1EyRxw8FrOjilnt_z246AEtgynbPHjKeq", "1Xk-FSIHFvqBKfneusy-jVaH-gL_K52lN"]
+      },
+      "favs": [],
+      "lastAt": {
+        "Cuộc Chiến Của Người Và Thần": 1793712942643,
+        "1-00 AM - 1 Giờ Sáng (Hwang Mi Ri - Trọn Bộ 12 Tập Tiếng Việt Full)": 1793763224452,
+        "Ám Hành Ngự Sử - Blade Of The Phantom Master (Trọn Bộ 195 Chương Tiếng Việt)": 1793763274850,
+        "Bậc Thầy Thiết Kế Điền Trang - The Greatest Estate Developer (Manhwa Bản FULL HD)": 1793763329858,
+        "Bác Sĩ Quái Dị - Black Jack (Bản Màu Đẹp Full 18 Tập PDF) - ( Bạn Ziin )": 1793763345256,
+        "Barakamon - Nghệ Thuật Viết Chữ (Trọn Bộ Full)": 1793763351670,
+        "Chàng trai hào hiệp - Hwang Miri (Trọn Bộ PDF) - ( Bạn Nguyễn Minh Tuấn )": 1793763395596
+      },
+      "updatedAt": 1793763398096
+    },
+    "u_mrmario90": {
+      "views": {
+        "Biệt Đội Lính Cứu Hỏa": 1,
+        "Bất Tử Và Bất Hạnh - Undead Unluck (Trọn Bộ 239 Chương Full)": 1,
+        "Cao Thủ Bóng Rổ - Slam Dunk (Trọn Bộ 276 Chương Full)": 1,
+        "Flame Of Recca": 4
+      },
+      "chaps": {
+        "Biệt Đội Lính Cứu Hỏa": ["1QW_p5YUsEH7Lgy1wRC6ZndClwcY7Gyqn"],
+        "Bất Tử Và Bất Hạnh - Undead Unluck (Trọn Bộ 239 Chương Full)": ["1gTQcPkT-1n7cF0zV0a0EmFtfp_-Rxan_"],
+        "Cao Thủ Bóng Rổ - Slam Dunk (Trọn Bộ 276 Chương Full)": ["1lb4DOXgTd2IUZu_Qe-rIl2FNEi2o0O2y"],
+        "Flame Of Recca": ["1dZO__qaWjPtl9vXfVs1M3QNyRa8Pvcp0", "1DnUC0K0gt86YdvoN7w9SQQN5PnITOfcT", "1OP_oYbDxaYWmc22LStxGqBp0yHVx-0TC", "1mFAhFr5pQUjf1sjjBSYYYzBs7b2FnZWA"]
+      },
+      "favs": [],
+      "lastAt": {
+        "Biệt Đội Lính Cứu Hỏa": 1793754841223,
+        "Bất Tử Và Bất Hạnh - Undead Unluck (Trọn Bộ 239 Chương Full)": 1793754965337,
+        "Cao Thủ Bóng Rổ - Slam Dunk (Trọn Bộ 276 Chương Full)": 1793876207205,
+        "Flame Of Recca": 1793588056110
+      },
+      "updatedAt": 1793876209707
+    },
+    "u_hiha1234": {
+      "views": {
+        "Á Nhân - Ajin Demi-Human (Trọn Bộ 86 Chương Full)": 1,
+        "Công Chúa Mặt Trăng Tập 2- Scarlet (Trọn Bộ PDF & EPUB) - ( Bạn ravo )": 1
+      },
+      "chaps": {
+        "Á Nhân - Ajin Demi-Human (Trọn Bộ 86 Chương Full)": ["1tJyycvmcC4iPIePoiczld7wSAtqGuJQA"],
+        "Công Chúa Mặt Trăng Tập 2- Scarlet (Trọn Bộ PDF & EPUB) - ( Bạn ravo )": ["1ZObeBh11Ktc729IsWBUbF5hqTosy8gFG"]
+      },
+      "favs": [],
+      "lastAt": {
+        "Á Nhân - Ajin Demi-Human (Trọn Bộ 86 Chương Full)": 1794019928180,
+        "Công Chúa Mặt Trăng Tập 2- Scarlet (Trọn Bộ PDF & EPUB) - ( Bạn ravo )": 1794020149883
+      },
+      "updatedAt": 1794020152384
+    }
+  };
 
-  function computeBasePopularityScore(it, idx) {
-    const rawName = String(it.name || '');
-    const norm = it._norm || (it._norm = normalizeVN(rawName));
-    const isFanfic = /dong\s*nhan|dong\s*bon\s*dau\s*tien|meo\s*tom|chat\s*group|nhom\s*chat/i.test(norm);
-    let score = 1200;
-    if (!isFanfic) {
-      for (const tier of CCX_HALL_OF_FAME_TIERS) {
-        if (tier.re.test(norm)) {
-          score += tier.boost;
-          break;
-        }
+  function getOrInitDeviceUid() {
+    try {
+      let uid = localStorage.getItem('ccx_device_uid_v1');
+      if (!uid || uid.length < 6) {
+        uid = Math.random().toString(36).slice(2, 10) + Date.now().toString(36).slice(-4);
+        localStorage.setItem('ccx_device_uid_v1', uid);
+      }
+      return uid;
+    } catch (e) {
+      return 'anon';
+    }
+  }
+
+  function getAnalyticsActorKey() {
+    try {
+      const rawCode = (localStorage.getItem('ccx_cloud_sync_code_v1') || '').trim().toLowerCase().replace(/[^a-z0-9_-]/g, '');
+      if (rawCode.length >= 3 && rawCode !== 'global_views_v1') {
+        const normCode = (rawCode === 'mrmario9x') ? 'mrmario90' : rawCode;
+        return 'u_' + normCode;
+      }
+    } catch (e) {}
+    return 'd_' + getOrInitDeviceUid();
+  }
+
+  let _canonicalSeriesCache = null;
+  function resolveCanonicalSeriesName(rawName) {
+    const s = String(rawName || '').trim();
+    if (!s) return '';
+    if (!catalogItems || catalogItems.length === 0) return s;
+    if (!_canonicalSeriesCache || _canonicalSeriesCache.len !== catalogItems.length) {
+      const exactMap = new Map();
+      const normMap = new Map();
+      for (const it of catalogItems) {
+        if (!it || !it.name) continue;
+        exactMap.set(it.name, it.name);
+        const nk = normalizeVN(it.name.replace(/-\s*\(\s*b[aạ]n\s+[^)]+\)/gi, ''));
+        if (nk && !normMap.has(nk)) normMap.set(nk, it.name);
+      }
+      _canonicalSeriesCache = { len: catalogItems.length, exactMap, normMap };
+    }
+    if (_canonicalSeriesCache.exactMap.has(s)) return _canonicalSeriesCache.exactMap.get(s);
+    const nk = normalizeVN(s.replace(/-\s*\(\s*b[aạ]n\s+[^)]+\)/gi, ''));
+    if (nk && _canonicalSeriesCache.normMap.has(nk)) return _canonicalSeriesCache.normMap.get(nk);
+    return s;
+  }
+
+  function mergeTwoActorRecords(a, b) {
+    const out = {
+      views: {},
+      chaps: {},
+      favs: [],
+      lastAt: {},
+      updatedAt: Math.max((a && a.updatedAt) || 0, (b && b.updatedAt) || 0)
+    };
+    let changedFromB = false;
+    const allSeries = new Set([
+      ...Object.keys((a && a.views) || {}),
+      ...Object.keys((b && b.views) || {}),
+      ...Object.keys((a && a.chaps) || {}),
+      ...Object.keys((b && b.chaps) || {})
+    ]);
+    for (const rawS of allSeries) {
+      const s = resolveCanonicalSeriesName(rawS);
+      if (!s) continue;
+      const ca = (a && a.chaps && Array.isArray(a.chaps[rawS])) ? a.chaps[rawS] : ((a && a.chaps && Array.isArray(a.chaps[s])) ? a.chaps[s] : []);
+      const cb = (b && b.chaps && Array.isArray(b.chaps[rawS])) ? b.chaps[rawS] : ((b && b.chaps && Array.isArray(b.chaps[s])) ? b.chaps[s] : []);
+      const prevSet = new Set(out.chaps[s] || []);
+      ca.forEach(id => { if (id) prevSet.add(id); });
+      cb.forEach(id => { if (id) prevSet.add(id); });
+      out.chaps[s] = Array.from(prevSet);
+
+      const va = Math.max((a && a.views && a.views[rawS]) || 0, (a && a.views && a.views[s]) || 0);
+      const vb = Math.max((b && b.views && b.views[rawS]) || 0, (b && b.views && b.views[s]) || 0);
+      const mergedV = Math.max(out.views[s] || 0, va, vb, out.chaps[s].length);
+      out.views[s] = mergedV;
+      if (mergedV > vb || out.chaps[s].length > cb.length) changedFromB = true;
+
+      const la = Math.max((a && a.lastAt && a.lastAt[rawS]) || 0, (a && a.lastAt && a.lastAt[s]) || 0);
+      const lb = Math.max((b && b.lastAt && b.lastAt[rawS]) || 0, (b && b.lastAt && b.lastAt[s]) || 0);
+      out.lastAt[s] = Math.max(out.lastAt[s] || 0, la, lb);
+    }
+    const favSet = new Set();
+    if (a && Array.isArray(a.favs)) a.favs.forEach(x => { const cs = resolveCanonicalSeriesName(x); if (cs) favSet.add(cs); });
+    if (b && Array.isArray(b.favs)) b.favs.forEach(x => { const cs = resolveCanonicalSeriesName(x); if (cs) favSet.add(cs); });
+    out.favs = Array.from(favSet);
+    if (out.favs.length > ((b && Array.isArray(b.favs)) ? b.favs.length : 0)) changedFromB = true;
+    return { record: out, changedFromB };
+  }
+
+  function loadGlobalViewsLedgerLocal() {
+    let parsed = null;
+    try {
+      parsed = JSON.parse(localStorage.getItem('ccx_global_views_ledger_v2') || 'null');
+    } catch (e) {}
+    const actors = {};
+    for (const [k, v] of Object.entries(INITIAL_VERIFIED_CLOUD_ACTORS)) {
+      actors[k] = mergeTwoActorRecords(v, null).record;
+    }
+    if (parsed && parsed.actors && typeof parsed.actors === 'object') {
+      for (const [rawKey, rec] of Object.entries(parsed.actors)) {
+        const k = (rawKey === 'u_mrmario9x') ? 'u_mrmario90' : rawKey;
+        actors[k] = mergeTwoActorRecords(actors[k], rec).record;
       }
     }
-    if (/\(\s*b[aạ]n\s+/i.test(rawName)) score += 1150;
-    if (/tr[oọ]n\s*b[oộ]|full/i.test(rawName)) score += 950;
-    const chapMatch = rawName.match(/(\d+)\s*(?:ch[uư][oơ]ng|chap|t[aậ]p|ph[aầ]n|vol)/i) || String(it.filesText || '').match(/(\d+)/);
-    if (chapMatch) {
-      const cnt = Math.min(1200, parseInt(chapMatch[1], 10) || 0);
-      score += cnt * (it._type === 'manga' ? 3.2 : 1.5);
+    return {
+      version: 2,
+      updatedAt: (parsed && parsed.updatedAt) || Date.now(),
+      actors
+    };
+  }
+
+  function saveGlobalViewsLedgerLocal(ledger) {
+    try {
+      localStorage.setItem('ccx_global_views_ledger_v2', JSON.stringify(ledger));
+    } catch (e) {}
+  }
+
+  function syncLocalReadingHistoryIntoActorLedger(ledger) {
+    if (!ledger || !ledger.actors) return false;
+    const myKey = getAnalyticsActorKey();
+    const anonKey = 'd_' + getOrInitDeviceUid();
+    let changed = false;
+
+    // If user linked a personal sync code (`u_...`), migrate any prior anonymous `d_...` activity on this device into `u_...` so it's never double-counted
+    if (myKey.startsWith('u_') && ledger.actors[anonKey]) {
+      const m = mergeTwoActorRecords(ledger.actors[anonKey], ledger.actors[myKey]);
+      ledger.actors[myKey] = m.record;
+      delete ledger.actors[anonKey];
+      changed = true;
     }
-    if (it._type === 'manga') score += 1600;
-    else if (it._type === 'anime') score += 1100;
-    else if (it._type === 'movie') score += 850;
-    // Deterministic hash jitter so read counts look natural & stable across reloads
-    let h = 2166136261;
-    for (let i = 0; i < norm.length; i++) {
-      h ^= norm.charCodeAt(i);
-      h = Math.imul(h, 16777619);
+
+    const histMap = getReadingHistoryMap();
+    const favArr = Array.from(getFavoritesSet());
+    const localViews = {};
+    const localChaps = {};
+    const localLastAt = {};
+
+    for (const [fid, item] of Object.entries(histMap)) {
+      const rawS = String((item && item.series) || (item && item.name) || '').trim();
+      const s = resolveCanonicalSeriesName(rawS);
+      if (!s) continue;
+      if (!localChaps[s]) localChaps[s] = [];
+      if (!localChaps[s].includes(fid)) localChaps[s].push(fid);
+      localViews[s] = localChaps[s].length;
+      const ts = Number(item.updatedAt) || 0;
+      if (ts > (localLastAt[s] || 0)) localLastAt[s] = ts;
     }
-    const jitter = Math.abs(h) % 890;
-    return Math.round(score + jitter);
+
+    if (Object.keys(localViews).length > 0 || favArr.length > 0) {
+      const syntheticLocal = {
+        views: localViews,
+        chaps: localChaps,
+        favs: favArr.map(resolveCanonicalSeriesName).filter(Boolean),
+        lastAt: localLastAt,
+        updatedAt: Date.now()
+      };
+      const merged = mergeTwoActorRecords(syntheticLocal, ledger.actors[myKey]);
+      if (merged.changedFromB || !ledger.actors[myKey]) {
+        ledger.actors[myKey] = merged.record;
+        changed = true;
+      }
+    }
+    return changed;
+  }
+
+  const _lastOpenSeriesTs = {};
+  const _lastOpenFileTs = {};
+  let _globalViewsSyncTimer = null;
+
+  function recordRealSeriesActivity(rawSeriesName, fileId, actionType) {
+    const s = resolveCanonicalSeriesName(rawSeriesName);
+    if (!s || s.startsWith('http')) return;
+    const now = Date.now();
+    const ledger = loadGlobalViewsLedgerLocal();
+    syncLocalReadingHistoryIntoActorLedger(ledger);
+    const myKey = getAnalyticsActorKey();
+    const cur = ledger.actors[myKey] || { views: {}, chaps: {}, favs: [], lastAt: {}, updatedAt: now };
+
+    if (!cur.chaps[s]) cur.chaps[s] = [];
+    let didIncrement = false;
+
+    if (actionType === 'open_series') {
+      if (now - (_lastOpenSeriesTs[s] || 0) > 90000) {
+        _lastOpenSeriesTs[s] = now;
+        cur.views[s] = (cur.views[s] || 0) + 1;
+        cur.lastAt[s] = now;
+        didIncrement = true;
+      }
+    } else if (actionType === 'read_chapter' || actionType === 'watch_video') {
+      const fid = String(fileId || '').trim();
+      if (fid && !cur.chaps[s].includes(fid)) {
+        cur.chaps[s].push(fid);
+        cur.views[s] = Math.max((cur.views[s] || 0) + 1, cur.chaps[s].length);
+        cur.lastAt[s] = now;
+        _lastOpenFileTs[fid] = now;
+        didIncrement = true;
+      } else if (fid && now - (_lastOpenFileTs[fid] || 0) > 300000) {
+        _lastOpenFileTs[fid] = now;
+        cur.views[s] = Math.max((cur.views[s] || 0) + 1, cur.chaps[s].length);
+        cur.lastAt[s] = now;
+        didIncrement = true;
+      }
+    } else if (actionType === 'fav') {
+      cur.favs = Array.from(getFavoritesSet()).map(resolveCanonicalSeriesName).filter(Boolean);
+      didIncrement = true;
+    }
+
+    if (didIncrement) {
+      cur.updatedAt = now;
+      ledger.actors[myKey] = cur;
+      ledger.updatedAt = now;
+      saveGlobalViewsLedgerLocal(ledger);
+      recomputeCatalogRealViewStats(ledger);
+      if (currentFilter === 'top') {
+        renderLibraryGrid();
+      }
+      clearTimeout(_globalViewsSyncTimer);
+      _globalViewsSyncTimer = setTimeout(() => {
+        syncGlobalRealViewsWithCloud(false);
+      }, 1800);
+    }
+  }
+
+  function recomputeCatalogRealViewStats(optionalLedger) {
+    const ledger = optionalLedger || loadGlobalViewsLedgerLocal();
+    syncLocalReadingHistoryIntoActorLedger(ledger);
+    const seriesStats = {};
+
+    for (const [actorKey, actor] of Object.entries(ledger.actors || {})) {
+      if (!actor || typeof actor !== 'object') continue;
+      const viewsObj = actor.views || {};
+      const chapsObj = actor.chaps || {};
+      const lastAtObj = actor.lastAt || {};
+      const favsArr = Array.isArray(actor.favs) ? actor.favs : [];
+
+      const touchedByActor = new Set([...Object.keys(viewsObj), ...Object.keys(chapsObj)]);
+      for (const rawS of touchedByActor) {
+        const s = resolveCanonicalSeriesName(rawS);
+        if (!s) continue;
+        const cArr = Array.isArray(chapsObj[rawS]) ? chapsObj[rawS] : [];
+        const vCnt = Math.max(Number(viewsObj[rawS]) || 0, cArr.length);
+        if (vCnt <= 0) continue;
+        if (!seriesStats[s]) {
+          seriesStats[s] = { views: 0, readers: new Set(), chaps: 0, favs: new Set(), lastAt: 0 };
+        }
+        seriesStats[s].views += vCnt;
+        seriesStats[s].readers.add(actorKey);
+        seriesStats[s].chaps += cArr.length;
+        const ts = Number(lastAtObj[rawS]) || 0;
+        if (ts > seriesStats[s].lastAt) seriesStats[s].lastAt = ts;
+      }
+
+      for (const rawFav of favsArr) {
+        const s = resolveCanonicalSeriesName(rawFav);
+        if (!s) continue;
+        if (!seriesStats[s]) {
+          seriesStats[s] = { views: 0, readers: new Set(), chaps: 0, favs: new Set(), lastAt: 0 };
+        }
+        seriesStats[s].favs.add(actorKey);
+      }
+    }
+
+    let totalRealSeries = 0;
+    let totalRealViewsSum = 0;
+    let totalDistinctReaders = new Set(Object.keys(ledger.actors || {})).size;
+
+    catalogItems.forEach(it => {
+      const st = seriesStats[it.name];
+      if (st && (st.views > 0 || st.favs.size > 0)) {
+        it._realViews = st.views;
+        it._realReaders = st.readers.size;
+        it._realChaps = st.chaps;
+        it._realFavs = st.favs.size;
+        it._realLastAt = st.lastAt;
+        totalRealSeries++;
+        totalRealViewsSum += st.views;
+      } else {
+        it._realViews = 0;
+        it._realReaders = 0;
+        it._realChaps = 0;
+        it._realFavs = 0;
+        it._realLastAt = 0;
+      }
+    });
+
+    const sumEl = document.getElementById('top-real-summary-pill');
+    if (sumEl) {
+      sumEl.textContent = `📊 Đếm thật 100%: ${totalRealSeries} bộ • ${totalRealViewsSum} lượt xem • ${totalDistinctReaders} độc giả`;
+    }
+    return { totalRealSeries, totalRealViewsSum, totalDistinctReaders };
+  }
+
+  let _isSyncingGlobalViews = false;
+  async function syncGlobalRealViewsWithCloud(showToast) {
+    if (_isSyncingGlobalViews) return;
+    _isSyncingGlobalViews = true;
+    const btn = document.getElementById('top-refresh-views-btn');
+    if (btn && showToast) btn.textContent = '⏳ Đang đồng bộ Đám Mây...';
+    try {
+      const localLedger = loadGlobalViewsLedgerLocal();
+      const localChanged = syncLocalReadingHistoryIntoActorLedger(localLedger);
+      const res = await callBridgeAsync('restoreUserProgressFromCloud', ['global_views_v1']);
+      let needPush = localChanged;
+      const mergedActors = { ...localLedger.actors };
+
+      if (res && res.ok && res.data && res.data.actors && typeof res.data.actors === 'object') {
+        const cloudActors = res.data.actors;
+        const allKeys = new Set([...Object.keys(mergedActors), ...Object.keys(cloudActors)]);
+        const myKey = getAnalyticsActorKey();
+        const myAnonKey = 'd_' + getOrInitDeviceUid();
+
+        for (const rawK of allKeys) {
+          if (myKey.startsWith('u_') && rawK === myAnonKey) {
+            needPush = true;
+            continue;
+          }
+          const k = (rawK === 'u_mrmario9x') ? 'u_mrmario90' : rawK;
+          const locA = mergedActors[k];
+          const cldA = cloudActors[rawK];
+          const m = mergeTwoActorRecords(locA, cldA);
+          mergedActors[k] = m.record;
+          if (m.changedFromB) needPush = true;
+        }
+      } else if (res && res.notFound) {
+        needPush = true;
+      }
+
+      const finalLedger = {
+        version: 2,
+        updatedAt: Date.now(),
+        actors: mergedActors
+      };
+      saveGlobalViewsLedgerLocal(finalLedger);
+      const stats = recomputeCatalogRealViewStats(finalLedger);
+      if (currentFilter === 'top') {
+        renderLibraryGrid();
+      }
+
+      if (needPush && ((res && res.ok) || (res && res.notFound))) {
+        await callBridgeAsync('syncUserProgressToCloud', ['global_views_v1', JSON.stringify(finalLedger)]);
+      }
+
+      if (showToast) {
+        showAppToast(`✅ Đã cập nhật Bảng Xếp Hạng Thật: ${stats.totalRealSeries} bộ có người đọc (${stats.totalRealViewsSum} lượt xem thật từ ${stats.totalDistinctReaders} độc giả)!`, 3500);
+      }
+    } catch (e) {
+      if (showToast) {
+        showAppToast('⚠️ Đang hiển thị dữ liệu lượt xem thật đã lưu trên máy.');
+      }
+    } finally {
+      _isSyncingGlobalViews = false;
+      if (btn) btn.textContent = '🔄 Làm Mới Lượt Xem Thật';
+    }
   }
 
   function updateCategoryCounts() {
@@ -3494,6 +3920,7 @@
     const novelIndices = [];
     const animeIndices = [];
     const movieIndices = [];
+    _canonicalSeriesCache = null;
     catalogItems.forEach((it, idx) => {
       if (!it.url && it.id) it.url = 'https://drive.google.com/drive/folders/' + it.id;
       it._type = inferItemType(it);
@@ -3513,8 +3940,8 @@
       it._createdTs = it.createdTime ? (Date.parse(it.createdTime) || 0) : 0;
       it._isNewFlag = !!it.isNew;
       it._newScore = it._createdTs > 0 ? it._createdTs : idx;
-      it._basePopScore = computeBasePopularityScore(it, idx);
     });
+    recomputeCatalogRealViewStats();
     // Mark latest items in each category as new if not already marked by Drive API
     [mangaIndices.slice(-14), novelIndices.slice(-10), animeIndices.slice(-10), movieIndices.slice(-8)].forEach(group => {
       group.forEach((idx, pos) => {
@@ -3537,7 +3964,7 @@
     if (elMovie) elMovie.textContent = vCount;
   }
 
-  let hardwareDeviceInfo = { isTablet: false, smallestScreenWidthDp: 390, versionCode: 25, versionName: '3.8.1' };
+  let hardwareDeviceInfo = { isTablet: false, smallestScreenWidthDp: 390, versionCode: 26, versionName: '3.8.2' };
   let isEcoCoolMode = false;
 
   window._ccxHotRefreshFolderTree = function() {
@@ -3677,9 +4104,13 @@
       if (window._ccxHotRefreshFolderTree) window._ccxHotRefreshFolderTree();
       checkAppUpdateSilent(false);
       syncCloudCatalogSilent();
+      syncGlobalRealViewsWithCloud(false);
       if (savedSyncCode.length >= 3) {
         callBridgeAsync('restoreUserProgressFromCloud', [savedSyncCode]).then(r => {
-          if (r && r.ok && r.data) mergeUserBackupObject(r.data);
+          if (r && r.ok && r.data) {
+            mergeUserBackupObject(r.data);
+            syncGlobalRealViewsWithCloud(false);
+          }
         });
       }
     }, 600);
@@ -3914,6 +4345,10 @@
     if (subBar) {
       subBar.classList.toggle('hidden', filter !== 'top');
     }
+    if (filter === 'top') {
+      recomputeCatalogRealViewStats();
+      syncGlobalRealViewsWithCloud(false);
+    }
     renderLibraryGrid();
   }
 
@@ -3950,14 +4385,20 @@
       }
     } catch (e) {}
 
+    if (currentFilter === 'top') {
+      recomputeCatalogRealViewStats();
+    }
+
     let filtered = catalogItems.filter(it => {
       if (q) {
         if (!it._norm) it._norm = normalizeVN(it.name);
         if (!it._norm.includes(q)) return false;
       }
       const t = it._type || inferItemType(it);
-      if (currentFilter === 'top' && topSubFilter !== 'all') {
-        if (t !== topSubFilter) return false;
+      if (currentFilter === 'top') {
+        if (topSubFilter !== 'all' && t !== topSubFilter) return false;
+        // 100% Real-View Policy: Only show series that have real verified views or favorites!
+        return (it._realViews || 0) > 0 || (it._realFavs || 0) > 0;
       }
       if (currentFilter === 'new') return !!it._isNewFlag;
       if (currentFilter === 'manga') return t === 'manga';
@@ -3972,36 +4413,22 @@
     if (currentFilter === 'new') {
       filtered = filtered.slice().sort((a, b) => (b._newScore || 0) - (a._newScore || 0));
     } else if (currentFilter === 'top') {
-      filtered.forEach(it => {
-        let s = it._basePopScore || computeBasePopularityScore(it, 0);
-        if (readingSeriesSet.has(it.name)) s += 4200;
-        if (favSet.has(it.name)) s += 3800;
-        if (offlineSeriesCountMap[it.name] > 0) s += 2600 + offlineSeriesCountMap[it.name] * 120;
-        it._topScore = s;
+      filtered = filtered.slice().sort((a, b) => {
+        if ((b._realViews || 0) !== (a._realViews || 0)) return (b._realViews || 0) - (a._realViews || 0);
+        if ((b._realReaders || 0) !== (a._realReaders || 0)) return (b._realReaders || 0) - (a._realReaders || 0);
+        if ((b._realChaps || 0) !== (a._realChaps || 0)) return (b._realChaps || 0) - (a._realChaps || 0);
+        if ((b._realFavs || 0) !== (a._realFavs || 0)) return (b._realFavs || 0) - (a._realFavs || 0);
+        return (b._realLastAt || 0) - (a._realLastAt || 0);
       });
-      filtered = filtered.slice().sort((a, b) => (b._topScore || 0) - (a._topScore || 0));
-      // Apply franchise edition diversity so multiple editions of Doraemon/Berserk/Conan don't crowd the Top 25
-      const franchiseSeen = {};
-      const franchiseKeys = ['doraemon', 'berserk', 'conan', 'dragon ball', 'one piece', 'naruto', 'bleach', 'hunter x hunter', 'jujutsu kaisen', 'kimetsu no yaiba', 'slam dunk', 'attack on titan', 'solo leveling', 'death note', 'kurosagi', 'dai phung', 'vo luyen dinh phong', 'pham nhan tu tien'];
-      filtered.forEach(it => {
-        const norm = it._norm || normalizeVN(it.name);
-        for (const fk of franchiseKeys) {
-          if (norm.includes(fk)) {
-            const cnt = franchiseSeen[fk] || 0;
-            franchiseSeen[fk] = cnt + 1;
-            if (cnt > 0) {
-              it._topScore = Math.max(1500, it._topScore - cnt * 5200);
-            }
-            break;
-          }
-        }
-        it._topReadCount = Math.max(850, Math.round(it._topScore * 1.45));
-      });
-      filtered = filtered.slice().sort((a, b) => (b._topScore || 0) - (a._topScore || 0));
     }
 
     if (filtered.length === 0) {
-      grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:40px 16px; color:var(--text-sub);">${currentFilter === 'fav' ? 'Chưa có bộ nào trong Tủ Yêu Thích. Hãy bấm biểu tượng 🤍 trên thẻ truyện/phim để ghim nhé!' : 'Không tìm thấy bộ Truyện / Anime / Phim nào khớp từ khóa.'}</div>`;
+      const emptyMsg = currentFilter === 'fav'
+        ? 'Chưa có bộ nào trong Tủ Yêu Thích. Hãy bấm biểu tượng 🤍 trên thẻ truyện/phim để ghim nhé!'
+        : (currentFilter === 'top'
+          ? 'Chưa có bộ nào trong danh mục này có lượt xem thật trên Đám Mây. Khi có người mở đọc/xem, bộ đó sẽ tự động xuất hiện tại đây!'
+          : 'Không tìm thấy bộ Truyện / Anime / Phim nào khớp từ khóa.');
+      grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:40px 16px; color:var(--text-sub);">${emptyMsg}</div>`;
       return;
     }
 
@@ -4080,8 +4507,11 @@
           topBadgeHtml = `<span style="font-size:9.5px; background:rgba(56,189,248,0.18); border:1px solid var(--cyan-neon); color:var(--cyan-neon); padding:1px 6px; border-radius:5px; font-weight:800;">⭐ #${rk}</span>`;
         }
       }
-      const readCountStr = currentFilter === 'top'
-        ? `<span style="color:#FBBF24; font-weight:800;">🔥 ${(it._topReadCount || 1500).toLocaleString('vi-VN')} lượt đọc</span> • `
+      const realViews = it._realViews || 0;
+      const realReaders = it._realReaders || 0;
+      const realChaps = it._realChaps || 0;
+      const readCountStr = (currentFilter === 'top' || realViews > 0)
+        ? `<span style="color:#FBBF24; font-weight:800;">👁️ ${realViews.toLocaleString('vi-VN')} lượt xem thật • 👥 ${realReaders} độc giả${realChaps > 0 ? ` (${realChaps} tập)` : ''}</span> • `
         : '';
       const subMeta = offCnt > 0
         ? `${readCountStr}<span style="color:#34D399; font-weight:800;">✅ Đã tải ${offCnt} tập trong máy</span>`
@@ -4160,6 +4590,7 @@
   async function openSeriesRoot(idOrUrl, seriesName) {
     currentSeriesName = seriesName;
     folderStack = [{ id: idOrUrl, title: seriesName }];
+    recordRealSeriesActivity(seriesName, null, 'open_series');
     pushCcxHistoryState('folder_root');
     await loadCurrentFolderStack();
   }
@@ -5866,6 +6297,7 @@
     switchVideoStreamMode('direct');
 
     saveReadingProgress(fileId, fileName, currentSeriesName || fileName, 1, 1);
+    recordRealSeriesActivity(currentSeriesName || fileName, fileId, 'watch_video');
   }
 
   window.onTranscodedStreamCaptured = function(capturedFileId) {
@@ -6676,6 +7108,7 @@
         window.CCXBridge.setVolumeKeyPaging(true);
       }
 
+      recordRealSeriesActivity(currentSeriesName || fileName, fileId, 'read_chapter');
       await buildReaderViewport();
     } catch (err) {
       alert('Lỗi đọc file PDF: ' + err.message);
@@ -6723,6 +7156,7 @@
       window.CCXBridge.setVolumeKeyPaging(true);
     }
 
+    recordRealSeriesActivity(currentSeriesName || topFolder.title, topFolder.id, 'read_chapter');
     await buildReaderViewport();
   }
 
