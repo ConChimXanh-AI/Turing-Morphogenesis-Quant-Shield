@@ -567,8 +567,8 @@
     min-height: 100%;
     margin: 0 auto;
     display: flex;
-    justify-content: flex-start;
-    align-items: flex-start;
+    justify-content: center;
+    align-items: center;
     background: radial-gradient(circle at 50% 50%, #111a2e 0%, #04070d 100%);
     perspective: 1800px;
     position: relative;
@@ -780,8 +780,8 @@
     content-visibility: auto;
     contain-intrinsic-size: 0 116px;
   }
-  body.reader-or-video-active #main-scroll,
-  body.reader-or-video-active .app-header,
+  body.reader-or-video-active .view-container,
+  body.reader-or-video-active .top-header,
   body.reader-or-video-active .bottom-nav {
     display: none !important;
     visibility: hidden !important;
@@ -1637,7 +1637,7 @@
       <div class="brand-logo">🦅</div>
       <div class="brand-text-wrap">
         <div class="brand-title">CON CHIM XANH HUB</div>
-        <div class="brand-sub" id="header-status">Android & Tablet • V3.3.0 Beta</div>
+        <div class="brand-sub" id="header-status">Android • iOS • Tablet • V3.8.3 Supreme</div>
       </div>
     </div>
     <div class="header-actions">
@@ -1773,21 +1773,21 @@
             Khi có bản nâng cấp hoặc tính năng mới từ chủ kho, bạn chỉ cần bấm nút kiểm tra bên dưới để <b>tự động tải & nâng cấp trực tiếp ngay trong App</b> mà không cần gỡ cài đặt:
           </div>
           <div style="background:#05070B; border:1px solid var(--border-cyber); border-radius:12px; padding:12px; margin-bottom:12px; font-size:12.5px; line-height:1.6;">
-            <div>• <b>Tên ứng dụng:</b> <span style="color:var(--cyan-neon); font-weight:800;">App đọc truyện - ConChimXanh Hub (Beta)</span></div>
-            <div>• <b>Phiên bản hiện tại:</b> <span style="color:#34D399; font-weight:800;" id="about-cur-ver">V3.1.0 Beta (Build #13)</span></div>
+            <div>• <b>Tên ứng dụng:</b> <span style="color:var(--cyan-neon); font-weight:800;">App đọc truyện - ConChimXanh Hub (Supreme)</span></div>
+            <div>• <b>Phiên bản hiện tại:</b> <span style="color:#34D399; font-weight:800;" id="about-cur-ver">V3.8.3 Supreme (Build #27)</span></div>
             <div>• <b>Bản mới nhất trên Cloud:</b> <span style="color:var(--amber-neon); font-weight:800;" id="about-latest-ver">Đang kiểm tra...</span></div>
             <div>• <b>Nhận diện thiết bị:</b> <span style="color:#7DD3FC; font-weight:700;" id="about-device-mode">Đang phân tích màn hình...</span></div>
-            <div>• <b>Dữ liệu Kho Tổng Hợp:</b> <span style="color:#fff; font-weight:700;" id="about-catalog-stats">507+ Bộ (Truyện Tranh • Anime • Phim)</span></div>
+            <div>• <b>Dữ liệu Kho Tổng Hợp:</b> <span style="color:#fff; font-weight:700;" id="about-catalog-stats">5,500+ Bộ (Truyện Tranh • Truyện Chữ • Anime • Phim)</span></div>
           </div>
           <button class="btn-cyber btn-primary" style="width:100%; margin-bottom:10px;" onclick="manualCheckUpdateFromVersionTab()">
             ⚡ KIỂM TRA & CẬP NHẬT PHIÊN BẢN MỚI NGAY
           </button>
           <div style="font-size:12px; font-weight:800; color:var(--cyan-neon); margin-bottom:6px;">✨ Tính năng mới trong phiên bản này:</div>
           <div id="about-changelog-box" style="background:#05070B; border:1px solid rgba(255,255,255,0.07); border-radius:10px; padding:10px 12px; font-size:12px; color:var(--text-sub); line-height:1.5;">
-            • Liên kết trực tiếp cả 3 thư mục trên Google Drive (354 Truyện Tranh + 108 Anime + 45 Phim Điện Ảnh = 507+ bộ), tự động cập nhật Live khi chủ kho thêm bộ mới.<br>
-            • Tải Cả Thư Mục / Trọn Bộ về máy & xuất file tên Tiếng Việt sạch đẹp ra thư mục Download/ConChimXanh/.<br>
-            • Tự động nhận diện Điện thoại (khóa dọc chống xoay nhầm) & Máy tính bảng Tablet (xoay ngang tự động, thanh điều hướng cạnh trái & chế độ đọc 2 Trang Đôi).<br>
-            • Đồng bộ tiến độ đọc & Tủ Yêu Thích sang máy mới bằng Mã Đồng Bộ Cá Nhân không cần tài khoản.
+            • Gỡ bỏ hoàn toàn chạm 1 ngón tự Zoom (Zoom chỉ kích hoạt khi Pinch 2 ngón tay hoặc bấm nút 🔍 Zoom), giúp 1 chạm mở/ẩn Menu điều khiển mượt 100%.<br>
+            • Tự động nhận diện Trang Đôi Khổ Ngang ("trang to đọc ngang") trải rộng toàn màn hình trong cả Chế Độ 2 Trang Đôi, 1 Trang & Cuộn Dọc.<br>
+            • Chống màn hình đen & chống sập khung trang khi lật trang nhanh.<br>
+            • Bộ Đếm Lượt Xem Thật 100% Thời Gian Thực trên Đám Mây cho Bảng Xếp Hạng 🏆 Top Đọc Nhiều.
           </div>
         </div>
 
@@ -2118,12 +2118,12 @@
   </div>
 </div>
 
-<script src="catalog_data.js?v=3.7.2"></script>
-<script src="folder_tree.js?v=3.7.2"></script>
+<script src="catalog_data.js?v=3.8.3"></script>
+<script src="folder_tree.js?v=3.8.3"></script>
 <script src="pdf.min.js"></script>
 <script>
   if (window.pdfjsLib) {
-    pdfjsLib.GlobalWorkerOptions.workerSrc = window._isNativeAndroidBridge ? 'pdf.worker.min.js' : 'pdf.worker.min.js?v=3.7.2';
+    pdfjsLib.GlobalWorkerOptions.workerSrc = window._isNativeAndroidBridge ? 'pdf.worker.min.js' : 'pdf.worker.min.js?v=3.8.3';
   }
 
   // ============================================================================
@@ -2269,7 +2269,7 @@
 
   if (!window.CCXBridge) {
     if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
-      navigator.serviceWorker.register('sw.js?v=3.7.1').then(reg => {
+      navigator.serviceWorker.register('sw.js?v=3.8.3').then(reg => {
         try { reg.update(); } catch (e) {}
       }).catch(() => {});
     }
@@ -2593,8 +2593,8 @@
         const minSide = Math.min(window.innerWidth, window.innerHeight);
         const isTab = window._isIpadOS || minSide >= 600;
         return JSON.stringify({
-          versionCode: 26,
-          versionName: '3.8.2',
+          versionCode: 27,
+          versionName: '3.8.3',
           isTablet: isTab,
           smallestScreenWidthDp: minSide,
           platform: window._isIosDevice ? 'ios' : 'web'
@@ -3964,14 +3964,14 @@
     if (elMovie) elMovie.textContent = vCount;
   }
 
-  let hardwareDeviceInfo = { isTablet: false, smallestScreenWidthDp: 390, versionCode: 26, versionName: '3.8.2' };
+  let hardwareDeviceInfo = { isTablet: false, smallestScreenWidthDp: 390, versionCode: 27, versionName: '3.8.3' };
   let isEcoCoolMode = false;
 
   window._ccxHotRefreshFolderTree = function() {
     try {
       const s = document.createElement('script');
       s.async = true;
-      s.src = 'https://conchimxanh-ai.github.io/Turing-Morphogenesis-Quant-Shield/folder_tree.js?v=3.8.1&t=' + Math.floor(Date.now() / 180000);
+      s.src = 'https://conchimxanh-ai.github.io/Turing-Morphogenesis-Quant-Shield/folder_tree.js?v=3.8.3&t=' + Math.floor(Date.now() / 180000);
       document.head.appendChild(s);
     } catch (e) {}
   };
@@ -4262,16 +4262,16 @@
   }
 
   async function startOtaDownloadAndInstall() {
-    if (!latestOtaInfo || !latestOtaInfo.apkFileId) return;
+    if (!latestOtaInfo) return;
     closeOtaUpdateModal();
     const loader = document.getElementById('loading-dialog');
-    document.getElementById('loader-title').textContent = `Đang Tải Bản Update V${latestOtaInfo.latestVersionName}...`;
+    document.getElementById('loader-title').textContent = `Đang Tải Bản Update V${latestOtaInfo.latestVersionName || '3.8.3'}...`;
     document.getElementById('loader-stage').textContent = 'Đang kết nối máy chủ Cloud OTA...';
     document.getElementById('loader-bar').style.width = '5%';
     document.getElementById('loader-pct').textContent = '0%';
     loader.classList.remove('hidden');
 
-    const res = await callBridgeAsync('downloadAndInstallUpdate', [latestOtaInfo.apkFileId]);
+    const res = await callBridgeAsync('downloadAndInstallUpdate', [latestOtaInfo.apkFileId || '']);
     loader.classList.add('hidden');
 
     if (!res || !res.ok) {
@@ -4438,7 +4438,7 @@
     grid.innerHTML = '';
     appendMoreLibraryGridCards(window._isIosDevice || isEcoCoolMode ? 48 : 80);
 
-    const mainScroll = document.getElementById('main-scroll');
+    const mainScroll = document.getElementById('tab-library') || document.getElementById('main-scroll');
     if (mainScroll && !mainScroll._ccxGridScrollBound) {
       mainScroll._ccxGridScrollBound = true;
       let scrollRaf = false;
@@ -7091,6 +7091,9 @@
       document.getElementById('reader-overlay').classList.remove('hidden');
       document.body.classList.add('reader-or-video-active');
       pushCcxHistoryState('reader');
+      zoomLevel = 1.0;
+      const zBtnInit = document.getElementById('zoom-btn');
+      if (zBtnInit) zBtnInit.textContent = '🔍 Zoom: 1.0x';
       barsCollapsed = false;
       document.getElementById('reader-topbar').classList.remove('collapsed');
       document.getElementById('reader-bottombar').classList.remove('collapsed');
@@ -7148,6 +7151,9 @@
     document.getElementById('reader-overlay').classList.remove('hidden');
     document.body.classList.add('reader-or-video-active');
     pushCcxHistoryState('reader');
+    zoomLevel = 1.0;
+    const zBtnImgInit = document.getElementById('zoom-btn');
+    if (zBtnImgInit) zBtnImgInit.textContent = '🔍 Zoom: 1.0x';
     barsCollapsed = false;
     document.getElementById('reader-topbar').classList.remove('collapsed');
     document.getElementById('reader-bottombar').classList.remove('collapsed');
@@ -7379,16 +7385,40 @@
     if (b2) b2.classList.toggle('active', shouldShow);
   }
 
+  let _currentSpreadStep = 2; // 2 when pairing two portrait pages side-by-side, 1 when showing a wide landscape spread or single page
+  const _ccxPageAspectCache = new Map(); // pNum -> (width / height)
+  let _ccxAspectCacheDocId = null;
+
   function isBookSpreadActive() {
-    if (readerMode === 'spread') return true;
-    if (readerMode === 'paged') {
-      const w = window.innerWidth;
-      const h = window.innerHeight;
-      if (w > h && w >= 580) {
-        return true;
-      }
+    return readerMode === 'spread';
+  }
+
+  function isCurrentViewDualHalfSpread() {
+    return isBookSpreadActive() && _currentSpreadStep === 2;
+  }
+
+  function isWideLandscapeRatio(wToHRatio) {
+    return (typeof wToHRatio === 'number') && wToHRatio > 1.05;
+  }
+
+  async function getPageWidthHeightRatio(pNum) {
+    if (!pdfDoc || pNum < 1 || pNum > totalPages) return 0.70;
+    if (currentReadingFile && _ccxAspectCacheDocId !== currentReadingFile.id) {
+      _ccxPageAspectCache.clear();
+      _ccxAspectCacheDocId = currentReadingFile.id;
     }
-    return false;
+    if (_ccxPageAspectCache.has(pNum)) {
+      return _ccxPageAspectCache.get(pNum);
+    }
+    try {
+      const p = await pdfDoc.getPage(pNum);
+      const vp = p.getViewport({ scale: 1.0 });
+      const ratio = vp.width / Math.max(1, vp.height);
+      _ccxPageAspectCache.set(pNum, ratio);
+      return ratio;
+    } catch (e) {
+      return 0.70;
+    }
   }
 
   function getPaperPalette() {
@@ -7425,12 +7455,22 @@
 
   function makeFallbackBlankPageCanvas(w, h, pageNum) {
     const c = document.createElement('canvas');
-    c.width = Math.max(120, Math.round(w));
-    c.height = Math.max(160, Math.round(h));
+    const safeW = Math.max(120, Math.round(w));
+    const safeH = Math.max(160, Math.round(h));
+    c.width = safeW;
+    c.height = safeH;
+    c.style.width = safeW + 'px';
+    c.style.height = safeH + 'px';
     const ctx = c.getContext('2d');
     const pal = getPaperPalette();
     ctx.fillStyle = pal.frontFill;
     ctx.fillRect(0, 0, c.width, c.height);
+    if (pageNum && _ccxPaperPageCache.has(pageNum)) {
+      try {
+        ctx.drawImage(_ccxPaperPageCache.get(pageNum), 0, 0, c.width, c.height);
+        return c;
+      } catch (e) {}
+    }
     if (pageNum && pageNum >= 1 && pageNum <= totalPages) {
       ctx.fillStyle = bookPhysConfig.paperTheme === 'night_dark' ? 'rgba(226,232,240,0.45)' : 'rgba(90,72,48,0.45)';
       ctx.font = 'bold 14px sans-serif';
@@ -7878,9 +7918,6 @@
       if (bb) bb.classList.add('collapsed');
       syncReaderFloatingBackBtn();
     }
-    const isSpread = isBookSpreadActive();
-    const step = isSpread ? 2 : 1;
-    let nextP = currentPage + (dir * step);
 
     if (dir > 0 && currentPage >= totalPages) {
       if (currentFolderPdfItems && currentFolderPdfItems.length > 1) {
@@ -7899,11 +7936,27 @@
       return;
     }
 
+    const isSpread = isBookSpreadActive();
+    let step = 1;
+    if (isSpread) {
+      if (dir > 0) {
+        step = _currentSpreadStep || 2;
+      } else {
+        if (pdfDoc && currentPage - 1 >= 1) {
+          const rPrev1 = await getPageWidthHeightRatio(currentPage - 1);
+          const rPrev2 = (currentPage - 2 >= 1) ? await getPageWidthHeightRatio(currentPage - 2) : 0.70;
+          step = (isWideLandscapeRatio(rPrev1) || isWideLandscapeRatio(rPrev2)) ? 1 : 2;
+        } else {
+          step = 2;
+        }
+      }
+    }
+    let nextP = currentPage + (dir * step);
     nextP = Math.max(1, Math.min(totalPages, nextP));
     if (nextP === currentPage) return;
 
     if (!skipFlipLaunch) {
-      const session = createPaperCurlInteractiveSession(dir, isSpread, null);
+      const session = createPaperCurlInteractiveSession(dir, isCurrentViewDualHalfSpread(), null);
       if (session) {
         const startX = (dir > 0) ? (session.bookW - 14) : 14;
         const endX = (dir > 0) ? (-session.pageW * 0.85) : (session.bookW + session.pageW * 0.85);
@@ -7939,7 +7992,7 @@
     });
     if (showToastFlag) {
       showAppToast(zoomLevel > 1.02
-        ? `🔍 Đã phóng to ${zoomLevel.toFixed(1)}x (Kéo 1 ngón để trượt xem, chạm đúp để thu nhỏ)`
+        ? `🔍 Đã phóng to ${zoomLevel.toFixed(1)}x (Kéo 1 ngón để trượt xem, dùng 2 ngón hoặc nút 🔍 Zoom để thu nhỏ)`
         : `🔍 Đã về kích thước chuẩn 1.0x`);
     }
   }
@@ -7967,9 +8020,7 @@
     let pinchStartDist = 0;
     let pinchStartZoom = 1.0;
     let pinchLastScale = 1.0;
-    let lastReaderTapTs = 0;
-    let lastReaderTapX = 0;
-    let lastReaderTapY = 0;
+    let lastTouchEventTs = 0;
 
     function beginPointer(clientX, clientY) {
       pointerDown = true;
@@ -7996,7 +8047,7 @@
 
       // When zoomed in (> 1.02x) in 2-Page Spread or 1-Page Mode: drag pans 2D smoothly!
       if (zoomLevel > 1.02 && readerMode !== 'webtoon') {
-        if (Math.hypot(dx, dy) > 6) {
+        if (Math.hypot(dx, dy) > 10) {
           isPanningZoomed = true;
           window._ccxLastSwipeAt = Date.now();
           vp.scrollLeft = startScrollLeft - dx;
@@ -8016,7 +8067,7 @@
         isHorizontalCurl = true;
         dragDir = dx < 0 ? 1 : -1;
         if ((dragDir > 0 && currentPage < totalPages) || (dragDir < 0 && currentPage > 1)) {
-          curlSession = createPaperCurlInteractiveSession(dragDir, isBookSpreadActive(), startY);
+          curlSession = createPaperCurlInteractiveSession(dragDir, isCurrentViewDualHalfSpread(), startY);
         }
       }
 
@@ -8036,23 +8087,7 @@
       const dy = clientY - startY;
       const dt = Date.now() - startTime;
 
-      // Check for Double-Tap to Zoom (works in 2-Page Spread, 1-Page, and Webtoon!)
-      if (dt < 280 && Math.hypot(dx, dy) < 18) {
-        const now = Date.now();
-        const w = window.innerWidth || 800;
-        const isCenterTap = (clientX >= w * 0.24 && clientX <= w * 0.76) || zoomLevel > 1.02;
-        if (isCenterTap && (now - lastReaderTapTs < 320) && Math.hypot(clientX - lastReaderTapX, clientY - lastReaderTapY) < 42) {
-          lastReaderTapTs = 0;
-          window._ccxLastSwipeAt = now;
-          const nextZ = zoomLevel > 1.05 ? 1.0 : 1.65;
-          applyZoomLevel(nextZ, true);
-          return;
-        }
-        lastReaderTapTs = now;
-        lastReaderTapX = clientX;
-        lastReaderTapY = clientY;
-      }
-
+      // Note: 1-finger tap / double-tap NEVER zooms (per user request: zoom is strictly 2-finger pinch or 🔍 Zoom button so 1-finger tap always toggles menu cleanly!)
       if (isPanningZoomed || zoomLevel > 1.02 || readerMode === 'webtoon') return;
 
       if (isHorizontalCurl && curlSession) {
@@ -8105,6 +8140,7 @@
     }
 
     vp.addEventListener('touchstart', (e) => {
+      lastTouchEventTs = Date.now();
       if (e.touches.length === 2) {
         isMultiTouch = true;
         pinchActive = true;
@@ -8126,6 +8162,7 @@
     }, { passive: true });
 
     vp.addEventListener('touchmove', (e) => {
+      lastTouchEventTs = Date.now();
       if (!e.touches || e.touches.length === 0) return;
       if (pinchActive && e.touches.length === 2) {
         if (e.cancelable) e.preventDefault();
@@ -8148,6 +8185,7 @@
     }, { passive: false });
 
     vp.addEventListener('touchend', (e) => {
+      lastTouchEventTs = Date.now();
       if (pinchActive && (!e.touches || e.touches.length < 2)) {
         pinchActive = false;
         window._ccxLastSwipeAt = Date.now();
@@ -8165,29 +8203,33 @@
       endPointer(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
     }, { passive: true });
 
-    // Also support mouse drag for PC / Tablet stylus testing
+    // Support mouse drag for PC / Tablet stylus testing (guarded by lastTouchEventTs to block synthesized touch->mouse double events!)
     vp.addEventListener('mousedown', (e) => {
+      if (Date.now() - lastTouchEventTs < 800) return;
       if (e.button !== 0) return;
       beginPointer(e.clientX, e.clientY);
     });
     window.addEventListener('mousemove', (e) => {
+      if (Date.now() - lastTouchEventTs < 800) return;
       if (!pointerDown) return;
       movePointer(e.clientX, e.clientY);
     });
     window.addEventListener('mouseup', (e) => {
+      if (Date.now() - lastTouchEventTs < 800) return;
       if (!pointerDown) return;
       endPointer(e.clientX, e.clientY);
     });
   }
 
   let _readerViewportGen = 0;
+  let _cachedWebtoonDocId = null;
+  let _cachedWebtoonAspect = 1.42;
+
   async function buildReaderViewport() {
     const myGen = ++_readerViewportGen;
     initReaderBookSwipeGestures();
     const vp = document.getElementById('reader-viewport');
     vp.classList.toggle('zoomed-active', zoomLevel > 1.02 && readerMode !== 'webtoon');
-    vp.innerHTML = '';
-    renderedPages.clear();
     if (_pageRenderWaitQueue && _pageRenderWaitQueue.length > 0) {
       while (_pageRenderWaitQueue.length > 0) {
         const it = _pageRenderWaitQueue.pop();
@@ -8200,7 +8242,11 @@
       pageObserver = null;
     }
 
-    if (!currentReadingFile) return;
+    if (!currentReadingFile) {
+      vp.innerHTML = '';
+      renderedPages.clear();
+      return;
+    }
     if (_ccxPaperCacheDocId !== currentReadingFile.id) {
       _ccxPaperPageCache.forEach(c => {
         if (c && !c.parentElement && !document.body.contains(c)) {
@@ -8212,19 +8258,18 @@
     }
     const useSpread = isBookSpreadActive();
 
-    // Update mode badge indicator subtly so user sees auto 1-page / 2-page status
     const pagedBtn = document.getElementById('mode-paged-btn');
     if (pagedBtn) {
-      pagedBtn.textContent = (readerMode === 'paged' && useSpread)
-        ? '📖 Sách 1T (Ngang 2T)'
-        : '📖 Sách 1 Trang';
+      pagedBtn.textContent = '📖 Sách 1 Trang';
     }
 
     // CASE A: External Drive Image Folder Chapter
     if (currentReadingFile.isImageChapter) {
       const port = (window.CCXBridge && window.CCXBridge.getLocalServerPort) ? window.CCXBridge.getLocalServerPort() : 0;
       const displayW = getTargetPageRenderWidth();
+      renderedPages.clear();
       if (readerMode === 'webtoon') {
+        const frag = document.createDocumentFragment();
         currentReadingFile.imageList.forEach((imgItem, i) => {
           const p = i + 1;
           const slot = document.createElement('div');
@@ -8238,14 +8283,20 @@
           img.style.width = displayW + 'px';
           img.style.height = 'auto';
           img.style.display = 'block';
-          img.onload = () => { slot.style.minHeight = 'auto'; };
+          img.onload = () => {
+            slot.style.minHeight = 'auto';
+            if (img.naturalWidth > img.naturalHeight * 1.05 && window.innerWidth >= 600) {
+              img.style.width = Math.floor(Math.min(window.innerWidth - 12, displayW * 1.65)) + 'px';
+            }
+          };
           slot.appendChild(img);
           const wm = document.createElement('span');
           wm.className = 'page-num-watermark';
           wm.textContent = `${p} / ${totalPages}`;
           slot.appendChild(wm);
-          vp.appendChild(slot);
+          frag.appendChild(slot);
         });
+        vp.replaceChildren(frag);
         attachScrollTracker(vp);
         if (currentPage > 1) {
           const targetEl = document.getElementById('page-slot-' + currentPage);
@@ -8253,6 +8304,7 @@
         }
       } else if (useSpread) {
         vp.onscroll = null;
+        _currentSpreadStep = (currentPage + 1 <= totalPages) ? 2 : 1;
         const row = document.createElement('div');
         row.className = 'spread-row-slot';
         const bookFrame = document.createElement('div');
@@ -8265,22 +8317,41 @@
           ? Math.max(window.innerWidth - 12, Math.floor(window.innerHeight * 0.92))
           : (window.innerWidth - 12);
         const maxHalfW = Math.floor((baseHalfSpan * 0.5) * zoomLevel);
+        const fullSpreadW = Math.floor((window.innerWidth - 14) * zoomLevel);
+        let spineEl = null;
+        let rightHalfEl = null;
         [pLeft, pRight].forEach((pNum, idx) => {
           if (!pNum) return;
           if (idx === 1) {
-            const spine = document.createElement('div');
-            spine.className = 'book-spine-crease';
-            bookFrame.appendChild(spine);
+            spineEl = document.createElement('div');
+            spineEl.className = 'book-spine-crease';
+            bookFrame.appendChild(spineEl);
           }
           const imgItem = currentReadingFile.imageList[pNum - 1];
           const half = document.createElement('div');
           half.className = 'spread-page-half ' + (idx === 0 ? 'left-page' : 'right-page');
+          if (idx === 1) rightHalfEl = half;
           const img = document.createElement('img');
           attachDriveImageSource(img, imgItem.id, port);
           img.style.maxHeight = maxSpreadH + 'px';
           img.style.maxWidth = maxHalfW + 'px';
           img.style.width = 'auto';
           img.style.height = maxSpreadH + 'px';
+          img.onload = () => {
+            if (img.naturalWidth > img.naturalHeight * 1.05) {
+              _currentSpreadStep = 1;
+              if (idx === 0) {
+                img.style.maxWidth = fullSpreadW + 'px';
+                img.style.height = 'auto';
+                if (spineEl) spineEl.style.display = 'none';
+                if (rightHalfEl) rightHalfEl.style.display = 'none';
+              } else {
+                if (spineEl) spineEl.style.display = 'none';
+                half.style.display = 'none';
+              }
+              updateReaderStatusUI();
+            }
+          };
           half.appendChild(img);
           const wm = document.createElement('span');
           wm.className = 'page-num-watermark';
@@ -8289,9 +8360,10 @@
           bookFrame.appendChild(half);
         });
         row.appendChild(bookFrame);
-        vp.appendChild(row);
+        vp.replaceChildren(row);
       } else {
         vp.onscroll = null;
+        _currentSpreadStep = 1;
         const imgItem = currentReadingFile.imageList[currentPage - 1];
         const slot = document.createElement('div');
         slot.className = 'book-single-slot';
@@ -8299,9 +8371,12 @@
         singleFrame.className = 'book-single-frame';
         const img = document.createElement('img');
         attachDriveImageSource(img, imgItem.id, port);
-        const bookImgW = Math.min(displayW, Math.max(240, Math.floor((window.innerWidth - 16) * zoomLevel)));
-        img.style.width = bookImgW + 'px';
-        img.style.maxHeight = Math.floor((window.innerHeight - 10) * zoomLevel) + 'px';
+        const maxBookW = Math.max(240, Math.floor((window.innerWidth - 14) * zoomLevel));
+        const maxBookH = Math.max(280, Math.floor((window.innerHeight - 10) * zoomLevel));
+        img.style.maxWidth = maxBookW + 'px';
+        img.style.maxHeight = maxBookH + 'px';
+        img.style.width = 'auto';
+        img.style.height = 'auto';
         img.style.objectFit = 'contain';
         singleFrame.appendChild(img);
         const wm = document.createElement('span');
@@ -8309,7 +8384,7 @@
         wm.textContent = `${currentPage} / ${totalPages}`;
         singleFrame.appendChild(wm);
         slot.appendChild(singleFrame);
-        vp.appendChild(slot);
+        vp.replaceChildren(slot);
       }
       updateReaderStatusUI();
       return;
@@ -8318,29 +8393,28 @@
     // CASE B: PDF Volume Reader
     if (!pdfDoc) return;
 
-    const firstPage = await pdfDoc.getPage(1);
-    if (myGen !== _readerViewportGen) return;
-    const firstVp = firstPage.getViewport({ scale: 1.0 });
-    let aspect = firstVp.height / firstVp.width;
-    // In Webtoons like Bậc Thầy Thiết Kế Điền Trang, Page 1 can be a super-tall 4MB stitched strip while Pages 2+ are standard strips. Sample Page 2 as well so initial slot height doesn't jump wildly!
-    if (readerMode === 'webtoon' && totalPages >= 2 && aspect > 2.4) {
-      try {
-        const secondPage = await pdfDoc.getPage(2);
-        if (myGen !== _readerViewportGen) return;
-        const secondVp = secondPage.getViewport({ scale: 1.0 });
-        const aspect2 = secondVp.height / secondVp.width;
-        if (aspect2 > 0.5 && aspect2 < aspect * 0.75) {
-          aspect = aspect2;
-        }
-      } catch (e) {}
-    }
-    if (myGen !== _readerViewportGen) return;
-    vp.innerHTML = '';
-    renderedPages.clear();
-    const screenW = getTargetPageRenderWidth();
-    const estH = Math.max(320, Math.min(2600, Math.round(screenW * aspect)));
-
     if (readerMode === 'webtoon') {
+      let aspect = _cachedWebtoonAspect;
+      if (_cachedWebtoonDocId !== currentReadingFile.id) {
+        const r1 = await getPageWidthHeightRatio(1);
+        if (myGen !== _readerViewportGen) return;
+        aspect = 1.0 / Math.max(0.1, r1);
+        if (totalPages >= 2 && aspect > 2.4) {
+          const r2 = await getPageWidthHeightRatio(2);
+          if (myGen !== _readerViewportGen) return;
+          const aspect2 = 1.0 / Math.max(0.1, r2);
+          if (aspect2 > 0.5 && aspect2 < aspect * 0.75) {
+            aspect = aspect2;
+          }
+        }
+        _cachedWebtoonDocId = currentReadingFile.id;
+        _cachedWebtoonAspect = aspect;
+      }
+      if (myGen !== _readerViewportGen) return;
+      renderedPages.clear();
+      const screenW = getTargetPageRenderWidth();
+      const estH = Math.max(320, Math.min(2600, Math.round(screenW * aspect)));
+
       const frag = document.createDocumentFragment();
       for (let p = 1; p <= totalPages; p++) {
         const slot = document.createElement('div');
@@ -8351,9 +8425,7 @@
         slot.innerHTML = `<span class="page-num-watermark">${p} / ${totalPages}</span>`;
         frag.appendChild(slot);
       }
-      vp.appendChild(frag);
 
-      // Append Next/Prev Volume Quick Card at bottom of Webtoon scroll
       if (currentFolderPdfItems.length > 1) {
         const curIdx = currentFolderPdfItems.findIndex(x => x.id === currentReadingFile.id);
         if (curIdx >= 0 && curIdx < currentFolderPdfItems.length - 1) {
@@ -8365,17 +8437,19 @@
             <div style="font-size:14px; font-weight:800; color:var(--cyan-neon); margin-bottom:14px;">${escapeHtml(nextVol.name)}</div>
             <button class="btn-cyber btn-primary" style="max-width:280px; margin:0 auto;" onclick="openAdjacentVolume(1)">⏭️ Đọc Tiếp Tập Sau Ngay</button>
           `;
-          vp.appendChild(footCard);
+          frag.appendChild(footCard);
         }
       }
+
+      vp.replaceChildren(frag);
 
       const obsMargin = (isEcoCoolMode || window._isIosDevice) ? '850px 0px 1050px 0px' : '1500px 0px 1500px 0px';
       pageObserver = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
           if (entry.isIntersecting) {
             const pNum = parseInt(entry.target.dataset.page, 10);
-            renderSinglePdfPage(pNum);
-            if (pNum + 1 <= totalPages) renderSinglePdfPage(pNum + 1);
+            renderSinglePdfPage(pNum, false, myGen);
+            if (pNum + 1 <= totalPages) renderSinglePdfPage(pNum + 1, false, myGen);
           }
         });
       }, {
@@ -8394,54 +8468,130 @@
           setTimeout(() => { targetEl.scrollIntoView({ behavior: 'instant' }); }, 50);
         }
       }
-      renderSinglePdfPage(currentPage);
-      if (currentPage + 1 <= totalPages) renderSinglePdfPage(currentPage + 1);
+      renderSinglePdfPage(currentPage, false, myGen);
+      if (currentPage + 1 <= totalPages) renderSinglePdfPage(currentPage + 1, false, myGen);
     } else if (useSpread) {
-      // 2-Page Open Book Spread Mode (Automatic on iPad/Tablet Landscape or Explicit 2-Page Mode)
+      // 2-Page Open Book Spread Mode with Auto Wide-Page Detection ("trang to đọc ngang")
       vp.onscroll = null;
+      const pLeft = currentPage;
+      const pRightCandidate = (currentPage + 1 <= totalPages) ? (currentPage + 1) : null;
+      const [ratioLeft, ratioRight] = await Promise.all([
+        getPageWidthHeightRatio(pLeft),
+        pRightCandidate ? getPageWidthHeightRatio(pRightCandidate) : Promise.resolve(0.70)
+      ]);
+      if (myGen !== _readerViewportGen) return;
+
+      const leftIsWide = isWideLandscapeRatio(ratioLeft);
+      const rightIsWide = pRightCandidate ? isWideLandscapeRatio(ratioRight) : false;
+      const shouldShowSingleSpread = leftIsWide || rightIsWide || !pRightCandidate;
+      _currentSpreadStep = shouldShowSingleSpread ? 1 : 2;
+
+      renderedPages.clear();
       const row = document.createElement('div');
       row.className = 'spread-row-slot';
       const bookFrame = document.createElement('div');
       bookFrame.className = 'book-open-frame';
 
-      const pLeft = currentPage;
-      const pRight = (currentPage + 1 <= totalPages) ? (currentPage + 1) : null;
+      if (shouldShowSingleSpread) {
+        // Wide landscape double-page spread (or single page before a wide spread): render full-width across the book frame!
+        const maxBookW = Math.max(240, Math.floor((window.innerWidth - 12) * zoomLevel));
+        const maxBookH = Math.max(280, Math.floor((window.innerHeight - 8) * zoomLevel));
+        const wFromH = Math.floor(maxBookH * ratioLeft);
+        const expectedW = Math.max(160, Math.min(maxBookW, wFromH));
+        const expectedH = Math.max(160, Math.floor(expectedW / Math.max(0.1, ratioLeft)));
 
-      const leftSlot = document.createElement('div');
-      leftSlot.className = 'spread-page-half left-page';
-      leftSlot.id = 'page-slot-' + pLeft;
-      leftSlot.dataset.page = pLeft;
-      bookFrame.appendChild(leftSlot);
+        const fullSlot = document.createElement('div');
+        fullSlot.className = 'spread-page-half';
+        fullSlot.id = 'page-slot-' + pLeft;
+        fullSlot.dataset.page = pLeft;
+        fullSlot.appendChild(makeFallbackBlankPageCanvas(expectedW, expectedH, pLeft));
+        const wm = document.createElement('span');
+        wm.className = 'page-num-watermark';
+        wm.textContent = `${pLeft} / ${totalPages}`;
+        fullSlot.appendChild(wm);
+        bookFrame.appendChild(fullSlot);
+        row.appendChild(bookFrame);
+        vp.replaceChildren(row);
+        updateReaderStatusUI();
+        await renderSinglePdfPage(pLeft, false, myGen, fullSlot);
+      } else {
+        // Pair two portrait pages side-by-side with pre-sized paper placeholders so layout NEVER collapses or flashes black!
+        const pRight = pRightCandidate;
+        const maxSpreadH = Math.max(300, Math.floor((window.innerHeight - 6) * zoomLevel));
+        const baseHalfSpan = zoomLevel > 1.02
+          ? Math.max(window.innerWidth - 12, Math.floor(window.innerHeight * 0.92))
+          : (window.innerWidth - 12);
+        const maxHalfW = Math.floor((baseHalfSpan * 0.5) * zoomLevel);
 
-      const spine = document.createElement('div');
-      spine.className = 'book-spine-crease';
-      bookFrame.appendChild(spine);
+        const expWLeft = Math.max(120, Math.min(maxHalfW, Math.floor(maxSpreadH * ratioLeft)));
+        const expHLeft = Math.max(160, Math.floor(expWLeft / Math.max(0.1, ratioLeft)));
+        const expWRight = Math.max(120, Math.min(maxHalfW, Math.floor(maxSpreadH * ratioRight)));
+        const expHRight = Math.max(160, Math.floor(expWRight / Math.max(0.1, ratioRight)));
 
-      if (pRight) {
+        const leftSlot = document.createElement('div');
+        leftSlot.className = 'spread-page-half left-page';
+        leftSlot.id = 'page-slot-' + pLeft;
+        leftSlot.dataset.page = pLeft;
+        leftSlot.appendChild(makeFallbackBlankPageCanvas(expWLeft, expHLeft, pLeft));
+        const wmL = document.createElement('span');
+        wmL.className = 'page-num-watermark';
+        wmL.textContent = `${pLeft} / ${totalPages}`;
+        leftSlot.appendChild(wmL);
+        bookFrame.appendChild(leftSlot);
+
+        const spine = document.createElement('div');
+        spine.className = 'book-spine-crease';
+        bookFrame.appendChild(spine);
+
         const rightSlot = document.createElement('div');
         rightSlot.className = 'spread-page-half right-page';
         rightSlot.id = 'page-slot-' + pRight;
         rightSlot.dataset.page = pRight;
+        rightSlot.appendChild(makeFallbackBlankPageCanvas(expWRight, expHRight, pRight));
+        const wmR = document.createElement('span');
+        wmR.className = 'page-num-watermark';
+        wmR.textContent = `${pRight} / ${totalPages}`;
+        rightSlot.appendChild(wmR);
         bookFrame.appendChild(rightSlot);
-      }
 
-      row.appendChild(bookFrame);
-      vp.appendChild(row);
-      await renderSinglePdfPage(pLeft, true);
-      if (pRight) await renderSinglePdfPage(pRight, true);
+        row.appendChild(bookFrame);
+        vp.replaceChildren(row);
+        updateReaderStatusUI();
+        await Promise.all([
+          renderSinglePdfPage(pLeft, true, myGen, leftSlot),
+          renderSinglePdfPage(pRight, true, myGen, rightSlot)
+        ]);
+      }
       setTimeout(() => prewarmNeighborBookPages(currentPage), 40);
     } else {
-      // Single Page 3D Book Mode (Phone or Portrait iPad)
+      // Single Page 3D Book Mode (Supports both Portrait Pages and Wide Landscape Pages across 100% screen width!)
       vp.onscroll = null;
+      _currentSpreadStep = 1;
+      const ratioCur = await getPageWidthHeightRatio(currentPage);
+      if (myGen !== _readerViewportGen) return;
+
+      renderedPages.clear();
+      const maxBookW = Math.max(240, Math.floor((window.innerWidth - 12) * zoomLevel));
+      const maxBookH = Math.max(280, Math.floor((window.innerHeight - 8) * zoomLevel));
+      const wFromH = Math.floor(maxBookH * ratioCur);
+      const expectedW = Math.max(160, Math.min(maxBookW, wFromH));
+      const expectedH = Math.max(160, Math.floor(expectedW / Math.max(0.1, ratioCur)));
+
       const outer = document.createElement('div');
       outer.className = 'book-single-slot';
       const slot = document.createElement('div');
       slot.className = 'book-single-frame';
       slot.id = 'page-slot-' + currentPage;
       slot.dataset.page = currentPage;
+      slot.appendChild(makeFallbackBlankPageCanvas(expectedW, expectedH, currentPage));
+      const wm = document.createElement('span');
+      wm.className = 'page-num-watermark';
+      wm.textContent = `${currentPage} / ${totalPages}`;
+      slot.appendChild(wm);
       outer.appendChild(slot);
-      vp.appendChild(outer);
-      await renderSinglePdfPage(currentPage, false);
+      vp.replaceChildren(outer);
+      updateReaderStatusUI();
+      await renderSinglePdfPage(currentPage, false, myGen, slot);
       setTimeout(() => prewarmNeighborBookPages(currentPage), 40);
     }
 
@@ -8538,15 +8688,23 @@
     _activePageRenders = Math.max(0, _activePageRenders - 1);
   }
 
-  async function renderSinglePdfPage(pNum, isSpreadHalf) {
-    if (!pdfDoc || renderedPages.has(pNum)) return;
-    const slot = document.getElementById('page-slot-' + pNum);
+  async function renderSinglePdfPage(pNum, isSpreadHalf, renderGen, directSlotEl) {
+    const targetGen = renderGen || _readerViewportGen;
+    if (!pdfDoc) return;
+    const slot = directSlotEl || document.getElementById('page-slot-' + pNum);
     if (!slot) return;
+    const genTag = String(targetGen);
+    if (slot.dataset.renderedGen === genTag || slot.dataset.renderingGen === genTag) return;
 
-    const shouldRun = await _acquirePageRenderSlot(pNum, isSpreadHalf);
+    const isBookPagePriority = isSpreadHalf || readerMode !== 'webtoon';
+    const shouldRun = await _acquirePageRenderSlot(pNum, isBookPagePriority);
     if (!shouldRun) return;
 
-    if (!pdfDoc || renderedPages.has(pNum)) {
+    if (!pdfDoc || targetGen !== _readerViewportGen) {
+      _releasePageRenderSlot();
+      return;
+    }
+    if (slot.dataset.renderedGen === genTag || slot.dataset.renderingGen === genTag) {
       _releasePageRenderSlot();
       return;
     }
@@ -8556,11 +8714,15 @@
       return;
     }
 
+    slot.dataset.renderingGen = genTag;
     renderedPages.add(pNum);
 
     try {
       const page = await pdfDoc.getPage(pNum);
       const baseVp = page.getViewport({ scale: 1.0 });
+      if (currentReadingFile && _ccxAspectCacheDocId === currentReadingFile.id) {
+        _ccxPageAspectCache.set(pNum, baseVp.width / Math.max(1, baseVp.height));
+      }
       const isCool = isEcoCoolMode || !!window._isIosDevice;
       let dpr = isCool
         ? (window._isIpadOS ? 1.15 : Math.min(window.devicePixelRatio || 1.35, 1.35))
@@ -8573,15 +8735,18 @@
           : (window.innerWidth - 12);
         const maxHalfW = Math.floor((baseHalfSpan * 0.5) * zoomLevel);
         const wFromH = Math.floor(maxSpreadH * (baseVp.width / baseVp.height));
-        displayW = Math.min(maxHalfW, wFromH);
+        displayW = Math.max(120, Math.min(maxHalfW, wFromH));
       } else if (readerMode !== 'webtoon') {
-        const maxBookW = Math.max(240, Math.floor((window.innerWidth - 14) * zoomLevel));
-        const maxBookH = Math.max(320, Math.floor((window.innerHeight - 10) * zoomLevel));
+        const maxBookW = Math.max(240, Math.floor((window.innerWidth - 12) * zoomLevel));
+        const maxBookH = Math.max(280, Math.floor((window.innerHeight - 8) * zoomLevel));
         const widthFromHeight = Math.floor(maxBookH * (baseVp.width / baseVp.height));
-        displayW = Math.min(displayW, maxBookW, widthFromHeight);
+        displayW = Math.max(160, Math.min(maxBookW, widthFromHeight));
+      } else if (baseVp.width > baseVp.height * 1.05 && window.innerWidth >= 600) {
+        // Wide landscape double-page spread inside Webtoon mode: expand wider across landscape/tablet screen!
+        displayW = Math.floor(Math.min((window.innerWidth - 8) * zoomLevel, displayW * 1.65));
       }
       const cssScale = displayW / baseVp.width;
-      const cssH = Math.floor(baseVp.height * cssScale);
+      const cssH = Math.max(120, Math.floor(baseVp.height * cssScale));
 
       // Apple iOS WebKit GPU Canvas Guard: Never allow a single canvas to exceed height 3580px or area 5.2 MP on iOS (prevents black canvas invalidation on tall Webtoon strips!)
       let targetScale = cssScale * dpr;
@@ -8607,16 +8772,18 @@
       canvas.style.height = cssH + 'px';
 
       const ctx = canvas.getContext('2d', { alpha: false });
-      ctx.fillStyle = '#0B101B';
+      ctx.fillStyle = getPaperPalette().frontFill;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       await page.render({ canvasContext: ctx, viewport: renderVp }).promise;
 
-      const liveSlot = document.getElementById('page-slot-' + pNum);
-      if (liveSlot && renderedPages.has(pNum)) {
+      const liveSlot = (directSlotEl && directSlotEl.isConnected) ? directSlotEl : document.getElementById('page-slot-' + pNum);
+      if (liveSlot && targetGen === _readerViewportGen) {
         if (!isSpreadHalf && readerMode === 'webtoon') {
           liveSlot.style.minHeight = cssH + 'px';
         }
+        liveSlot.dataset.renderedGen = genTag;
+        delete liveSlot.dataset.renderingGen;
         liveSlot.innerHTML = '';
         liveSlot.appendChild(canvas);
         const wm = document.createElement('span');
@@ -8628,10 +8795,11 @@
         canvas.height = 1;
       }
 
-      if (readerMode !== 'webtoon') {
+      if (readerMode !== 'webtoon' && targetGen === _readerViewportGen) {
         _ccxPaperPageCache.set(pNum, canvas);
       }
     } catch (e) {
+      delete slot.dataset.renderingGen;
       renderedPages.delete(pNum);
     } finally {
       _releasePageRenderSlot();
@@ -8641,7 +8809,8 @@
   let _saveProgDebounce = null;
   function updateReaderStatusUI() {
     const isSpread = (readerMode !== 'webtoon') && isBookSpreadActive();
-    const pageLabel = (isSpread && currentPage + 1 <= totalPages)
+    const isDualNow = isSpread && (_currentSpreadStep === 2) && (currentPage + 1 <= totalPages);
+    const pageLabel = isDualNow
       ? `${currentPage}-${currentPage + 1} / ${totalPages}`
       : `${currentPage} / ${totalPages}`;
     document.getElementById('page-indicator').textContent = pageLabel;
@@ -8690,11 +8859,9 @@
     const spreadBtn = document.getElementById('mode-spread-btn');
     if (spreadBtn) spreadBtn.classList.toggle('active', mode === 'spread');
     if (mode === 'paged') {
-      showAppToast(isBookSpreadActive()
-        ? '📖 Lật Sách 3D: Màn hình ngang -> Tự động mở Sách Đôi 2 Trang!'
-        : '📖 Lật Sách 3D: Vuốt trái/phải hoặc chạm mép trang để lật sách!');
+      showAppToast('📖 Đã bật Chế Độ Sách 1 Trang 3D (Hỗ trợ trang to đọc ngang toàn màn hình)!');
     } else if (mode === 'spread') {
-      showAppToast('📘 Đã bật chế độ Sách Mở 2 Trang 3D!');
+      showAppToast('📘 Đã bật Chế Độ Sách Mở 2 Trang Đôi (Tự động trải rộng trang đôi ngang)!');
     }
     buildReaderViewport();
   }
@@ -8828,10 +8995,11 @@
       syncReaderFloatingBackBtn();
       return;
     }
-    if (readerMode === 'paged' || readerMode === 'spread') {
-      const x = e.clientX;
-      const w = window.innerWidth;
-      const edgeRatio = zoomLevel > 1.02 ? 0.12 : 0.28;
+    // When zoomed in (> 1.02x), 1-finger tap ANYWHERE on screen toggles the menu bars so user can easily access controls!
+    if (zoomLevel <= 1.02 && (readerMode === 'paged' || readerMode === 'spread')) {
+      const x = e ? e.clientX : (window.innerWidth * 0.5);
+      const w = window.innerWidth || 800;
+      const edgeRatio = 0.22;
       if (x < w * edgeRatio) {
         turnBookPage(-1);
         return;
