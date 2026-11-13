@@ -2964,7 +2964,7 @@
         const minSide = Math.min(window.innerWidth, window.innerHeight);
         const isTab = window._isIpadOS || minSide >= 600;
         return JSON.stringify({
-          versionCode: 30, versionName: '3.9.0',
+          versionCode: 31, versionName: '3.9.1',
           isTablet: isTab,
           smallestScreenWidthDp: minSide,
           platform: window._isIosDevice ? 'ios' : 'web'
@@ -3067,10 +3067,10 @@
           const changelog = 'Phiên bản V3.9.0 Supreme (Build #29): 1) Hệ thống Lọc Đa Tag (Multi-Tag) thông minh cho 18.650+ bộ (Chủ đề Sách/Ebook Kinh doanh, Tâm lý, Ngoại ngữ, Lịch sử... + Thể loại Truyện/Phim + Thuyết minh/Vietsub + 3.331 Tác giả trích xuất chuẩn); 2) Bảng xếp hạng 🏆 Top Đọc Nhiều lọc theo Khung Thời Gian Thật (Hôm Nay • 7 Ngày • 30 Ngày • Năm 2026 • Mọi Thời Đại); 3) Tính năng 🗳️ Top Đề Cử (Vote 👍 1 chạm đồng bộ Đám Mây, chống spam 1 người/1 phiếu); 4) 🆕 Mới Cập Nhật sắp xếp chuẩn xác 100% theo ngày giờ cập nhật thật + Tách bạch Bản PDF Đọc Trực Tiếp & File Ebook Gốc (.EPUB) + Giảm 47% dung lượng Catalog cho iOS Eco-Cool!';
           window.onCCXCallback(cbId, {
             ok: true,
-            currentVersionCode: 30,
-            currentVersionName: '3.9.0',
-            latestVersionCode: 30,
-            latestVersionName: '3.9.0',
+            currentVersionCode: 31,
+            currentVersionName: '3.9.1',
+            latestVersionCode: 31,
+            latestVersionName: '3.9.1',
             hasUpdate: false,
             changelog: changelog
           });
@@ -3461,45 +3461,76 @@
             return;
           }
           const syncFileName = 'ccx_sync_' + cleanCode + '.json';
-          let existingId = (cleanCode === 'global_views_v1') ? '1aMnrmz0f1tVJDaM_9CLxxeGIUrcOru8P' : null;
+          const fidCacheKey = 'ccx_sync_fid_' + cleanCode;
+          let existingId = (cleanCode === 'global_views_v1')
+            ? '1aMnrmz0f1tVJDaM_9CLxxeGIUrcOru8P'
+            : (localStorage.getItem(fidCacheKey) || null);
           if (!existingId) {
             const q = `'${CCX_OAUTH.otaRoot}' in parents and name = '${syncFileName}' and trashed = false`;
             let findRes = null;
             for (let att = 0; att < 4; att++) {
-              findRes = await fetch(`https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(q)}&fields=files(id,name)&pageSize=1&supportsAllDrives=true&includeItemsFromAllDrives=true`, {
+              findRes = await fetch(`https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(q)}&fields=files(id,name)&pageSize=1&orderBy=modifiedTime%20desc&supportsAllDrives=true&includeItemsFromAllDrives=true`, {
                 headers: { 'Authorization': 'Bearer ' + token }
               });
               if (findRes.ok || (findRes.status !== 403 && findRes.status !== 429 && findRes.status < 500)) break;
-              await new Promise(r => setTimeout(r, 700 * (att + 1) + Math.floor(Math.random() * 250)));
+              await new Promise(r => setTimeout(r, 900 * (att + 1) + Math.floor(Math.random() * 250)));
             }
-            if (findRes && findRes.ok) {
-              const fj = await findRes.json();
-              if (fj.files && fj.files.length > 0) existingId = fj.files[0].id;
+            if (!findRes || !findRes.ok) {
+              window.onCCXCallback(cbId, { ok: false, deferred: true, syncCode: cleanCode, error: 'Đám Mây đang bận vài giây, hệ thống sẽ tự đồng bộ ngầm ngay sau 15 giây!' });
+              return;
+            }
+            const fj = await findRes.json();
+            if (fj.files && fj.files.length > 0) {
+              existingId = fj.files[0].id;
+              try { localStorage.setItem(fidCacheKey, existingId); } catch (e) {}
             }
           }
           if (existingId) {
             let pr = null;
             for (let att = 0; att < 5; att++) {
               pr = await fetch(`https://www.googleapis.com/upload/drive/v3/files/${existingId}?uploadType=media&supportsAllDrives=true`, {
-                method: 'PATCH',
+                method: 'POST',
                 headers: {
                   'Authorization': 'Bearer ' + token,
+                  'X-HTTP-Method-Override': 'PATCH',
                   'Content-Type': 'application/json; charset=UTF-8'
                 },
                 body: jsonPayload
               });
-              if (pr.ok || (pr.status !== 403 && pr.status !== 429 && pr.status < 500)) break;
-              await new Promise(r => setTimeout(r, 750 * (att + 1) + Math.floor(Math.random() * 300)));
+              if (pr.ok) {
+                try { localStorage.setItem(fidCacheKey, existingId); } catch (e) {}
+                window.onCCXCallback(cbId, { ok: true, syncCode: cleanCode });
+                return;
+              }
+              if (pr.status === 404) {
+                try { localStorage.removeItem(fidCacheKey); } catch (e) {}
+                existingId = null;
+                break;
+              }
+              if (pr.status !== 403 && pr.status !== 429 && pr.status < 500) break;
+              let sleepMs = 1100 * (att + 1) + Math.floor(Math.random() * 300);
+              if (att === 2) {
+                const msToNextMin = 60500 - (Date.now() % 60000);
+                if (msToNextMin > 0 && msToNextMin <= 14000) sleepMs = msToNextMin;
+              }
+              await new Promise(r => setTimeout(r, sleepMs));
             }
-            window.onCCXCallback(cbId, { ok: !!(pr && pr.ok), syncCode: cleanCode });
-            return;
+            if (existingId) {
+              window.onCCXCallback(cbId, {
+                ok: false,
+                deferred: !!(pr && (pr.status === 403 || pr.status === 429 || pr.status >= 500)),
+                syncCode: cleanCode,
+                error: 'Đám Mây đang bận vài giây, hệ thống sẽ tự đồng bộ ngầm ngay sau 15 giây!'
+              });
+              return;
+            }
           }
           const boundary = '=======CCXWebSync' + Date.now();
           const meta = JSON.stringify({ name: syncFileName, parents: [CCX_OAUTH.otaRoot] });
           const multipartBody = `--${boundary}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n${meta}\r\n--${boundary}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n${jsonPayload}\r\n--${boundary}--\r\n`;
           let cr = null;
           for (let att = 0; att < 5; att++) {
-            cr = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&supportsAllDrives=true', {
+            cr = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,name&supportsAllDrives=true', {
               method: 'POST',
               headers: {
                 'Authorization': 'Bearer ' + token,
@@ -3508,9 +3539,27 @@
               body: multipartBody
             });
             if (cr.ok || (cr.status !== 403 && cr.status !== 429 && cr.status < 500)) break;
-            await new Promise(r => setTimeout(r, 750 * (att + 1) + Math.floor(Math.random() * 300)));
+            let sleepMs = 1100 * (att + 1) + Math.floor(Math.random() * 300);
+            if (att === 2) {
+              const msToNextMin = 60500 - (Date.now() % 60000);
+              if (msToNextMin > 0 && msToNextMin <= 14000) sleepMs = msToNextMin;
+            }
+            await new Promise(r => setTimeout(r, sleepMs));
           }
-          window.onCCXCallback(cbId, { ok: !!(cr && cr.ok), syncCode: cleanCode });
+          if (cr && cr.ok) {
+            try {
+              const cj = await cr.json();
+              if (cj && cj.id) localStorage.setItem(fidCacheKey, cj.id);
+            } catch (e) {}
+            window.onCCXCallback(cbId, { ok: true, syncCode: cleanCode });
+          } else {
+            window.onCCXCallback(cbId, {
+              ok: false,
+              deferred: !!(cr && (cr.status === 403 || cr.status === 429 || cr.status >= 500)),
+              syncCode: cleanCode,
+              error: 'Đám Mây đang bận vài giây, hệ thống sẽ tự đồng bộ ngầm ngay sau 15 giây!'
+            });
+          }
         } catch (e) {
           window.onCCXCallback(cbId, { ok: false, error: e.message });
         }
@@ -3801,6 +3850,25 @@
     return mergedCount;
   }
 
+  let _deferredCloudSyncTimer = null;
+  function scheduleDeferredUserCloudSync() {
+    if (_deferredCloudSyncTimer) clearTimeout(_deferredCloudSyncTimer);
+    _deferredCloudSyncTimer = setTimeout(async () => {
+      _deferredCloudSyncTimer = null;
+      const code = (localStorage.getItem('ccx_cloud_sync_code_v1') || '').trim();
+      if (code.length < 3) return;
+      const res = await callBridgeAsync('syncUserProgressToCloud', [code, JSON.stringify(buildFullUserBackupObject())]);
+      const statusEl = document.getElementById('cloud-sync-status');
+      if (res && res.ok) {
+        try { localStorage.removeItem('ccx_pending_cloud_sync_flag'); } catch (e) {}
+        if (statusEl) statusEl.textContent = `✅ Đã liên kết & tự động đồng bộ Đám Mây với mã: "${res.syncCode}"`;
+        showAppToast(`☁️ Đã đồng bộ tự động tiến độ lên Đám Mây (${res.syncCode})!`, 2600);
+      } else if (res && res.deferred) {
+        scheduleDeferredUserCloudSync();
+      }
+    }, 15000);
+  }
+
   async function pushProgressToCloudNow(showAlert) {
     const inp = document.getElementById('cloud-sync-code-input');
     const rawCode = (inp && inp.value ? inp.value : (localStorage.getItem('ccx_cloud_sync_code_v1') || '')).trim();
@@ -3814,9 +3882,17 @@
     const payloadStr = JSON.stringify(buildFullUserBackupObject());
     const res = await callBridgeAsync('syncUserProgressToCloud', [rawCode, payloadStr]);
     if (res && res.ok) {
+      try { localStorage.removeItem('ccx_pending_cloud_sync_flag'); } catch (e) {}
       if (statusEl) statusEl.textContent = `✅ Đã liên kết & tự động đồng bộ Đám Mây với mã: "${res.syncCode}"`;
       if (showAlert) alert(`✅ Đã lưu toàn bộ lịch sử đang đọc, Đề Cử & Tủ Yêu Thích lên Đám Mây với mã: "${res.syncCode}"!\n\nKhi đổi sang máy mới hoặc dùng Tablet, bạn chỉ cần nhập mã "${res.syncCode}" và bấm "⚡ Khôi Phục Về Máy Này" là xong!`);
+    } else if (res && res.deferred) {
+      try { localStorage.setItem('ccx_pending_cloud_sync_flag', '1'); } catch (e) {}
+      scheduleDeferredUserCloudSync();
+      const cleanShown = (res && res.syncCode) || rawCode;
+      if (statusEl) statusEl.textContent = `⏳ Đã lưu mã "${cleanShown}" trên máy — đang tự động đẩy ngầm lên Đám Mây sau 15s...`;
+      if (showAlert) showAppToast(`☁️ Đã ghi nhận mã "${cleanShown}"! Máy chủ đang đông, App sẽ tự đồng bộ ngầm sau 15 giây.`, 3800);
     } else if (showAlert) {
+      if (statusEl) statusEl.textContent = (res && res.error) || 'Không thể lưu lên Đám Mây lúc này.';
       alert((res && res.error) || 'Không thể lưu lên Đám Mây lúc này.');
     }
   }
