@@ -181,32 +181,282 @@
     padding-bottom: 10px;
   }
 
+  .search-row-flex {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
   .search-input-wrap {
+    flex: 1;
+    min-width: 0;
     display: flex;
     align-items: center;
     background: var(--bg-card);
     border: 1px solid var(--border-cyber);
     border-radius: 12px;
-    padding: 0 12px;
+    padding: 0 11px;
     height: 44px;
     box-shadow: 0 4px 16px rgba(0,0,0,0.45);
   }
 
   .search-input-wrap input {
     flex: 1;
+    min-width: 0;
     background: transparent;
     border: none;
     outline: none;
     color: var(--text-main);
-    font-size: 14px;
-    margin-left: 8px;
+    font-size: 13.5px;
+    margin-left: 7px;
   }
 
   .clear-search {
     color: var(--text-sub);
-    font-size: 18px;
-    padding: 4px 6px;
+    font-size: 17px;
+    padding: 4px 5px;
     cursor: pointer;
+  }
+
+  .multitag-open-btn {
+    flex-shrink: 0;
+    height: 44px;
+    padding: 0 12px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, rgba(15, 23, 42, 0.96), rgba(30, 41, 59, 0.92));
+    border: 1px solid rgba(56, 189, 248, 0.42);
+    color: #E0F2FE;
+    font-size: 12.5px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.42);
+    white-space: nowrap;
+    touch-action: manipulation;
+    transition: transform 0.16s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+  }
+  .multitag-open-btn:active {
+    transform: scale(0.95);
+  }
+  .multitag-open-btn.has-active {
+    background: linear-gradient(135deg, rgba(2, 132, 199, 0.35), rgba(124, 58, 237, 0.38));
+    border-color: var(--cyan-neon);
+    color: #FFFFFF;
+    box-shadow: 0 0 14px rgba(0, 240, 255, 0.28);
+  }
+
+  .active-multitag-bar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    overflow-x: auto;
+    margin-top: 8px;
+    padding: 5px 8px;
+    background: rgba(8, 18, 36, 0.85);
+    border: 1px solid rgba(0, 240, 255, 0.32);
+    border-radius: 10px;
+  }
+  .active-multitag-bar::-webkit-scrollbar { display: none; }
+
+  .active-tag-chip {
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 9px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+    background: rgba(2, 132, 199, 0.24);
+    border: 1px solid rgba(56, 189, 248, 0.5);
+    color: #E0F2FE;
+    cursor: pointer;
+  }
+  .active-tag-chip.author-chip {
+    background: rgba(245, 158, 11, 0.2);
+    border-color: rgba(251, 191, 36, 0.55);
+    color: #FEF3C7;
+  }
+
+  .card-tag-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-top: 6px;
+  }
+  .card-mini-tag {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 6.5px;
+    border-radius: 6px;
+    background: rgba(15, 23, 42, 0.9);
+    border: 1px solid rgba(148, 163, 184, 0.22);
+    color: #CBD5E1;
+    cursor: pointer;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    transition: border-color 0.15s ease, background 0.15s ease;
+  }
+  .card-mini-tag:active, .card-mini-tag.is-selected {
+    background: rgba(2, 132, 199, 0.28);
+    border-color: var(--cyan-neon);
+    color: #fff;
+  }
+  .card-mini-tag.author-mini {
+    background: rgba(245, 158, 11, 0.12);
+    border-color: rgba(245, 158, 11, 0.35);
+    color: #FDE68A;
+  }
+  .card-mini-tag.dub-mini {
+    background: rgba(16, 185, 129, 0.14);
+    border-color: rgba(52, 211, 153, 0.42);
+    color: #A7F3D0;
+  }
+
+  .vote-btn {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 8px;
+    height: 28px;
+    padding: 0 7px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    font-size: 11.5px;
+    font-weight: 800;
+    color: #CBD5E1;
+    cursor: pointer;
+    touch-action: manipulation;
+    transition: transform 0.16s ease, background 0.16s ease, border-color 0.16s ease;
+  }
+  .vote-btn:active {
+    transform: scale(0.92);
+  }
+  .vote-btn.active {
+    background: rgba(245, 158, 11, 0.24);
+    border-color: rgba(251, 191, 36, 0.72);
+    color: #FDE68A;
+    animation: heartPop 0.26s ease;
+  }
+
+  /* Multi-Tag Drawer / Bottom-Sheet Modal (60 FPS + iOS Eco-Cool Safe) */
+  #multitag-drawer {
+    position: fixed;
+    inset: 0;
+    z-index: 920;
+    background: rgba(2, 6, 14, 0.78);
+    backdrop-filter: blur(6px);
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+  }
+  body.ios-cool-mode #multitag-drawer {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background: rgba(2, 6, 14, 0.92);
+  }
+  @media (min-width: 700px) {
+    #multitag-drawer {
+      align-items: center;
+      padding: 20px;
+    }
+  }
+  .multitag-sheet {
+    width: 100%;
+    max-width: 780px;
+    max-height: 88vh;
+    background: #070D19;
+    border: 1px solid rgba(0, 240, 255, 0.35);
+    border-radius: 20px 20px 0 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 -8px 36px rgba(0, 0, 0, 0.85);
+    animation: modalSlideUp 0.24s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  @media (min-width: 700px) {
+    .multitag-sheet {
+      border-radius: 20px;
+      max-height: 84vh;
+    }
+  }
+  .multitag-head {
+    padding: 13px 15px 10px 15px;
+    border-bottom: 1px solid rgba(56, 189, 248, 0.18);
+    background: #0A1222;
+  }
+  .multitag-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 12px 15px 18px 15px;
+    -webkit-overflow-scrolling: touch;
+  }
+  .multitag-group-title {
+    font-size: 12px;
+    font-weight: 900;
+    color: var(--cyan-neon);
+    margin: 12px 0 8px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .multitag-group-title:first-child {
+    margin-top: 2px;
+  }
+  .multitag-chip-wrap {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+  }
+  .drawer-tag-btn {
+    padding: 6px 10px;
+    border-radius: 10px;
+    background: rgba(15, 23, 42, 0.92);
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    color: #E2E8F0;
+    font-size: 11.5px;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    touch-action: manipulation;
+    transition: background 0.15s ease, border-color 0.15s ease, transform 0.12s ease;
+  }
+  .drawer-tag-btn:active {
+    transform: scale(0.95);
+  }
+  .drawer-tag-btn .tag-cnt {
+    font-size: 10px;
+    color: #94A3B8;
+    font-weight: 600;
+  }
+  .drawer-tag-btn.selected {
+    background: linear-gradient(90deg, rgba(2, 132, 199, 0.42), rgba(37, 99, 235, 0.48));
+    border-color: var(--cyan-neon);
+    color: #FFFFFF;
+    box-shadow: 0 0 10px rgba(0, 240, 255, 0.22);
+  }
+  .drawer-tag-btn.selected .tag-cnt {
+    color: #BAE6FD;
+  }
+  .drawer-tag-btn.author-btn.selected {
+    background: linear-gradient(90deg, rgba(217, 119, 6, 0.42), rgba(245, 158, 11, 0.38));
+    border-color: #FBBF24;
+    color: #FFFBEB;
+  }
+  .multitag-foot {
+    padding: 11px 15px calc(11px + env(safe-area-inset-bottom, 0px)) 15px;
+    border-top: 1px solid rgba(56, 189, 248, 0.2);
+    background: #0A1222;
+    display: flex;
+    align-items: center;
+    gap: 10px;
   }
 
   .filter-pills {
@@ -1642,7 +1892,7 @@
       <div class="brand-logo">🦅</div>
       <div class="brand-text-wrap">
         <div class="brand-title">CON CHIM XANH HUB</div>
-        <div class="brand-sub" id="header-status">Android • iOS • Tablet • V3.8.4 Supreme</div>
+        <div class="brand-sub" id="header-status">Android • iOS • Tablet • V3.9.0 Supreme</div>
       </div>
     </div>
     <div class="header-actions">
@@ -1670,30 +1920,71 @@
   <!-- TAB 1: KHO GIẢI TRÍ 4 THƯ MỤC (TRUYỆN TRANH - TRUYỆN CHỮ - ANIME - PHIM ĐIỆN ẢNH) -->
   <div id="tab-library" class="view-container">
     <div class="search-box">
-      <div class="search-input-wrap">
-        <span>🔍</span>
-        <input type="text" id="search-input" placeholder="Tìm Truyện Tranh, Truyện Chữ, Anime, Phim (VD: Lớp Học Đề Cao Thực Lực, Conan...)" oninput="renderLibraryGrid()">
-        <span class="clear-search" onclick="clearSearch()">✕</span>
+      <div class="search-row-flex">
+        <div class="search-input-wrap">
+          <span>🔍</span>
+          <input type="text" id="search-input" placeholder="Tìm tên bộ, tác giả, chủ đề sách, thể loại (VD: Kim Dung, kinh doanh, thuyết minh...)" oninput="renderLibraryGrid()">
+          <span class="clear-search" onclick="clearSearch()">✕</span>
+        </div>
+        <button type="button" id="btn-multitag-open" class="multitag-open-btn" onclick="openMultiTagDrawer()">
+          <span>🏷️</span> <span id="multitag-btn-label">Đa Tag</span>
+        </button>
       </div>
       <div class="filter-pills">
         <div class="pill active" id="pill-all" onclick="setLibraryFilter('all')">🌟 Tất Cả (<span id="count-all">0</span>)</div>
         <div class="pill" id="pill-top" onclick="setLibraryFilter('top')">🏆 Top Đọc Nhiều</div>
+        <div class="pill" id="pill-vote" onclick="setLibraryFilter('vote')">🗳️ Top Đề Cử (<span id="count-vote">0</span>)</div>
         <div class="pill" id="pill-new" onclick="setLibraryFilter('new')">🆕 Mới Cập Nhật</div>
         <div class="pill" id="pill-manga" onclick="setLibraryFilter('manga')">📚 Truyện Tranh (<span id="count-manga">0</span>)</div>
-        <div class="pill" id="pill-novel" onclick="setLibraryFilter('novel')">📖 Truyện Chữ (<span id="count-novel">0</span>)</div>
+        <div class="pill" id="pill-novel" onclick="setLibraryFilter('novel')">📖 Truyện Chữ & Sách (<span id="count-novel">0</span>)</div>
         <div class="pill" id="pill-anime" onclick="setLibraryFilter('anime')">🎬 Anime (<span id="count-anime">0</span>)</div>
         <div class="pill" id="pill-movie" onclick="setLibraryFilter('movie')">🍿 Phim Điện Ảnh (<span id="count-movie">0</span>)</div>
         <div class="pill" id="pill-fav" onclick="setLibraryFilter('fav')">❤️ Yêu Thích</div>
         <div class="pill" id="pill-reading" onclick="setLibraryFilter('reading')">🔥 Đang Đọc / Xem</div>
       </div>
-      <div id="top-subfilter-bar" class="top-subfilter-bar hidden">
-        <div class="sub-pill active" id="top-sub-all" onclick="setTopSubFilter('all')">🔥 Top Tất Cả</div>
-        <div class="sub-pill" id="top-sub-manga" onclick="setTopSubFilter('manga')">📚 Top Truyện Tranh</div>
-        <div class="sub-pill" id="top-sub-novel" onclick="setTopSubFilter('novel')">📖 Top Truyện Chữ</div>
-        <div class="sub-pill" id="top-sub-anime" onclick="setTopSubFilter('anime')">🎬 Top Anime</div>
-        <div class="sub-pill" id="top-sub-movie" onclick="setTopSubFilter('movie')">🍿 Top Phim Điện Ảnh</div>
-        <div class="sub-pill" id="top-refresh-views-btn" style="border-color:rgba(16,185,129,0.55); color:#34D399;" onclick="syncGlobalRealViewsWithCloud(true)">🔄 Làm Mới Lượt Xem Thật</div>
-        <div id="top-real-summary-pill" style="font-size:10.5px; color:var(--cyan-neon); font-weight:800; padding:3px 6px; white-space:nowrap;"></div>
+
+      <!-- Slim Active Multi-Tag Bar (Visible ONLY when >= 1 tag or author is selected) -->
+      <div id="active-multitag-bar" class="active-multitag-bar hidden"></div>
+
+      <!-- 🏆 Top Đọc Nhiều: Real Time-Window + Category Subfilter Bar -->
+      <div id="top-subfilter-bar" class="top-subfilter-bar hidden" style="flex-direction:column; gap:6px;">
+        <div style="display:flex; align-items:center; gap:6px; overflow-x:auto; width:100%;">
+          <span style="font-size:11px; color:#FBBF24; font-weight:900; white-space:nowrap;">⏱️ Khung giờ:</span>
+          <div class="sub-pill" id="top-win-today" onclick="setTopTimeWindow('today')">⚡ Hôm Nay</div>
+          <div class="sub-pill" id="top-win-7d" onclick="setTopTimeWindow('7d')">📅 7 Ngày</div>
+          <div class="sub-pill" id="top-win-30d" onclick="setTopTimeWindow('30d')">🗓️ 30 Ngày</div>
+          <div class="sub-pill" id="top-win-year" onclick="setTopTimeWindow('year')">📆 Năm 2026</div>
+          <div class="sub-pill active" id="top-win-all" onclick="setTopTimeWindow('all')">👑 Mọi Thời Đại</div>
+          <div class="sub-pill" id="top-refresh-views-btn" style="border-color:rgba(16,185,129,0.55); color:#34D399; margin-left:auto;" onclick="syncGlobalRealViewsWithCloud(true)">🔄 Làm Mới</div>
+        </div>
+        <div style="display:flex; align-items:center; gap:6px; overflow-x:auto; width:100%;">
+          <div class="sub-pill active" id="top-sub-all" onclick="setTopSubFilter('all')">🔥 Tất Cả</div>
+          <div class="sub-pill" id="top-sub-manga" onclick="setTopSubFilter('manga')">📚 Truyện Tranh</div>
+          <div class="sub-pill" id="top-sub-novel" onclick="setTopSubFilter('novel')">📖 Truyện Chữ & Sách</div>
+          <div class="sub-pill" id="top-sub-anime" onclick="setTopSubFilter('anime')">🎬 Anime</div>
+          <div class="sub-pill" id="top-sub-movie" onclick="setTopSubFilter('movie')">🍿 Phim</div>
+          <div id="top-real-summary-pill" style="font-size:10.5px; color:var(--cyan-neon); font-weight:800; padding:2px 6px; white-space:nowrap;"></div>
+        </div>
+      </div>
+
+      <!-- 🗳️ Top Đề Cử (Vote): Category Subfilter Bar -->
+      <div id="vote-subfilter-bar" class="top-subfilter-bar hidden" style="border-color:rgba(251,191,36,0.45);">
+        <div class="sub-pill active" id="vote-sub-all" onclick="setVoteSubFilter('all')">🗳️ Đề Cử Tất Cả</div>
+        <div class="sub-pill" id="vote-sub-manga" onclick="setVoteSubFilter('manga')">📚 Truyện Tranh</div>
+        <div class="sub-pill" id="vote-sub-novel" onclick="setVoteSubFilter('novel')">📖 Truyện Chữ & Sách</div>
+        <div class="sub-pill" id="vote-sub-anime" onclick="setVoteSubFilter('anime')">🎬 Anime</div>
+        <div class="sub-pill" id="vote-sub-movie" onclick="setVoteSubFilter('movie')">🍿 Phim</div>
+        <div id="vote-real-summary-pill" style="font-size:10.5px; color:#FDE68A; font-weight:800; padding:3px 6px; white-space:nowrap;"></div>
+      </div>
+
+      <!-- 🆕 Mới Cập Nhật: Real Timestamp Category Subfilter Bar -->
+      <div id="new-subfilter-bar" class="top-subfilter-bar hidden" style="border-color:rgba(236,72,153,0.42);">
+        <div class="sub-pill active" id="new-sub-all" onclick="setNewSubFilter('all')">🆕 Tất Cả Mới Lên Kệ</div>
+        <div class="sub-pill" id="new-sub-manga" onclick="setNewSubFilter('manga')">📚 Truyện Tranh Mới</div>
+        <div class="sub-pill" id="new-sub-novel" onclick="setNewSubFilter('novel')">📖 Sách / Truyện Chữ Mới</div>
+        <div class="sub-pill" id="new-sub-anime" onclick="setNewSubFilter('anime')">🎬 Anime Mới</div>
+        <div class="sub-pill" id="new-sub-movie" onclick="setNewSubFilter('movie')">🍿 Phim Mới</div>
+        <div style="font-size:10.5px; color:#F472B6; font-weight:800; padding:3px 6px; white-space:nowrap;">🕒 Sắp xếp chuẩn ngày cập nhật thật trên Kho</div>
       </div>
     </div>
 
@@ -1779,7 +2070,7 @@
           </div>
           <div style="background:#05070B; border:1px solid var(--border-cyber); border-radius:12px; padding:12px; margin-bottom:12px; font-size:12.5px; line-height:1.6;">
             <div>• <b>Tên ứng dụng:</b> <span style="color:var(--cyan-neon); font-weight:800;">App đọc truyện - ConChimXanh Hub (Supreme)</span></div>
-            <div>• <b>Phiên bản hiện tại:</b> <span style="color:#34D399; font-weight:800;" id="about-cur-ver">V3.8.4 Supreme (Build #28)</span></div>
+            <div>• <b>Phiên bản hiện tại:</b> <span style="color:#34D399; font-weight:800;" id="about-cur-ver">V3.9.0 (Build #29)</span></div>
             <div>• <b>Bản mới nhất trên Cloud:</b> <span style="color:var(--amber-neon); font-weight:800;" id="about-latest-ver">Đang kiểm tra...</span></div>
             <div>• <b>Nhận diện thiết bị:</b> <span style="color:#7DD3FC; font-weight:700;" id="about-device-mode">Đang phân tích màn hình...</span></div>
             <div>• <b>Dữ liệu Kho Tổng Hợp:</b> <span style="color:#fff; font-weight:700;" id="about-catalog-stats">18,840+ Bộ (467 Truyện Tranh • 18,191 Truyện Chữ • 145 Anime • 46 Phim)</span></div>
@@ -1787,11 +2078,11 @@
           <button class="btn-cyber btn-primary" style="width:100%; margin-bottom:10px;" onclick="manualCheckUpdateFromVersionTab()">
             ⚡ KIỂM TRA & CẬP NHẬT PHIÊN BẢN MỚI NGAY
           </button>
-          <div style="font-size:12px; font-weight:800; color:var(--cyan-neon); margin-bottom:6px;">✨ Tính năng mới trong phiên bản này:</div>
+          <div style="font-size:12px; font-weight:800; color:var(--cyan-neon); margin-bottom:6px;">✨ Tính năng mới trong phiên bản V3.9.0 Supreme (Build #29):</div>
           <div id="about-changelog-box" style="background:#05070B; border:1px solid rgba(255,255,255,0.07); border-radius:10px; padding:10px 12px; font-size:12px; color:var(--text-sub); line-height:1.5;">
-            • Zoom đúng tâm ngón tay (Focal-Point Pinch Zoom) ở cả Trang Trái, Trang Phải (2 Trang Đôi), 1 Trang & Cuộn Dọc — chấm dứt hoàn toàn hiện tượng nhảy tâm về gáy sách.<br>
-            • Gỡ bỏ hoàn toàn chạm 1 ngón tự Zoom (Zoom chỉ kích hoạt khi Pinch 2 ngón tay hoặc bấm nút 🔍 Zoom), giúp 1 chạm mở/ẩn Menu điều khiển mượt 100%.<br>
-            • Tự động nhận diện Trang Đôi Khổ Ngang ("trang to đọc ngang") trải rộng toàn màn hình và gia cố chống nghẽn hạn mức Đám Mây khi Cập nhật OTA & Đồng bộ Lượt Xem Thật.
+            • <b>Hệ thống Lọc Đa Tag (Multi-Tag) & Tác Giả thông minh</b> cho 18.650+ bộ (Chủ đề Sách Kinh doanh, Tâm lý, Lịch sử, Ngoại ngữ... + Thể loại Truyện/Phim + Thuyết minh/Vietsub + 3.330+ Tác giả chuẩn).<br>
+            • <b>Bảng xếp hạng 🏆 Top Đọc Nhiều 5 Khung Thời Gian Thật</b> (Hôm Nay • 7 Ngày • 30 Ngày • Năm 2026 • Mọi Thời Đại) & <b>🗳️ Top Đề Cử (Vote 👍 1 chạm đồng bộ Đám Mây)</b>.<br>
+            • <b>🆕 Mới Cập Nhật theo ngày giờ thật 100%</b> + <b>Tách riêng rạch ròi Bản PDF Đọc Trực Tiếp & File Ebook Gốc (.EPUB)</b> trong mọi thư mục Truyện Chữ + Nén giảm 47% dung lượng Catalog siêu mát máy iOS Eco-Cool!
           </div>
         </div>
 
@@ -1970,6 +2261,37 @@
   </div>
 </div>
 
+<!-- Multi-Tag & Author Filter Drawer (60 FPS + Eco-Cool Ready) -->
+<div id="multitag-drawer" class="hidden" onclick="closeMultiTagDrawer()">
+  <div class="multitag-sheet" onclick="event.stopPropagation()">
+    <div class="multitag-head">
+      <div style="display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:9px;">
+        <div>
+          <div style="font-size:14px; font-weight:900; color:#fff;">🏷️ LỌC ĐA TAG: CHỦ ĐỀ SÁCH • THỂ LOẠI • TÁC GIẢ</div>
+          <div style="font-size:11px; color:var(--text-sub); margin-top:2px;">Chọn nhiều Tag cùng lúc để tìm đúng cuốn Ebook, bộ Truyện hoặc Phim bạn thích</div>
+        </div>
+        <button type="button" class="tool-chip" style="padding:5px 10px; font-size:12px;" onclick="closeMultiTagDrawer()">✕ Đóng</button>
+      </div>
+      <div style="display:flex; align-items:center; gap:7px; flex-wrap:wrap;">
+        <div class="search-input-wrap" style="height:38px; flex:1; min-width:190px; box-shadow:none;">
+          <span>🔍</span>
+          <input type="text" id="tag-drawer-search" placeholder="Tìm nhanh chủ đề, thể loại hoặc tên tác giả (3.300+ tác giả)..." oninput="renderMultiTagDrawerBody()">
+          <span class="clear-search" onclick="document.getElementById('tag-drawer-search').value=''; renderMultiTagDrawerBody();">✕</span>
+        </div>
+        <div style="display:flex; align-items:center; background:#050912; border:1px solid rgba(56,189,248,0.28); border-radius:10px; padding:2px;">
+          <button type="button" id="tag-mode-and" class="sub-pill active" style="border:none; padding:5px 9px; font-size:11px;" onclick="setMultiTagCombineMode('AND')">🔗 Khớp Tất Cả</button>
+          <button type="button" id="tag-mode-or" class="sub-pill" style="border:none; padding:5px 9px; font-size:11px;" onclick="setMultiTagCombineMode('OR')">⚡ Khớp Bất Kỳ</button>
+        </div>
+      </div>
+    </div>
+    <div id="multitag-drawer-body" class="multitag-body"></div>
+    <div class="multitag-foot">
+      <button type="button" class="btn-cyber btn-secondary" style="flex:0 0 auto; padding:10px 14px;" onclick="clearAllMultiTags(false)">🗑️ Xóa Lọc</button>
+      <button type="button" id="btn-multitag-apply" class="btn-cyber btn-primary" style="flex:1; font-weight:900;" onclick="closeMultiTagDrawer()">⚡ Xem Ngay 18.650 Bộ Khớp</button>
+    </div>
+  </div>
+</div>
+
 <!-- Folder / Volume Explorer Modal -->
 <div id="folder-modal" class="hidden">
   <div class="modal-header">
@@ -1978,6 +2300,8 @@
       <div class="modal-title" id="folder-modal-title">Tên Bộ Truyện</div>
       <div class="modal-subtitle" id="folder-modal-sub">Đang quét danh sách tập qua cổng Vượt Limit...</div>
     </div>
+    <button type="button" id="folder-modal-vote-btn" class="vote-btn" style="height:32px; padding:0 10px; flex-shrink:0;" onclick="toggleVoteCurrentModalSeries(event)" title="Đề cử bộ này lên Bảng Xếp Hạng">👍 Đề cử</button>
+    <button type="button" id="folder-modal-fav-btn" class="fav-btn" style="width:32px; height:32px; flex-shrink:0;" onclick="toggleFavCurrentModalSeries(event)" title="Thêm vào Tủ Yêu Thích">🤍</button>
   </div>
   <div id="folder-file-list" class="file-list"></div>
 </div>
@@ -2122,8 +2446,8 @@
   </div>
 </div>
 
-<script src="catalog_data.js?v=3.8.4"></script>
-<script src="folder_tree.js?v=3.8.4"></script>
+<script src="catalog_data.js?v=3.9.0"></script>
+<script src="folder_tree.js?v=3.9.0"></script>
 <script src="pdf.min.js"></script>
 <script>
   if (window.pdfjsLib) {
@@ -2273,7 +2597,7 @@
 
   if (!window.CCXBridge) {
     if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
-      navigator.serviceWorker.register('sw.js?v=3.8.4').then(reg => {
+      navigator.serviceWorker.register('sw.js?v=3.9.0').then(reg => {
         try { reg.update(); } catch (e) {}
       }).catch(() => {});
     }
@@ -2597,8 +2921,8 @@
         const minSide = Math.min(window.innerWidth, window.innerHeight);
         const isTab = window._isIpadOS || minSide >= 600;
         return JSON.stringify({
-          versionCode: 28,
-          versionName: '3.8.4',
+          versionCode: 29,
+          versionName: '3.9.0',
           isTablet: isTab,
           smallestScreenWidthDp: minSide,
           platform: window._isIosDevice ? 'ios' : 'web'
@@ -2698,13 +3022,13 @@
       },
       checkAppUpdate: async function(cbId) {
         try {
-          const changelog = 'Phiên bản V3.8.4 Supreme (Build #28): 1) Nâng cấp Zoom Đúng Tâm Ngón Tay (Focal-Point Pinch Zoom) ở cả Trang Trái, Trang Phải (2 Trang Đôi), 1 Trang & Cuộn Dọc — không còn bị nhảy tâm về gáy sách; 2) Gỡ bỏ hoàn toàn chạm 1 ngón tự Zoom để 1 chạm mở/ẩn Menu mượt 100%, tự động trải rộng Trang Đôi Khổ Ngang ("trang to đọc ngang") toàn màn hình; 3) Bảng Xếp Hạng 🏆 Top Đọc Nhiều dùng 100% Lượt Xem Thật thời gian thực trên Đám Mây; 4) Gia cố chống nghẽn hạn mức 403/429 khi Cập nhật OTA & Đồng bộ Đám Mây!';
+          const changelog = 'Phiên bản V3.9.0 Supreme (Build #29): 1) Hệ thống Lọc Đa Tag (Multi-Tag) thông minh cho 18.650+ bộ (Chủ đề Sách/Ebook Kinh doanh, Tâm lý, Ngoại ngữ, Lịch sử... + Thể loại Truyện/Phim + Thuyết minh/Vietsub + 3.331 Tác giả trích xuất chuẩn); 2) Bảng xếp hạng 🏆 Top Đọc Nhiều lọc theo Khung Thời Gian Thật (Hôm Nay • 7 Ngày • 30 Ngày • Năm 2026 • Mọi Thời Đại); 3) Tính năng 🗳️ Top Đề Cử (Vote 👍 1 chạm đồng bộ Đám Mây, chống spam 1 người/1 phiếu); 4) 🆕 Mới Cập Nhật sắp xếp chuẩn xác 100% theo ngày giờ cập nhật thật + Tách bạch Bản PDF Đọc Trực Tiếp & File Ebook Gốc (.EPUB) + Giảm 47% dung lượng Catalog cho iOS Eco-Cool!';
           window.onCCXCallback(cbId, {
             ok: true,
-            currentVersionCode: 28,
-            currentVersionName: '3.8.4',
-            latestVersionCode: 28,
-            latestVersionName: '3.8.4',
+            currentVersionCode: 29,
+            currentVersionName: '3.9.0',
+            latestVersionCode: 29,
+            latestVersionName: '3.9.0',
             hasUpdate: false,
             changelog: changelog
           });
@@ -2822,12 +3146,12 @@
               (j.files || []).forEach(f => {
                 const fName = f.name || '';
                 const fMime = f.mimeType || '';
-                if (/\.(xlsx|md|txt|json|apk|ini|epub|mobi|cbz|cbr)$/i.test(fName)) return;
+                if (/\.(xlsx|md|txt|json|apk|ini|cbz|cbr)$/i.test(fName)) return;
                 const isFolder = fMime === 'application/vnd.google-apps.folder';
                 const isImg = fMime.startsWith('image/') || isImgName(fName);
                 const isVid = fMime.startsWith('video/') || isVidName(fName);
-                const isPdf = fName.toLowerCase().endsWith('.pdf') || fMime.includes('pdf');
-                if (!isFolder && !isPdf && !isImg && !isVid) return;
+                const isPdfOrEbook = /\.(pdf|epub|mobi|azw3|prc)$/i.test(fName) || fMime.includes('pdf') || fMime.includes('epub');
+                if (!isFolder && !isPdfOrEbook && !isImg && !isVid) return;
                 const sz = Number(f.size) || 0;
                 if (sz > 0) window._ccxFileSizeCache[f.id] = sz;
                 allItems.push({
@@ -2876,11 +3200,11 @@
                 while ((m = re.exec(html)) !== null) {
                   const eId = m[1];
                   const eName = m[2].replace(/&amp;/g, '&').replace(/&#39;/g, "'").replace(/&quot;/g, '"').trim();
-                  if (/\.(xlsx|md|txt|json|apk|ini|epub|mobi|cbz|cbr)$/i.test(eName)) continue;
-                  const isPdf = eName.toLowerCase().endsWith('.pdf');
+                  if (/\.(xlsx|md|txt|json|apk|ini|cbz|cbr)$/i.test(eName)) continue;
+                  const isPdfOrEbook = /\.(pdf|epub|mobi|azw3|prc)$/i.test(eName);
                   const isVid = isVidName(eName);
                   const isImg = isImgName(eName);
-                  const isFolder = !isPdf && !isVid && !isImg;
+                  const isFolder = !isPdfOrEbook && !isVid && !isImg;
                   scraped.push({
                     id: eId,
                     name: eName,
@@ -3081,6 +3405,12 @@
           const cleanCode = String(syncCode || '').trim().toLowerCase().replace(/[^a-z0-9_-]/g, '');
           if (cleanCode.length < 3) {
             window.onCCXCallback(cbId, { ok: false, error: 'Mã đồng bộ cần ít nhất 3 ký tự!' });
+            return;
+          }
+          // Preview Sandbox Safety Guard: Never overwrite live community Cloud ledger while testing on localhost/127.0.0.1!
+          if (/^(localhost|127\.0\.0\.1)$/i.test(location.hostname || '')) {
+            try { localStorage.setItem('ccx_preview_sandbox_' + cleanCode, String(jsonPayload || '')); } catch (e) {}
+            window.onCCXCallback(cbId, { ok: true, syncCode: cleanCode, sandbox: true });
             return;
           }
           const token = await getValidWebAccessToken();
@@ -3343,12 +3673,40 @@
     }, 2500);
   }
 
+  // =========================================================================
+  // V3.9.0 VOTE / RECOMMEND HELPERS (1 ACTOR = MAX 1 VOTE PER SERIES, LWW CRDT)
+  // =========================================================================
+  function getVotedMapLocal() {
+    try {
+      const obj = JSON.parse(localStorage.getItem('ccx_voted_map_v1') || '{}');
+      return (obj && typeof obj === 'object') ? obj : {};
+    } catch (e) {
+      return {};
+    }
+  }
+
+  function saveVotedMapLocal(mapObj) {
+    try {
+      localStorage.setItem('ccx_voted_map_v1', JSON.stringify(mapObj || {}));
+    } catch (e) {}
+  }
+
+  function getVotedSeriesSet() {
+    const m = getVotedMapLocal();
+    const out = new Set();
+    for (const [k, v] of Object.entries(m)) {
+      if (Number(v) > 0) out.add(k);
+    }
+    return out;
+  }
+
   function buildFullUserBackupObject() {
     return {
-      version: 1,
+      version: 2,
       updatedAt: Date.now(),
       readingProgress: getReadingHistoryMap(),
       favorites: Array.from(getFavoritesSet()),
+      votedMap: getVotedMapLocal(),
       externalLinks: getExternalHistoryList()
     };
   }
@@ -3371,6 +3729,20 @@
       data.favorites.forEach(x => { favSet.add(x); mergedCount++; });
       localStorage.setItem('ccx_fav_series_v1', JSON.stringify(Array.from(favSet)));
     }
+    if (data.votedMap && typeof data.votedMap === 'object') {
+      const curV = getVotedMapLocal();
+      for (const [rawS, tsVal] of Object.entries(data.votedMap)) {
+        const s = resolveCanonicalSeriesName(rawS);
+        if (!s) continue;
+        const nv = Number(tsVal) || 0;
+        const pv = Number(curV[s]) || 0;
+        if (Math.abs(nv) > Math.abs(pv)) {
+          curV[s] = nv;
+          mergedCount++;
+        }
+      }
+      saveVotedMapLocal(curV);
+    }
     if (Array.isArray(data.externalLinks)) {
       const curExt = getExternalHistoryList();
       const urls = new Set(curExt.map(x => x.url));
@@ -3381,6 +3753,7 @@
       });
       localStorage.setItem('ccx_external_links_v1', JSON.stringify(curExt.slice(0, 30)));
     }
+    recomputeCatalogRealViewStats();
     renderLibraryGrid();
     renderOfflineAndContinueTab();
     return mergedCount;
@@ -3400,7 +3773,7 @@
     const res = await callBridgeAsync('syncUserProgressToCloud', [rawCode, payloadStr]);
     if (res && res.ok) {
       if (statusEl) statusEl.textContent = `✅ Đã liên kết & tự động đồng bộ Đám Mây với mã: "${res.syncCode}"`;
-      if (showAlert) alert(`✅ Đã lưu toàn bộ lịch sử đang đọc & Tủ Yêu Thích lên Đám Mây với mã: "${res.syncCode}"!\n\nKhi đổi sang máy mới hoặc dùng Tablet, bạn chỉ cần nhập mã "${res.syncCode}" và bấm "⚡ Khôi Phục Về Máy Này" là xong!`);
+      if (showAlert) alert(`✅ Đã lưu toàn bộ lịch sử đang đọc, Đề Cử & Tủ Yêu Thích lên Đám Mây với mã: "${res.syncCode}"!\n\nKhi đổi sang máy mới hoặc dùng Tablet, bạn chỉ cần nhập mã "${res.syncCode}" và bấm "⚡ Khôi Phục Về Máy Này" là xong!`);
     } else if (showAlert) {
       alert((res && res.error) || 'Không thể lưu lên Đám Mây lúc này.');
     }
@@ -3418,7 +3791,7 @@
     if (statusEl) statusEl.textContent = '⚡ Đang tải tiến độ đọc từ Đám Mây về máy...';
     const res = await callBridgeAsync('restoreUserProgressFromCloud', [rawCode]);
     if (res && res.ok && res.data) {
-      const count = mergeUserBackupObject(res.data);
+      mergeUserBackupObject(res.data);
       if (statusEl) statusEl.textContent = `✅ Đã khôi phục thành công từ mã: "${res.syncCode}"!`;
       alert(`🎉 Đã đồng bộ thành công dữ liệu từ mã "${res.syncCode}" sang máy này!\nToàn bộ các bộ truyện/phim đang đọc dở và Tủ Yêu Thích đã sẵn sàng.`);
     } else {
@@ -3487,15 +3860,71 @@
 
   function toggleFavoriteSeries(ev, seriesName) {
     if (ev) ev.stopPropagation();
+    const s = resolveCanonicalSeriesName(seriesName) || seriesName;
     const set = getFavoritesSet();
-    if (set.has(seriesName)) set.delete(seriesName);
-    else set.add(seriesName);
+    if (set.has(s)) set.delete(s);
+    else if (set.has(seriesName)) set.delete(seriesName);
+    else set.add(s);
     try {
       localStorage.setItem('ccx_fav_series_v1', JSON.stringify(Array.from(set)));
       scheduleSilentCloudSync();
     } catch (e) {}
-    recordRealSeriesActivity(seriesName, null, 'fav');
+    recordRealSeriesActivity(s, null, 'fav');
+    syncFolderModalHeaderActions();
     renderLibraryGrid();
+  }
+
+  function toggleVoteSeries(ev, seriesName) {
+    if (ev) ev.stopPropagation();
+    const s = resolveCanonicalSeriesName(seriesName) || seriesName;
+    if (!s || s.startsWith('http')) return;
+    const vMap = getVotedMapLocal();
+    const now = Date.now();
+    const wasVoted = Number(vMap[s]) > 0;
+    vMap[s] = wasVoted ? -now : now;
+    saveVotedMapLocal(vMap);
+    scheduleSilentCloudSync();
+    recordRealSeriesActivity(s, null, 'vote');
+    syncFolderModalHeaderActions();
+    renderLibraryGrid();
+    showAppToast(wasVoted
+      ? `Đã gỡ phiếu đề cử cho "${s.slice(0, 48)}"`
+      : `👍 Đã đề cử "${s.slice(0, 48)}" lên Bảng Xếp Hạng Cộng Đồng!`, 2400);
+  }
+
+  function syncFolderModalHeaderActions() {
+    const vBtn = document.getElementById('folder-modal-vote-btn');
+    const fBtn = document.getElementById('folder-modal-fav-btn');
+    const s = resolveCanonicalSeriesName(currentSeriesName) || currentSeriesName;
+    if (!s || s.startsWith('http')) {
+      if (vBtn) vBtn.classList.add('hidden');
+      if (fBtn) fBtn.classList.add('hidden');
+      return;
+    }
+    const vSet = getVotedSeriesSet();
+    const fSet = getFavoritesSet();
+    const matchedItem = catalogItems.find(x => x.name === s);
+    const voteCnt = matchedItem ? (matchedItem._realVotes || 0) : (vSet.has(s) ? 1 : 0);
+    if (vBtn) {
+      vBtn.classList.remove('hidden');
+      const isV = vSet.has(s);
+      vBtn.classList.toggle('active', isV);
+      vBtn.innerHTML = `👍 ${isV ? 'Đã đề cử' : 'Đề cử'}${voteCnt > 0 ? ' (' + voteCnt + ')' : ''}`;
+    }
+    if (fBtn) {
+      fBtn.classList.remove('hidden');
+      const isF = fSet.has(s) || fSet.has(currentSeriesName);
+      fBtn.classList.toggle('active', isF);
+      fBtn.textContent = isF ? '❤️' : '🤍';
+    }
+  }
+
+  function toggleVoteCurrentModalSeries(ev) {
+    if (currentSeriesName) toggleVoteSeries(ev, currentSeriesName);
+  }
+
+  function toggleFavCurrentModalSeries(ev) {
+    if (currentSeriesName) toggleFavoriteSeries(ev, currentSeriesName);
   }
 
   function inferItemType(it) {
@@ -3506,87 +3935,837 @@
   }
 
   // =========================================================================
-  // 100% REAL-TIME MULTI-DEVICE CLOUD VIEW COUNTER (ZERO FAKE / ZERO HEURISTIC)
+  // V3.9.0 MULTI-TAG DICTIONARY & CLIENT-SIDE RUNTIME AUTO-TAGGER (< 35ms)
+  // =========================================================================
+  const CCX_DEFAULT_TAG_DICT = [
+    { id: 1, group: 'ebook', icon: '💼', label: 'Kinh Tế & Kinh Doanh', short: '💼 Kinh Doanh' },
+    { id: 2, group: 'ebook', icon: '🧠', label: 'Tâm Lý & Kỹ Năng Sống', short: '🧠 Tâm Lý - Kỹ Năng' },
+    { id: 3, group: 'ebook', icon: '🏛️', label: 'Lịch Sử - Triết Học - Tôn Giáo', short: '🏛️ Lịch Sử - Triết Học' },
+    { id: 4, group: 'ebook', icon: '🔬', label: 'Khoa Học - Công Nghệ - Y Học', short: '🔬 Khoa Học - Y Học' },
+    { id: 5, group: 'ebook', icon: '🌍', label: 'Ngoại Ngữ & Giáo Trình', short: '🌍 Ngoại Ngữ - Học Tập' },
+    { id: 6, group: 'ebook', icon: '📜', label: 'Văn Học & Tản Văn', short: '📜 Văn Học' },
+    { id: 7, group: 'ebook', icon: '🧒', label: 'Thiếu Nhi & Cổ Tích', short: '🧒 Thiếu Nhi' },
+    { id: 8, group: 'ebook', icon: '🏡', label: 'Gia Đình - Ẩm Thực - Đời Sống', short: '🏡 Đời Sống' },
+    { id: 9, group: 'genre', icon: '⚔️', label: 'Hành Động & Phiêu Lưu', short: '⚔️ Hành Động' },
+    { id: 10, group: 'genre', icon: '🗡️', label: 'Kiếm Hiệp & Võ Thuật', short: '🗡️ Kiếm Hiệp' },
+    { id: 11, group: 'genre', icon: '☁️', label: 'Tiên Hiệp & Tu Chân', short: '☁️ Tiên Hiệp' },
+    { id: 12, group: 'genre', icon: '🐉', label: 'Huyền Huyễn & Giả Tưởng', short: '🐉 Giả Tưởng' },
+    { id: 13, group: 'genre', icon: '🕵️', label: 'Trinh Thám & Hình Sự', short: '🕵️ Trinh Thám' },
+    { id: 14, group: 'genre', icon: '👻', label: 'Kinh Dị - Tâm Linh - Bí Ẩn', short: '👻 Kinh Dị' },
+    { id: 15, group: 'genre', icon: '😂', label: 'Hài Hước & Giải Trí', short: '😂 Hài Hước' },
+    { id: 16, group: 'genre', icon: '💕', label: 'Tình Cảm & Ngôn Tình', short: '💕 Tình Cảm' },
+    { id: 17, group: 'genre', icon: '🏫', label: 'Học Đường & Thanh Xuân', short: '🏫 Học Đường' },
+    { id: 18, group: 'genre', icon: '⚽', label: 'Thể Thao & Đam Mê', short: '⚽ Thể Thao' },
+    { id: 19, group: 'genre', icon: '🚀', label: 'Khoa Học Viễn Tưởng & Mecha', short: '🚀 Viễn Tưởng' },
+    { id: 20, group: 'genre', icon: '🌀', label: 'Chuyển Sinh & Hệ Thống', short: '🌀 Chuyển Sinh' },
+    { id: 21, group: 'genre', icon: '👑', label: 'Cổ Trang - Dân Quốc - Cung Đấu', short: '👑 Cổ Trang' },
+    { id: 22, group: 'format', icon: '✅', label: 'Trọn Bộ Full', short: '✅ Trọn Bộ' },
+    { id: 23, group: 'format', icon: '🎙️', label: 'Thuyết Minh / Lồng Tiếng', short: '🎙️ Thuyết Minh' },
+    { id: 24, group: 'format', icon: '📝', label: 'Vietsub / Phụ Đề Việt', short: '📝 Vietsub' },
+    { id: 25, group: 'format', icon: '🎨', label: 'Bản Màu (Full Color)', short: '🎨 Bản Màu' },
+    { id: 26, group: 'format', icon: '📕', label: 'Có EPUB + PDF', short: '📕 EPUB+PDF' },
+    { id: 27, group: 'format', icon: '🇯🇵', label: 'Nhật Bản', short: '🇯🇵 Nhật Bản' },
+    { id: 28, group: 'format', icon: '🇰🇷', label: 'Hàn Quốc', short: '🇰🇷 Hàn Quốc' },
+    { id: 29, group: 'format', icon: '🇨🇳', label: 'Hoa Ngữ / TVB', short: '🇨🇳 Hoa Ngữ' },
+    { id: 30, group: 'format', icon: '🇺🇸', label: 'Âu Mỹ & Thế Giới', short: '🇺🇸 Âu Mỹ' },
+    { id: 31, group: 'format', icon: '🇻🇳', label: 'Tác Phẩm Việt Nam', short: '🇻🇳 Việt Nam' }
+  ];
+
+  let ccxTagDict = CCX_DEFAULT_TAG_DICT;
+  let ccxTagById = {};
+  let ccxTagCounts = {};
+  let ccxSortedAuthors = []; // [{ name, norm, count }]
+
+  function rebuildTagLookupDict() {
+    if (window.CCX_INITIAL_CATALOG && Array.isArray(window.CCX_INITIAL_CATALOG.tagDict) && window.CCX_INITIAL_CATALOG.tagDict.length > 0) {
+      ccxTagDict = window.CCX_INITIAL_CATALOG.tagDict;
+    } else {
+      ccxTagDict = CCX_DEFAULT_TAG_DICT;
+    }
+    ccxTagById = {};
+    for (const td of ccxTagDict) {
+      ccxTagById[td.id] = Object.assign({}, td, { _norm: normalizeVN(td.label + ' ' + (td.short || '')) });
+    }
+  }
+
+  const _RT_KNOWN_AUTHORS = [
+    ['kim dung', 'Kim Dung', [10, 21, 29]], ['co long', 'Cổ Long', [10, 21, 29]], ['on thuy an', 'Ôn Thụy An', [10, 21, 29]],
+    ['huynh di', 'Huỳnh Dị', [10, 21, 29]], ['quynh dao', 'Quỳnh Dao', [16, 29]], ['nguyen nhat anh', 'Nguyễn Nhật Ánh', [6, 17, 31]],
+    ['nguyen ngoc tu', 'Nguyễn Ngọc Tư', [6, 31]], ['nam cao', 'Nam Cao', [6, 31]], ['to hoai', 'Tô Hoài', [6, 7, 31]],
+    ['nguyen hien le', 'Nguyễn Hiến Lê', [2, 3, 5, 6, 31]], ['thich nhat hanh', 'Thích Nhất Hạnh', [2, 3, 31]],
+    ['stephen king', 'Stephen King', [14, 13, 30]], ['agatha christie', 'Agatha Christie', [13, 30]], ['conan doyle', 'Arthur Conan Doyle', [13, 30]],
+    ['dan brown', 'Dan Brown', [13, 9, 30]], ['haruki murakami', 'Haruki Murakami', [6, 27]], ['keigo higashino', 'Keigo Higashino', [13, 27]],
+    ['higashino keigo', 'Keigo Higashino', [13, 27]], ['marc levy', 'Marc Levy', [16, 30]], ['guillaume musso', 'Guillaume Musso', [16, 13, 30]],
+    ['paulo coelho', 'Paulo Coelho', [2, 6, 30]], ['dale carnegie', 'Dale Carnegie', [2, 1, 30]], ['napoleon hill', 'Napoleon Hill', [1, 2, 30]],
+    ['robert kiyosaki', 'Robert Kiyosaki', [1, 30]], ['fujiko f fujio', 'Fujiko F. Fujio', [7, 15, 27]], ['tezuka osamu', 'Tezuka Osamu', [9, 19, 27]],
+    ['adachi mitsuru', 'Adachi Mitsuru', [18, 17, 16, 27]], ['rumiko takahashi', 'Rumiko Takahashi', [15, 12, 16, 27]],
+    ['gosho aoyama', 'Gosho Aoyama', [13, 27]], ['junji ito', 'Junji Ito', [14, 27]], ['hwang mi ri', 'Hwang Mi Ri', [16, 17, 28]],
+    ['hwang miri', 'Hwang Mi Ri', [16, 17, 28]], ['hoang ngoc lang', 'Hoàng Ngọc Lang', [10, 29]], ['ma vinh thanh', 'Mã Vinh Thành', [10, 29]]
+  ];
+
+  const _RT_KEYWORD_RULES = [
+    [1, /\b(kinh te|kinh doanh|dau tu|tai chinh|lam giau|khoi nghiep|marketing|ban hang|quan tri|lanh dao|chung khoan|bat dong san|doanh nhan|startup)\b/],
+    [2, /\b(tam ly|ky nang|dac nhan tam|song dep|huong thien|chua lanh|thoi quen|giao tiep|tu duy|thanh cong|tiem thuc|hat giong tam hon|chanh niem|phat trien ban than)\b/],
+    [3, /\b(lich su|su ky|hoi ky|dai viet|hoang de|danh nhan|chien tranh|tam quoc|triet hoc|ton giao|phat giao|dao phat|khong tu|lao tu|van hoa|binh phap)\b/],
+    [4, /\b(khoa hoc|vat ly|vu tru|thien van|sinh hoc|toan hoc|cong nghe|lap trinh|may tinh|y hoc|suc khoe|dinh duong|chua benh|dong y)\b/],
+    [5, /\b(tieng anh|ngoai ngu|tieng nhat|tieng trung|tieng han|tu dien|ngu phap|giao trinh|ielts|toeic|luyen thi|tu hoc)\b/],
+    [7, /\b(thieu nhi|co tich|dong thoai|ngu ngon|doraemon|shin cau be|maruko|tham tu lung danh conan|detective conan|pokemon|digimon|disney|pixar|hoang tu be|than dong dat viet)\b/],
+    [8, /\b(mang thai|nuoi con|day con|am thuc|nau an|mon ngon|gia dinh|hon nhan|phong thuy|tu vi)\b/],
+    [10, /\b(kiem hiep|vo hiep|vo thuat|giang ho|vo lam|than dieu|thien long bat bo|tieu ngao giang ho|phong van|long ho mon|samurai|ninja|baki)\b/],
+    [11, /\b(tien hiep|tu tien|tu chan|phi thang|dau pha|the gioi hoan my|pham nhan tu tien|tien nghich|tru tien|van co)\b/],
+    [12, /\b(huyen huyen|gia tuong|fantasy|ma thuat|phap su|phu thuy|ma vuong|quy vuong|rong |dungeon|frieren|harry potter|diet quy|jujutsu|one piece|naruto|bleach|berserk)\b/],
+    [13, /\b(trinh tham|pha an|tham tu|hinh su|an mang|toi pham|sherlock|kindaichi|conan|death note|monster|yakuza|mafia)\b/],
+    [14, /\b(kinh di|linh di|tam linh|co mo|dao mo|ma ca rong|zombie|xac song|quy an tang|junji ito|parasyte|tokyo ghoul|chainsaw man|ajin)\b/],
+    [15, /\b(hai huoc|vui nhon|gintama|one punch man|mashle|sakamoto|lucky man|mr bean|chau tinh tri|spy x family)\b/],
+    [16, /\b(ngon tinh|tinh yeu|tinh cam|lang man|tong tai|hao mon|thanh xuan|horimiya|violet evergarden|hoa thom kieu hanh|your name)\b/],
+    [17, /\b(hoc duong|truong hoc|hoc sinh|lop hoc|tuoi hoc tro|wind breaker|tokyo revengers|blue box|chiec hop xanh)\b/],
+    [18, /\b(the thao|bong da|bong ro|bida|tennis|dua xe|co vay|blue lock|slam dunk|tsubasa|haikyuu|boxing)\b/],
+    [19, /\b(vien tuong|sci fi|cyberpunk|robot|mecha|gundam|evangelion|pacific rim|hau tan the|dr stone|kaiju|jurassic|avatar|matrix)\b/],
+    [20, /\b(chuyen sinh|trong sinh|xuyen khong|di gioi|isekai|he thong|solo leveling|slime|re zero|mushoku tensei)\b/],
+    [21, /\b(co trang|cung dau|dan quoc|vuong phi|hoang hau|thai tu|duoc su tu su|hau cung)\b/],
+    [9, /\b(hanh dong|phieu luu|chien dau|chien binh|sat thu|cuop bien|sinh ton|john wick|spider man|batman|attack on titan|vinland saga|jojo|kingdom)\b/]
+  ];
+
+  const _RT_VN_SURNAMES = /^(nguyen|tran|le|pham|hoang|huynh|phan|vu|vo|dang|bui|do|ho|ngo|duong|ly|dinh|doan|truong|mai|luong|trinh|dao|chu|ta|ton|cao|lam|ha|quach|diep|mac|nghiem|khai|thach|to|ma|luu|kieu|vuong|trieu)\b/;
+  const _RT_SUB_BLACKLIST = /\b(tap|phan|quyen|chuong|vol|season|full|tron bo|ban mau|vietsub|thuyet minh|long tieng|pdf|epub|cam nang|phuong phap|ky nang|bi quyet|huong dan|giao trinh|tu dien|lich su|kinh te|kinh doanh|tuyen tap|truyen ngan|tieu thuyet|hoi ky|co tich|suc khoe|dinh duong|am thuc|nau an|tieng anh|cong nghe|triet hoc|phat giao|phong thuy|viet nam|trung quoc|nhat ban|han quoc|trai cay|chua benh)\b/i;
+
+  function runtimeClassifyItem(it) {
+    const rawName = String((it && it.name) || '');
+    const cleanNoContrib = rawName.replace(/\s*-\s*\(\s*B[aạ]n\s+[^)]+\)/gi, '').replace(/\s*\(\s*B[aạ]n\s+[^)]+\)/gi, '');
+    const n = normalizeVN(cleanNoContrib);
+    const tSet = new Set();
+    let author = it.a || '';
+
+    if (!author) {
+      for (const [kNorm, kLabel, seeds] of _RT_KNOWN_AUTHORS) {
+        if (n.includes(kNorm)) {
+          author = kLabel;
+          seeds.forEach(s => tSet.add(s));
+          break;
+        }
+      }
+    }
+    if (!author && it._type === 'novel') {
+      let stripped = cleanNoContrib;
+      for (let k = 0; k < 3; k++) {
+        stripped = stripped.replace(/\s*\((?:Trọn Bộ|Tuyển Tập|Bản |Phần |Tập |Full|PDF|EPUB|\d+\s*Chương|\d+\s*Tập)[^)]*\)\s*$/gi, '').trim();
+      }
+      if (stripped.includes(' - ')) {
+        const parts = stripped.split(/\s+-\s+/).map(p => p.trim()).filter(Boolean);
+        const last = (parts[parts.length - 1] || '').replace(/^[-–—\s]+|[-–—\s]+$/g, '');
+        const ln = normalizeVN(last);
+        if (last && !/\d/.test(last) && ln.split(' ').length >= 2 && ln.split(' ').length <= 4 && !_RT_SUB_BLACKLIST.test(ln) && _RT_VN_SURNAMES.test(ln)) {
+          author = last;
+        }
+      }
+    }
+    for (const [id, re] of _RT_KEYWORD_RULES) {
+      if (re.test(n)) tSet.add(id);
+    }
+    if (it.isFull || /\b(tron bo|full|tuyen tap)\b/.test(n)) tSet.add(22);
+    if (/\b(thuyet minh|long tieng|htv3)\b/.test(n)) tSet.add(23);
+    if (/\b(vietsub)\b/.test(n) || (it._type === 'anime' && !tSet.has(23))) tSet.add(24);
+    if (/\b(ban mau|full color|mau dep|webtoon|manhwa|manhua)\b/.test(n)) tSet.add(25);
+    if (/\b(epub)\b/.test(n)) tSet.add(26);
+    if (/\b(manhwa|webtoon|han quoc)\b/.test(n)) tSet.add(28);
+    else if (/\b(manhua|tvb|trung quoc|hoa ngu)\b/.test(n)) tSet.add(29);
+    else if (it._type === 'manga' || it._type === 'anime') tSet.add(27);
+
+    if (it._type === 'novel') {
+      let hasTheme = false;
+      for (const tid of tSet) { if (tid >= 1 && tid <= 21) { hasTheme = true; break; } }
+      if (!hasTheme) tSet.add(6);
+    } else {
+      let hasGenre = false;
+      for (const tid of tSet) { if (tid >= 7 && tid <= 21) { hasGenre = true; break; } }
+      if (!hasGenre) tSet.add(9);
+    }
+    if (author) it.a = author;
+    it.t = Array.from(tSet).sort((a, b) => a - b);
+  }
+
+  // =========================================================================
+  // 100% REAL-TIME MULTI-DEVICE CLOUD VIEW & VOTE LEDGER (ZERO FAKE DATA)
   // Synced via `ccx_sync_global_views_v1.json` on Google Drive Cloud (`OTA_FOLDER_ID`)
   // =========================================================================
   const INITIAL_VERIFIED_CLOUD_ACTORS = {
     "u_tamlm": {
-      "views": { "Captain Kid - Hoàng Tử Cướp Biển (Hoàng Tử Hải Tặc - Trọn Bộ Full)": 1 },
-      "chaps": { "Captain Kid - Hoàng Tử Cướp Biển (Hoàng Tử Hải Tặc - Trọn Bộ Full)": ["11KEY8sS8Lamoh99LQKsyDifpRwgR7FJu"] },
-      "favs": [],
-      "lastAt": { "Captain Kid - Hoàng Tử Cướp Biển (Hoàng Tử Hải Tặc - Trọn Bộ Full)": 1794234943564 },
-      "updatedAt": 1794234946064
+        "views": {
+            "Captain Kid - Hoàng Tử Cướp Biển (Hoàng Tử Hải Tặc - Trọn Bộ Full)": 1,
+            "Thiên Tử Truyền Kỳ Phần 1 - Cơ Phát Chu Vũ Vương (Trọn Bộ 163 Chương Tiếng Việt Full)": 4
+        },
+        "chaps": {
+            "Captain Kid - Hoàng Tử Cướp Biển (Hoàng Tử Hải Tặc - Trọn Bộ Full)": [
+                "11KEY8sS8Lamoh99LQKsyDifpRwgR7FJu"
+            ],
+            "Thiên Tử Truyền Kỳ Phần 1 - Cơ Phát Chu Vũ Vương (Trọn Bộ 163 Chương Tiếng Việt Full)": [
+                "12cdpLEMF3i_COJf1RzUInkojiDgTGm-_"
+            ]
+        },
+        "favs": [],
+        "lastAt": {
+            "Captain Kid - Hoàng Tử Cướp Biển (Hoàng Tử Hải Tặc - Trọn Bộ Full)": 1794234943564,
+            "Thiên Tử Truyền Kỳ Phần 1 - Cơ Phát Chu Vũ Vương (Trọn Bộ 163 Chương Tiếng Việt Full)": 1794496530197
+        },
+        "updatedAt": 1794496530197
     },
     "u_nstxst": {
-      "views": {
-        "Cuộc Chiến Của Người Và Thần": 1,
-        "1-00 AM - 1 Giờ Sáng (Hwang Mi Ri - Trọn Bộ 12 Tập Tiếng Việt Full)": 2,
-        "Ám Hành Ngự Sử - Blade Of The Phantom Master (Trọn Bộ 195 Chương Tiếng Việt)": 1,
-        "Bậc Thầy Thiết Kế Điền Trang - The Greatest Estate Developer (Manhwa Bản FULL HD)": 1,
-        "Bác Sĩ Quái Dị - Black Jack (Bản Màu Đẹp Full 18 Tập PDF) - ( Bạn Ziin )": 1,
-        "Barakamon - Nghệ Thuật Viết Chữ (Trọn Bộ Full)": 1,
-        "Chàng trai hào hiệp - Hwang Miri (Trọn Bộ PDF) - ( Bạn Nguyễn Minh Tuấn )": 3
-      },
-      "chaps": {
-        "Cuộc Chiến Của Người Và Thần": ["1nOQxmhajKwNZxgw4otqI6xSEnHDr7v4q"],
-        "1-00 AM - 1 Giờ Sáng (Hwang Mi Ri - Trọn Bộ 12 Tập Tiếng Việt Full)": ["1ZONRgbnzZkaMxsYKibfjR9l9X6eowO1t", "1xuibHfhGr_mRpD2udgW-3QW6JChTeHmL"],
-        "Ám Hành Ngự Sử - Blade Of The Phantom Master (Trọn Bộ 195 Chương Tiếng Việt)": ["1g79lns45wmn2nWVh54U2vd-CDoJLdxZX"],
-        "Bậc Thầy Thiết Kế Điền Trang - The Greatest Estate Developer (Manhwa Bản FULL HD)": ["1lk6WaA3eZmS2zg1BOAyYtOWMhBbm4Zdk"],
-        "Bác Sĩ Quái Dị - Black Jack (Bản Màu Đẹp Full 18 Tập PDF) - ( Bạn Ziin )": ["1eLlPknRAQwe5xRPAgK6_Br2OrB2Sf9JK"],
-        "Barakamon - Nghệ Thuật Viết Chữ (Trọn Bộ Full)": ["1YXJCce588gPfqV6kogFIZIhb2X42NRT4"],
-        "Chàng trai hào hiệp - Hwang Miri (Trọn Bộ PDF) - ( Bạn Nguyễn Minh Tuấn )": ["1oZ-V9axk1bBgRDMycr3AwGfo1cQ_ydJ4", "1EyRxw8FrOjilnt_z246AEtgynbPHjKeq", "1Xk-FSIHFvqBKfneusy-jVaH-gL_K52lN"]
-      },
-      "favs": [],
-      "lastAt": {
-        "Cuộc Chiến Của Người Và Thần": 1793712942643,
-        "1-00 AM - 1 Giờ Sáng (Hwang Mi Ri - Trọn Bộ 12 Tập Tiếng Việt Full)": 1793763224452,
-        "Ám Hành Ngự Sử - Blade Of The Phantom Master (Trọn Bộ 195 Chương Tiếng Việt)": 1793763274850,
-        "Bậc Thầy Thiết Kế Điền Trang - The Greatest Estate Developer (Manhwa Bản FULL HD)": 1793763329858,
-        "Bác Sĩ Quái Dị - Black Jack (Bản Màu Đẹp Full 18 Tập PDF) - ( Bạn Ziin )": 1793763345256,
-        "Barakamon - Nghệ Thuật Viết Chữ (Trọn Bộ Full)": 1793763351670,
-        "Chàng trai hào hiệp - Hwang Miri (Trọn Bộ PDF) - ( Bạn Nguyễn Minh Tuấn )": 1793763395596
-      },
-      "updatedAt": 1793763398096
+        "views": {
+            "Cuộc Chiến Của Người Và Thần": 1,
+            "1-00 AM - 1 Giờ Sáng (Hwang Mi Ri - Trọn Bộ 12 Tập Tiếng Việt Full)": 2,
+            "Ám Hành Ngự Sử - Blade Of The Phantom Master (Trọn Bộ 195 Chương Tiếng Việt)": 1,
+            "Bậc Thầy Thiết Kế Điền Trang - The Greatest Estate Developer (Manhwa Bản FULL HD)": 1,
+            "Bác Sĩ Quái Dị - Black Jack (Bản Màu Đẹp Full 18 Tập PDF) - ( Bạn Ziin )": 1,
+            "Barakamon - Nghệ Thuật Viết Chữ (Trọn Bộ Full)": 1,
+            "Chàng trai hào hiệp - Hwang Miri (Trọn Bộ PDF) - ( Bạn Nguyễn Minh Tuấn )": 3
+        },
+        "chaps": {
+            "Cuộc Chiến Của Người Và Thần": [
+                "1nOQxmhajKwNZxgw4otqI6xSEnHDr7v4q"
+            ],
+            "1-00 AM - 1 Giờ Sáng (Hwang Mi Ri - Trọn Bộ 12 Tập Tiếng Việt Full)": [
+                "1ZONRgbnzZkaMxsYKibfjR9l9X6eowO1t",
+                "1xuibHfhGr_mRpD2udgW-3QW6JChTeHmL"
+            ],
+            "Ám Hành Ngự Sử - Blade Of The Phantom Master (Trọn Bộ 195 Chương Tiếng Việt)": [
+                "1g79lns45wmn2nWVh54U2vd-CDoJLdxZX"
+            ],
+            "Bậc Thầy Thiết Kế Điền Trang - The Greatest Estate Developer (Manhwa Bản FULL HD)": [
+                "1lk6WaA3eZmS2zg1BOAyYtOWMhBbm4Zdk"
+            ],
+            "Bác Sĩ Quái Dị - Black Jack (Bản Màu Đẹp Full 18 Tập PDF) - ( Bạn Ziin )": [
+                "1eLlPknRAQwe5xRPAgK6_Br2OrB2Sf9JK"
+            ],
+            "Barakamon - Nghệ Thuật Viết Chữ (Trọn Bộ Full)": [
+                "1YXJCce588gPfqV6kogFIZIhb2X42NRT4"
+            ],
+            "Chàng trai hào hiệp - Hwang Miri (Trọn Bộ PDF) - ( Bạn Nguyễn Minh Tuấn )": [
+                "1oZ-V9axk1bBgRDMycr3AwGfo1cQ_ydJ4",
+                "1EyRxw8FrOjilnt_z246AEtgynbPHjKeq",
+                "1Xk-FSIHFvqBKfneusy-jVaH-gL_K52lN"
+            ]
+        },
+        "favs": [],
+        "lastAt": {
+            "Cuộc Chiến Của Người Và Thần": 1793712942643,
+            "1-00 AM - 1 Giờ Sáng (Hwang Mi Ri - Trọn Bộ 12 Tập Tiếng Việt Full)": 1793763224452,
+            "Ám Hành Ngự Sử - Blade Of The Phantom Master (Trọn Bộ 195 Chương Tiếng Việt)": 1793763274850,
+            "Bậc Thầy Thiết Kế Điền Trang - The Greatest Estate Developer (Manhwa Bản FULL HD)": 1793763329858,
+            "Bác Sĩ Quái Dị - Black Jack (Bản Màu Đẹp Full 18 Tập PDF) - ( Bạn Ziin )": 1793763345256,
+            "Barakamon - Nghệ Thuật Viết Chữ (Trọn Bộ Full)": 1793763351670,
+            "Chàng trai hào hiệp - Hwang Miri (Trọn Bộ PDF) - ( Bạn Nguyễn Minh Tuấn )": 1793763395596
+        },
+        "updatedAt": 1793763398096
     },
     "u_mrmario90": {
-      "views": {
-        "Biệt Đội Lính Cứu Hỏa": 1,
-        "Bất Tử Và Bất Hạnh - Undead Unluck (Trọn Bộ 239 Chương Full)": 1,
-        "Cao Thủ Bóng Rổ - Slam Dunk (Trọn Bộ 276 Chương Full)": 1,
-        "Flame Of Recca": 4
-      },
-      "chaps": {
-        "Biệt Đội Lính Cứu Hỏa": ["1QW_p5YUsEH7Lgy1wRC6ZndClwcY7Gyqn"],
-        "Bất Tử Và Bất Hạnh - Undead Unluck (Trọn Bộ 239 Chương Full)": ["1gTQcPkT-1n7cF0zV0a0EmFtfp_-Rxan_"],
-        "Cao Thủ Bóng Rổ - Slam Dunk (Trọn Bộ 276 Chương Full)": ["1lb4DOXgTd2IUZu_Qe-rIl2FNEi2o0O2y"],
-        "Flame Of Recca": ["1dZO__qaWjPtl9vXfVs1M3QNyRa8Pvcp0", "1DnUC0K0gt86YdvoN7w9SQQN5PnITOfcT", "1OP_oYbDxaYWmc22LStxGqBp0yHVx-0TC", "1mFAhFr5pQUjf1sjjBSYYYzBs7b2FnZWA"]
-      },
-      "favs": [],
-      "lastAt": {
-        "Biệt Đội Lính Cứu Hỏa": 1793754841223,
-        "Bất Tử Và Bất Hạnh - Undead Unluck (Trọn Bộ 239 Chương Full)": 1793754965337,
-        "Cao Thủ Bóng Rổ - Slam Dunk (Trọn Bộ 276 Chương Full)": 1793876207205,
-        "Flame Of Recca": 1793588056110
-      },
-      "updatedAt": 1793876209707
+        "views": {
+            "Biệt Đội Lính Cứu Hỏa": 3,
+            "Bất Tử Và Bất Hạnh - Undead Unluck (Trọn Bộ 239 Chương Full)": 1,
+            "Cao Thủ Bóng Rổ - Slam Dunk (Trọn Bộ 276 Chương Full)": 1,
+            "Flame Of Recca": 4,
+            "Giả Kim Thuật Sư - Fullmetal Alchemist Brotherhood (Trọn Bộ Vietsub) - ( Bạn Nguyễn Hoàng Trí )": 1,
+            "Câu Chuyện Về Việc Đối Xử Với Một Nữ Hiệp Sĩ Chưa Bao Giờ Được Xem Là Phụ Nữ (Trọn Bộ Chap 1-101 - 131 Hồi Full)": 2,
+            "7 Viên Ngọc Rồng - Dragon Ball (Bản Màu Đẹp Trọn Bộ 35 Tập PDF) - ( Bạn charlie brown )": 3,
+            "Á Nhân - Ajin Demi-Human (Trọn Bộ 86 Chương Full)": 5,
+            "Anh Hùng, Quỷ Vương Và Phản Diện (Manhwa Full)": 2,
+            "BEASTARS (Trọn Bộ 196 Chương Full)": 2,
+            "Chàng Trai Mắt Khiên - Eyeshield 21 (Trọn Bộ 333 Chương Full)": 2,
+            "Clover - CLAMP (Trọn Bộ 3 Tập Tiếng Việt Full)": 2,
+            "Dr. Stone - Tiến Sĩ Đá (Trọn Bộ 232 Chương Full HD)": 2,
+            "Dũng Sĩ Hesman Remastered - Hùng Lân (Trọn Bộ 16 Tập Gộp Full 160 Tập PDF) - ( Bạn Annnn )": 2,
+            "Hậu Cung Giả Tạo - Giji Harem (Trọn Bộ 131 Chương Full)": 1,
+            "Hậu Cung Quá Nhiều, Tốt Nhất Là Phi Thăng Thôi (Trọn Bộ 78 Chương + 5 Chương .5 Tiếng Việt)": 3,
+            "12 Con Giáp - Hiệp Sĩ Hoàng Đạo (1080p AI Remastered) - ( Bạn Nguyễn Hoàng Trí )": 2,
+            "Digimon Adventure - Cuộc Phiêu Lưu Của Các Con Thú (Trọn Bộ Vietsub) - ( Bạn Nguyễn Minh Tuấn & Bạn Nguyễn Hoàng Trí )": 2,
+            "Dragon Ball 1986 & GT (Lồng Tiếng - Thuyết Minh) - ( Bạn Nguyễn Minh Tuấn & Bạn Nguyễn Hoàng Trí )": 4,
+            "Con Mắt Âm Dương - Jinrui-Shoku Blight of Man (Trọn Bộ 45 Chương Tiếng Việt)": 1,
+            "Vua Sáng Chế (Trọn Bộ 22 Tập Full) - ( Bạn Nguyễn Minh Tuấn )": 2,
+            "023 - SIÊU NHÂN MAY MẮN - ( Bạn zero12340017 )": 2,
+            "Hành Trình U Linh Giới": 1,
+            "Chiến Binh Vũ Trụ - Mobile Suit Gundam SEED (Trọn Bộ Vietsub) - ( Bạn Nguyễn Hoàng Trí )": 1,
+            "Fire Force": 1,
+            "Pokemon Đặc Biệt": 3
+        },
+        "chaps": {
+            "Biệt Đội Lính Cứu Hỏa": [
+                "1QW_p5YUsEH7Lgy1wRC6ZndClwcY7Gyqn"
+            ],
+            "Bất Tử Và Bất Hạnh - Undead Unluck (Trọn Bộ 239 Chương Full)": [
+                "1gTQcPkT-1n7cF0zV0a0EmFtfp_-Rxan_"
+            ],
+            "Cao Thủ Bóng Rổ - Slam Dunk (Trọn Bộ 276 Chương Full)": [
+                "1lb4DOXgTd2IUZu_Qe-rIl2FNEi2o0O2y"
+            ],
+            "Flame Of Recca": [
+                "1dZO__qaWjPtl9vXfVs1M3QNyRa8Pvcp0",
+                "1DnUC0K0gt86YdvoN7w9SQQN5PnITOfcT",
+                "1OP_oYbDxaYWmc22LStxGqBp0yHVx-0TC",
+                "1mFAhFr5pQUjf1sjjBSYYYzBs7b2FnZWA"
+            ],
+            "Giả Kim Thuật Sư - Fullmetal Alchemist Brotherhood (Trọn Bộ Vietsub) - ( Bạn Nguyễn Hoàng Trí )": [
+                "1CV0s9yntugkAGc03_GEMoh2q-z7_zS1G"
+            ],
+            "Câu Chuyện Về Việc Đối Xử Với Một Nữ Hiệp Sĩ Chưa Bao Giờ Được Xem Là Phụ Nữ (Trọn Bộ Chap 1-101 - 131 Hồi Full)": [
+                "1rd0MwOeIezrjlqioOEAzX5COAPJFYB_f"
+            ],
+            "7 Viên Ngọc Rồng - Dragon Ball (Bản Màu Đẹp Trọn Bộ 35 Tập PDF) - ( Bạn charlie brown )": [
+                "1YHu8zpJM8Q-yjRQJR2Nrq3gTvxmA9LKe",
+                "18G2vkC2pDrRQzbDLyXfVEtvqSZM9vlkH"
+            ],
+            "Á Nhân - Ajin Demi-Human (Trọn Bộ 86 Chương Full)": [
+                "1tJyycvmcC4iPIePoiczld7wSAtqGuJQA",
+                "1sB0k4J3xl15R1q67NpoeRgClrddcE6ma"
+            ],
+            "Anh Hùng, Quỷ Vương Và Phản Diện (Manhwa Full)": [
+                "1OTyFKcSmwB2B33PfGEiHJDQug21ecFCo"
+            ],
+            "BEASTARS (Trọn Bộ 196 Chương Full)": [
+                "1vwk1WdcKqDwdAh2AaYj2I5xY-LC6Ug3L"
+            ],
+            "Chàng Trai Mắt Khiên - Eyeshield 21 (Trọn Bộ 333 Chương Full)": [
+                "1fScvQe7bfQSg9rlhaVro3i2Xn-OB1Wvs"
+            ],
+            "Clover - CLAMP (Trọn Bộ 3 Tập Tiếng Việt Full)": [
+                "1boh9yvHmEBj-DhcAk1KBJmyT4qaiyVe-"
+            ],
+            "Dr. Stone - Tiến Sĩ Đá (Trọn Bộ 232 Chương Full HD)": [
+                "1rWQ8brBlvbxcKvgfh51jju0i3vFAultB"
+            ],
+            "Dũng Sĩ Hesman Remastered - Hùng Lân (Trọn Bộ 16 Tập Gộp Full 160 Tập PDF) - ( Bạn Annnn )": [
+                "1w_3xdvGZj7qSSGU39EOZC95ujYM6uvdQ"
+            ],
+            "Hậu Cung Giả Tạo - Giji Harem (Trọn Bộ 131 Chương Full)": [
+                "1YjYUf8FzGCePKCGdfbGEXrO0psmYC60a"
+            ],
+            "Hậu Cung Quá Nhiều, Tốt Nhất Là Phi Thăng Thôi (Trọn Bộ 78 Chương + 5 Chương .5 Tiếng Việt)": [
+                "1rFi9HI9ccIMNZ9lYxGjoYUu5ZTLQbdNU"
+            ],
+            "12 Con Giáp - Hiệp Sĩ Hoàng Đạo (1080p AI Remastered) - ( Bạn Nguyễn Hoàng Trí )": [
+                "1r3VRjrikXHeg8N1HCMV8K1DFVG7fyU6X"
+            ],
+            "Digimon Adventure - Cuộc Phiêu Lưu Của Các Con Thú (Trọn Bộ Vietsub) - ( Bạn Nguyễn Minh Tuấn & Bạn Nguyễn Hoàng Trí )": [
+                "13iWU5AA476pbaRB9cnRCY_NVYk4i_WVi"
+            ],
+            "Dragon Ball 1986 & GT (Lồng Tiếng - Thuyết Minh) - ( Bạn Nguyễn Minh Tuấn & Bạn Nguyễn Hoàng Trí )": [
+                "1S8f9zGMIgl4KFR4FWHAl7aSl9ak3sPDW",
+                "1arJwmuY1bJkjiwlzMrWtX5JczinTSMNL",
+                "16wEmTHXgzL0eVfsA6rE6o67JLluDiB99"
+            ],
+            "Con Mắt Âm Dương - Jinrui-Shoku Blight of Man (Trọn Bộ 45 Chương Tiếng Việt)": [],
+            "Vua Sáng Chế (Trọn Bộ 22 Tập Full) - ( Bạn Nguyễn Minh Tuấn )": [
+                "1wA6lAxIqGh8c0e5-1USwZ5Zj2cIcu1I6"
+            ],
+            "023 - SIÊU NHÂN MAY MẮN - ( Bạn zero12340017 )": [
+                "1H2ow5bmsvIjdbn-tcVMsgWgeMntR1Lpn"
+            ],
+            "Hành Trình U Linh Giới": [],
+            "Chiến Binh Vũ Trụ - Mobile Suit Gundam SEED (Trọn Bộ Vietsub) - ( Bạn Nguyễn Hoàng Trí )": [],
+            "Fire Force": [],
+            "Pokemon Đặc Biệt": [
+                "1RsGdi8cLJde8fqjs25XohbsjZmzCHIio",
+                "1PKr0AZAEQsj3fUbA2aQghTGzzuUtwcnp"
+            ]
+        },
+        "favs": [],
+        "lastAt": {
+            "Biệt Đội Lính Cứu Hỏa": 1794422110746,
+            "Bất Tử Và Bất Hạnh - Undead Unluck (Trọn Bộ 239 Chương Full)": 1794114635599,
+            "Cao Thủ Bóng Rổ - Slam Dunk (Trọn Bộ 276 Chương Full)": 1794293862788,
+            "Flame Of Recca": 1793588056110,
+            "Giả Kim Thuật Sư - Fullmetal Alchemist Brotherhood (Trọn Bộ Vietsub) - ( Bạn Nguyễn Hoàng Trí )": 1794314388906,
+            "Câu Chuyện Về Việc Đối Xử Với Một Nữ Hiệp Sĩ Chưa Bao Giờ Được Xem Là Phụ Nữ (Trọn Bộ Chap 1-101 - 131 Hồi Full)": 1794460894462,
+            "7 Viên Ngọc Rồng - Dragon Ball (Bản Màu Đẹp Trọn Bộ 35 Tập PDF) - ( Bạn charlie brown )": 1794391165144,
+            "Á Nhân - Ajin Demi-Human (Trọn Bộ 86 Chương Full)": 1794501147660,
+            "Anh Hùng, Quỷ Vương Và Phản Diện (Manhwa Full)": 1794420982002,
+            "BEASTARS (Trọn Bộ 196 Chương Full)": 1794421014135,
+            "Chàng Trai Mắt Khiên - Eyeshield 21 (Trọn Bộ 333 Chương Full)": 1794421178797,
+            "Clover - CLAMP (Trọn Bộ 3 Tập Tiếng Việt Full)": 1794421238883,
+            "Dr. Stone - Tiến Sĩ Đá (Trọn Bộ 232 Chương Full HD)": 1794421316913,
+            "Dũng Sĩ Hesman Remastered - Hùng Lân (Trọn Bộ 16 Tập Gộp Full 160 Tập PDF) - ( Bạn Annnn )": 1794421382402,
+            "Hậu Cung Giả Tạo - Giji Harem (Trọn Bộ 131 Chương Full)": 1794421498362,
+            "Hậu Cung Quá Nhiều, Tốt Nhất Là Phi Thăng Thôi (Trọn Bộ 78 Chương + 5 Chương .5 Tiếng Việt)": 1794421563991,
+            "12 Con Giáp - Hiệp Sĩ Hoàng Đạo (1080p AI Remastered) - ( Bạn Nguyễn Hoàng Trí )": 1794421598375,
+            "Digimon Adventure - Cuộc Phiêu Lưu Của Các Con Thú (Trọn Bộ Vietsub) - ( Bạn Nguyễn Minh Tuấn & Bạn Nguyễn Hoàng Trí )": 1794421673058,
+            "Dragon Ball 1986 & GT (Lồng Tiếng - Thuyết Minh) - ( Bạn Nguyễn Minh Tuấn & Bạn Nguyễn Hoàng Trí )": 1794421898599,
+            "Con Mắt Âm Dương - Jinrui-Shoku Blight of Man (Trọn Bộ 45 Chương Tiếng Việt)": 1794391286478,
+            "Vua Sáng Chế (Trọn Bộ 22 Tập Full) - ( Bạn Nguyễn Minh Tuấn )": 1794391357014,
+            "023 - SIÊU NHÂN MAY MẮN - ( Bạn zero12340017 )": 1794420454887,
+            "Hành Trình U Linh Giới": 1794421426388,
+            "Chiến Binh Vũ Trụ - Mobile Suit Gundam SEED (Trọn Bộ Vietsub) - ( Bạn Nguyễn Hoàng Trí )": 1794421621462,
+            "Fire Force": 1794422008506,
+            "Pokemon Đặc Biệt": 1794440299030
+        },
+        "updatedAt": 1794501147660
     },
     "u_hiha1234": {
-      "views": {
-        "Á Nhân - Ajin Demi-Human (Trọn Bộ 86 Chương Full)": 1,
-        "Công Chúa Mặt Trăng Tập 2- Scarlet (Trọn Bộ PDF & EPUB) - ( Bạn ravo )": 1
-      },
-      "chaps": {
-        "Á Nhân - Ajin Demi-Human (Trọn Bộ 86 Chương Full)": ["1tJyycvmcC4iPIePoiczld7wSAtqGuJQA"],
-        "Công Chúa Mặt Trăng Tập 2- Scarlet (Trọn Bộ PDF & EPUB) - ( Bạn ravo )": ["1ZObeBh11Ktc729IsWBUbF5hqTosy8gFG"]
-      },
-      "favs": [],
-      "lastAt": {
-        "Á Nhân - Ajin Demi-Human (Trọn Bộ 86 Chương Full)": 1794019928180,
-        "Công Chúa Mặt Trăng Tập 2- Scarlet (Trọn Bộ PDF & EPUB) - ( Bạn ravo )": 1794020149883
-      },
-      "updatedAt": 1794020152384
+        "views": {
+            "Á Nhân - Ajin Demi-Human (Trọn Bộ 86 Chương Full)": 1,
+            "Công Chúa Mặt Trăng Tập 2- Scarlet (Trọn Bộ PDF & EPUB) - ( Bạn ravo )": 1
+        },
+        "chaps": {
+            "Á Nhân - Ajin Demi-Human (Trọn Bộ 86 Chương Full)": [
+                "1tJyycvmcC4iPIePoiczld7wSAtqGuJQA"
+            ],
+            "Công Chúa Mặt Trăng Tập 2- Scarlet (Trọn Bộ PDF & EPUB) - ( Bạn ravo )": [
+                "1ZObeBh11Ktc729IsWBUbF5hqTosy8gFG"
+            ]
+        },
+        "favs": [],
+        "lastAt": {
+            "Á Nhân - Ajin Demi-Human (Trọn Bộ 86 Chương Full)": 1794019928180,
+            "Công Chúa Mặt Trăng Tập 2- Scarlet (Trọn Bộ PDF & EPUB) - ( Bạn ravo )": 1794020149883
+        },
+        "updatedAt": 1794020152384
+    },
+    "d_v5ix4iqxkumx": {
+        "views": {
+            "Bác Sĩ Quái Dị": 1,
+            "1q84 - Trọn Bộ 3 Tập (Trọn Bộ PDF & EPUB) - ( Bạn ravo )": 1
+        },
+        "chaps": {
+            "Bác Sĩ Quái Dị": [
+                "1kl8EcQI5lrk_v2JBcaoYplAx1RY8HcSn"
+            ],
+            "1q84 - Trọn Bộ 3 Tập (Trọn Bộ PDF & EPUB) - ( Bạn ravo )": [
+                "1WwwjvfrpNZHdgDeFBBbhahS3AU0JDkTR"
+            ]
+        },
+        "favs": [],
+        "lastAt": {
+            "Bác Sĩ Quái Dị": 1794030940642,
+            "1q84 - Trọn Bộ 3 Tập (Trọn Bộ PDF & EPUB) - ( Bạn ravo )": 1794031513344
+        },
+        "updatedAt": 1794361620238
+    },
+    "d_zc2k1uq6r6m8": {
+        "views": {
+            "Long Phi Bất Bại (Yongbi the Invincible - Trọn Bộ 2 Phần 261 Chương Full) - ( Bạn Tý )": 2
+        },
+        "chaps": {
+            "Long Phi Bất Bại (Yongbi the Invincible - Trọn Bộ 2 Phần 261 Chương Full) - ( Bạn Tý )": [
+                "1U5B-FbPlbO-SlwS2afGd9Cz90asB1tvJ"
+            ]
+        },
+        "favs": [],
+        "lastAt": {
+            "Long Phi Bất Bại (Yongbi the Invincible - Trọn Bộ 2 Phần 261 Chương Full) - ( Bạn Tý )": 1794306528673
+        },
+        "updatedAt": 1794306528673
+    },
+    "d_eoxzbo5r11w4": {
+        "views": {
+            "Ares - Kiếm Sĩ Lang Thang (Manhwa)": 1
+        },
+        "chaps": {
+            "Ares - Kiếm Sĩ Lang Thang (Manhwa)": [
+                "1Gij6JaAFlg_lL1R4gBm5WCUmB-_WtDBK"
+            ]
+        },
+        "favs": [],
+        "lastAt": {
+            "Ares - Kiếm Sĩ Lang Thang (Manhwa)": 1794356974134
+        },
+        "updatedAt": 1794356974134
+    },
+    "d_jej7umq5eq5y": {
+        "views": {
+            "12 Con Giáp - Hiệp Sĩ Hoàng Đạo (1080p AI Remastered) - ( Bạn Nguyễn Hoàng Trí )": 1,
+            "Thám Tử Kindaichi - Kindaichi Shounen no Jikenbo (Trọn Bộ Full)": 2,
+            "Tiếu Ngạo Giang Hồ (Trọn Bộ 156 Chương Tiếng Việt)": 4,
+            "1-00 AM - 1 Giờ Sáng (Hwang Mi Ri - Trọn Bộ 12 Tập Tiếng Việt Full)": 1,
+            "BEASTARS (Trọn Bộ 196 Chương Full)": 1,
+            "Chainsaw Man - Người Cưa": 1,
+            "Cướp Biển Vùng Caribbean": 1,
+            "Kiếm Sĩ Đen - Berserk (Trọn Bộ Vietsub) - ( Bạn Nguyễn Hoàng Trí )": 5
+        },
+        "chaps": {
+            "12 Con Giáp - Hiệp Sĩ Hoàng Đạo (1080p AI Remastered) - ( Bạn Nguyễn Hoàng Trí )": [
+                "1r3VRjrikXHeg8N1HCMV8K1DFVG7fyU6X"
+            ],
+            "Thám Tử Kindaichi - Kindaichi Shounen no Jikenbo (Trọn Bộ Full)": [
+                "1rUrN66NtRTlr4EIRN7Rg2VsbpAnINPRq",
+                "1SiBm_D8qt5oKEySUrfZ6c1cSHylCV9SY"
+            ],
+            "Tiếu Ngạo Giang Hồ (Trọn Bộ 156 Chương Tiếng Việt)": [
+                "1z5vVMQx-my7wnAJfIfN-pZRqN-6K90FP",
+                "1jVIhnMkgsu2LWFTPjBAhWYyB2hJOkJLI",
+                "1DzawBdAtVdj7vIitFYSaShnxFvlyRTHN",
+                "1xcjR_WR4IwjWAnaHba8dKcz-LZvmrGK_"
+            ],
+            "1-00 AM - 1 Giờ Sáng (Hwang Mi Ri - Trọn Bộ 12 Tập Tiếng Việt Full)": [
+                "1vIYYTa_26VtI5fpfgwvyEFWFZXVbV9ot"
+            ],
+            "BEASTARS (Trọn Bộ 196 Chương Full)": [
+                "1vwk1WdcKqDwdAh2AaYj2I5xY-LC6Ug3L"
+            ],
+            "Chainsaw Man - Người Cưa": [
+                "15edU5y_rgOfwA8G3kjMmn_3DnsiaGOK8"
+            ],
+            "Cướp Biển Vùng Caribbean": [
+                "1z7vJBUieKKMoArDP7vUdIekYUfUTQGJh"
+            ],
+            "Kiếm Sĩ Đen - Berserk (Trọn Bộ Vietsub) - ( Bạn Nguyễn Hoàng Trí )": [
+                "1xG0c4gHUvxRz4g1EenCjDJNtKKgdIS14",
+                "1_I31YueWsW30YbTakjFlIzsA7vfb0XsU"
+            ]
+        },
+        "favs": [],
+        "lastAt": {
+            "12 Con Giáp - Hiệp Sĩ Hoàng Đạo (1080p AI Remastered) - ( Bạn Nguyễn Hoàng Trí )": 1793762718910,
+            "Thám Tử Kindaichi - Kindaichi Shounen no Jikenbo (Trọn Bộ Full)": 1793763163792,
+            "Tiếu Ngạo Giang Hồ (Trọn Bộ 156 Chương Tiếng Việt)": 1793781292895,
+            "1-00 AM - 1 Giờ Sáng (Hwang Mi Ri - Trọn Bộ 12 Tập Tiếng Việt Full)": 1793941109359,
+            "BEASTARS (Trọn Bộ 196 Chương Full)": 1793941435840,
+            "Chainsaw Man - Người Cưa": 1793941593372,
+            "Cướp Biển Vùng Caribbean": 1793943117078,
+            "Kiếm Sĩ Đen - Berserk (Trọn Bộ Vietsub) - ( Bạn Nguyễn Hoàng Trí )": 1794333036203
+        },
+        "updatedAt": 1794333036203
+    },
+    "d_j7ao3qm2wpy6": {
+        "views": {
+            "Vương Tử Takeru (Phần 1 - 2 Trọn Bộ 20 Tập) - ( Bạn Nguyễn Minh Tuấn )": 2
+        },
+        "chaps": {
+            "Vương Tử Takeru (Phần 1 - 2 Trọn Bộ 20 Tập) - ( Bạn Nguyễn Minh Tuấn )": [
+                "15RrptWeK8FCohYydZrST9iVPT0qdMBUw"
+            ]
+        },
+        "favs": [],
+        "lastAt": {
+            "Vương Tử Takeru (Phần 1 - 2 Trọn Bộ 20 Tập) - ( Bạn Nguyễn Minh Tuấn )": 1794307058665
+        },
+        "updatedAt": 1794307058665
+    },
+    "d_wbsnkc9rpk4p": {
+        "views": {
+            "1-00 AM - 1 Giờ Sáng (Hwang Mi Ri - Trọn Bộ 12 Tập Tiếng Việt Full)": 1,
+            "Cô Bé Long Châu - Bộ Đôi Siêu Hài (Binbougami ga! - Trọn Bộ 84 Chương Full)": 1,
+            "Ký Sinh Thú - Parasyte Kiseijuu (Trọn Bộ 64 Chương Full)": 2,
+            "Conan": 2,
+            "Bà Xã Nhà Tôi Đến Từ Ngàn Năm Trước (Trọn Bộ 294 Chương Bản Màu Full)": 2,
+            "Dấu Ấn Rồng Thiêng Phần 2 - Dấu Ấn Rô Tô (Bản Ansu - Emblem of Roto & Người Kế Thừa)": 4,
+            "Dũng Sĩ Hesman - Hùng Lân (Trọn Bộ 160 Tập)": 2,
+            "Dấu Ấn Trong Tim (Trọn Bộ PDF & EPUB) - ( Bạn ravo )": 2,
+            "Dấu Ấn Rồng Thiêng - Dragon Quest Dai no Daibouken (Trọn Bộ 349 Chương Full)": 2
+        },
+        "chaps": {
+            "1-00 AM - 1 Giờ Sáng (Hwang Mi Ri - Trọn Bộ 12 Tập Tiếng Việt Full)": [
+                "1vIYYTa_26VtI5fpfgwvyEFWFZXVbV9ot"
+            ],
+            "Cô Bé Long Châu - Bộ Đôi Siêu Hài (Binbougami ga! - Trọn Bộ 84 Chương Full)": [
+                "1Ni-eYUWv5KaOhJ5OBkNlQPNsK9acaa98"
+            ],
+            "Ký Sinh Thú - Parasyte Kiseijuu (Trọn Bộ 64 Chương Full)": [
+                "1XY4s2UWvGAEEBka3odrq2occT09EazI6"
+            ],
+            "Conan": [
+                "1TqSKN8BKgydc0bE71sztvwPWAN_ipD1o"
+            ],
+            "Bà Xã Nhà Tôi Đến Từ Ngàn Năm Trước (Trọn Bộ 294 Chương Bản Màu Full)": [
+                "1LTy3EE8knmGWxIybKQSfDh3c9-gQiNp4"
+            ],
+            "Dấu Ấn Rồng Thiêng Phần 2 - Dấu Ấn Rô Tô (Bản Ansu - Emblem of Roto & Người Kế Thừa)": [
+                "1xkQZzNkin3g23KwnVffTMQKC5JHpyBKS",
+                "1vKGNr16YadlXsjh8eauDODFYXWQRIw26",
+                "1bd9ZsPCrKjRRrOWqfgzr9q1kJt627hpH",
+                "1f2rbWgO1OnA25suapomFpdnCH6kvqVxY"
+            ],
+            "Dũng Sĩ Hesman - Hùng Lân (Trọn Bộ 160 Tập)": [
+                "1kco3eiKQrEXBQkH3PIFKn9ikCBA4GRWE"
+            ],
+            "Dấu Ấn Trong Tim (Trọn Bộ PDF & EPUB) - ( Bạn ravo )": [
+                "1fs9bayLBklUL8TcrngT0VaS_CTgiCE03"
+            ],
+            "Dấu Ấn Rồng Thiêng - Dragon Quest Dai no Daibouken (Trọn Bộ 349 Chương Full)": [
+                "1rOsPkcTeZhjafC46rnKElDi06sbMNXD2",
+                "1ZM1c9k7ChbEWmgUtdYpYFdAcHO0_eWtk"
+            ]
+        },
+        "favs": [],
+        "lastAt": {
+            "1-00 AM - 1 Giờ Sáng (Hwang Mi Ri - Trọn Bộ 12 Tập Tiếng Việt Full)": 1794026222389,
+            "Cô Bé Long Châu - Bộ Đôi Siêu Hài (Binbougami ga! - Trọn Bộ 84 Chương Full)": 1794026391430,
+            "Ký Sinh Thú - Parasyte Kiseijuu (Trọn Bộ 64 Chương Full)": 1794445843622,
+            "Conan": 1794445848099,
+            "Bà Xã Nhà Tôi Đến Từ Ngàn Năm Trước (Trọn Bộ 294 Chương Bản Màu Full)": 1794445926538,
+            "Dấu Ấn Rồng Thiêng Phần 2 - Dấu Ấn Rô Tô (Bản Ansu - Emblem of Roto & Người Kế Thừa)": 1794446566311,
+            "Dũng Sĩ Hesman - Hùng Lân (Trọn Bộ 160 Tập)": 1794446628069,
+            "Dấu Ấn Trong Tim (Trọn Bộ PDF & EPUB) - ( Bạn ravo )": 1794446698864,
+            "Dấu Ấn Rồng Thiêng - Dragon Quest Dai no Daibouken (Trọn Bộ 349 Chương Full)": 1794451288207
+        },
+        "updatedAt": 1794451288207
+    },
+    "d_ib9d9p0jf7lf": {
+        "views": {
+            "Tiểu Đầu Bếp Cung Đình Phần 2 - Shin Chuuka Ichiban (Trọn Bộ 108 Chương PDF Tiếng Việt Full)": 1,
+            "Tiểu Đầu Bếp Cung Đình - Trung Hoa Nhất Phiên (Chuuka Ichiban - Trọn Bộ 94 Chương Full)": 1,
+            "Bị Đuổi Khỏi Tổ Đội Anh Hùng, Tôi Nhắm Đến Một Cuộc Sống Nhàn Nhã Ở Vùng Biên Cương (Bản FULL HD)": 1
+        },
+        "chaps": {
+            "Tiểu Đầu Bếp Cung Đình Phần 2 - Shin Chuuka Ichiban (Trọn Bộ 108 Chương PDF Tiếng Việt Full)": [
+                "1Dig9QcT9NFnXH5TBkXkn8HVjgcXzUkH6"
+            ],
+            "Tiểu Đầu Bếp Cung Đình - Trung Hoa Nhất Phiên (Chuuka Ichiban - Trọn Bộ 94 Chương Full)": [
+                "1CJbrTJ8mDBz_isPKJ_TYUjsNoRAhF7KG"
+            ],
+            "Bị Đuổi Khỏi Tổ Đội Anh Hùng, Tôi Nhắm Đến Một Cuộc Sống Nhàn Nhã Ở Vùng Biên Cương (Bản FULL HD)": []
+        },
+        "favs": [],
+        "lastAt": {
+            "Tiểu Đầu Bếp Cung Đình Phần 2 - Shin Chuuka Ichiban (Trọn Bộ 108 Chương PDF Tiếng Việt Full)": 1793943598759,
+            "Tiểu Đầu Bếp Cung Đình - Trung Hoa Nhất Phiên (Chuuka Ichiban - Trọn Bộ 94 Chương Full)": 1793943633043,
+            "Bị Đuổi Khỏi Tổ Đội Anh Hùng, Tôi Nhắm Đến Một Cuộc Sống Nhàn Nhã Ở Vùng Biên Cương (Bản FULL HD)": 1794445421223
+        },
+        "updatedAt": 1794445421223
+    },
+    "u_haibara2419": {
+        "views": {
+            "Ám Hành Ngự Sử - Blade Of The Phantom Master (Trọn Bộ 195 Chương Tiếng Việt)": 1
+        },
+        "chaps": {
+            "Ám Hành Ngự Sử - Blade Of The Phantom Master (Trọn Bộ 195 Chương Tiếng Việt)": [
+                "1g79lns45wmn2nWVh54U2vd-CDoJLdxZX"
+            ]
+        },
+        "favs": [],
+        "lastAt": {
+            "Ám Hành Ngự Sử - Blade Of The Phantom Master (Trọn Bộ 195 Chương Tiếng Việt)": 1794186463636
+        },
+        "updatedAt": 1794423689295
+    },
+    "d_lhayx1kwn3pp": {
+        "views": {
+            "1-00 AM - 1 Giờ Sáng (Hwang Mi Ri - Trọn Bộ 12 Tập Tiếng Việt Full)": 4,
+            "072 - CHÚA TỂ BẦU TRỜI Z - ( Bạn zero12340017 )": 1,
+            "Anh Hùng, Quỷ Vương Và Phản Diện (Manhwa Full)": 1,
+            "Bậc Thầy Thiết Kế Điền Trang - The Greatest Estate Developer (Manhwa Bản FULL HD)": 2,
+            "Gia Đình Là Số 1 - Phần 2": 20,
+            "Tiếu Ngạo Giang Hồ (Trọn Bộ 156 Chương Tiếng Việt)": 3,
+            "07-Ghost - Bảy Bóng Ma (Trọn Bộ 100 Chương Full)": 1,
+            "Cao Thủ Bida - Hoàng Phi Hồng - Break Shot (Trọn Bộ 16 Tập Full)": 2,
+            "sex-machine (Trọn Bộ 12 Chương Tiếng Việt)": 3
+        },
+        "chaps": {
+            "1-00 AM - 1 Giờ Sáng (Hwang Mi Ri - Trọn Bộ 12 Tập Tiếng Việt Full)": [
+                "1vIYYTa_26VtI5fpfgwvyEFWFZXVbV9ot",
+                "1u6KVmLQr7o-lh7Gry69LE3P_zvDHd-gW",
+                "1xuibHfhGr_mRpD2udgW-3QW6JChTeHmL",
+                "1ur4ridI7RjDxXXusEjzlNEK3SN_toLg-"
+            ],
+            "072 - CHÚA TỂ BẦU TRỜI Z - ( Bạn zero12340017 )": [
+                "1oERP9gEj_q7kWPHqYaQ3hMH6EaycaPkh"
+            ],
+            "Anh Hùng, Quỷ Vương Và Phản Diện (Manhwa Full)": [
+                "1WJ3ZBnQWRWDL4tsAuE0CLmH1XcbOTuHy"
+            ],
+            "Bậc Thầy Thiết Kế Điền Trang - The Greatest Estate Developer (Manhwa Bản FULL HD)": [
+                "1Pj9fJEcFAmQNu-qMJmt1C7QSek4jO3ul",
+                "1AB7okx114ZoVkOvKBRaGdJhPe4saHyT4"
+            ],
+            "Gia Đình Là Số 1 - Phần 2": [
+                "1WHbsgYTrUXn0H_O-QbshFZZwlNiTkK41",
+                "1bq_5-iasHTqb1qdxUmrkePF7mfw_KKPo",
+                "1QZAHOGiXWb1pBibcRqm5ArhSHFKlVaZ4",
+                "1VgfmMNbUoHdN18Avg3Up5lUgLkw_3LdU",
+                "1yPTIEn9w_QEoQRfMSqn1CXSzX5nSLU2o",
+                "1p5-Hn9YwoK7a6qlCrCd-2lf-bZwD_dJW",
+                "1c-1sQ3uEcib9IXniuRkaAPoxs-QOTBnE",
+                "11jzBQxXHGbTNXYsYazx4MnatOzJOo2Lg",
+                "1iCLEmikh1x-81faYReGQo-JmmMhv5-TA",
+                "1JjuMp-bxZ6dBWL2ibZtX9yAn1LjIm_dE",
+                "1xitym2NrlA6AxhTNz_QcM4UK1caGGXuw",
+                "1rw26LLs4vga17G8zHSrZb2WCNkXERB-i",
+                "1pw7sTsPirrYv7lEBBHozMWUvP-9_47Qj",
+                "1-3kMEx2YA7pYRwKnQOR4Kb7bmZ_jaW0e",
+                "1OKHWBEnOIlBfltEl-FjOZ7FZu23E18Ty",
+                "11bLQjtEzYudT730pdlzYFMEUgmmlAy5A",
+                "18vegNMjFX6mt9MDTZGmN6bl7MysHeFWH"
+            ],
+            "Tiếu Ngạo Giang Hồ (Trọn Bộ 156 Chương Tiếng Việt)": [
+                "1z5vVMQx-my7wnAJfIfN-pZRqN-6K90FP",
+                "1HIV6qawK9lwkZAC6djKzrkl43mexcyTr",
+                "1xcjR_WR4IwjWAnaHba8dKcz-LZvmrGK_"
+            ],
+            "07-Ghost - Bảy Bóng Ma (Trọn Bộ 100 Chương Full)": [
+                "1CkFlh7TFVhwW3KFB_vZvHVZ_G8kLEr2j"
+            ],
+            "Cao Thủ Bida - Hoàng Phi Hồng - Break Shot (Trọn Bộ 16 Tập Full)": [
+                "1Xk-FSIHFvqBKfneusy-jVaH-gL_K52lN",
+                "1emaRuBYT07X62NqnbJzzWnID_R-mOBk_"
+            ],
+            "sex-machine (Trọn Bộ 12 Chương Tiếng Việt)": [
+                "1UUsTlgtv0_V9clW8rST8YdEaFU3ur9zR"
+            ]
+        },
+        "favs": [],
+        "lastAt": {
+            "1-00 AM - 1 Giờ Sáng (Hwang Mi Ri - Trọn Bộ 12 Tập Tiếng Việt Full)": 1793764320482,
+            "072 - CHÚA TỂ BẦU TRỜI Z - ( Bạn zero12340017 )": 1793711400217,
+            "Anh Hùng, Quỷ Vương Và Phản Diện (Manhwa Full)": 1793728009933,
+            "Bậc Thầy Thiết Kế Điền Trang - The Greatest Estate Developer (Manhwa Bản FULL HD)": 1793764263128,
+            "Gia Đình Là Số 1 - Phần 2": 1794492403725,
+            "Tiếu Ngạo Giang Hồ (Trọn Bộ 156 Chương Tiếng Việt)": 1793851913734,
+            "07-Ghost - Bảy Bóng Ma (Trọn Bộ 100 Chương Full)": 1793804973296,
+            "Cao Thủ Bida - Hoàng Phi Hồng - Break Shot (Trọn Bộ 16 Tập Full)": 1794286775242,
+            "sex-machine (Trọn Bộ 12 Chương Tiếng Việt)": 1794490732469
+        },
+        "updatedAt": 1794492403725
+    },
+    "d_lykgx4g1v6o9": {
+        "views": {
+            "Ám Hành Ngự Sử - Blade Of The Phantom Master (Trọn Bộ 195 Chương Tiếng Việt)": 3,
+            "Cậu Bé Ba Mắt - Mitsume ga Tooru (Trọn Bộ Tiếng Việt Full)": 1,
+            "Cậu Bé Cầm Thương Và Quái Vật Hổ - Ushio to Tora (Trọn Bộ Vietsub) - ( Bạn Nguyễn Hoàng Trí )": 1,
+            "Dấu Ấn Rồng Thiêng Phần 2 - Dấu Ấn Rô Tô (Bản Ansu - Emblem of Roto & Người Kế Thừa)": 2
+        },
+        "chaps": {
+            "Ám Hành Ngự Sử - Blade Of The Phantom Master (Trọn Bộ 195 Chương Tiếng Việt)": [
+                "1FpjDUNfYlV2tAeFJeYASUMb_16AkJsi2",
+                "1g79lns45wmn2nWVh54U2vd-CDoJLdxZX",
+                "1xpc76Bi6rhNXSm8sRZXLzQK7aiNsYDSU"
+            ],
+            "Cậu Bé Ba Mắt - Mitsume ga Tooru (Trọn Bộ Tiếng Việt Full)": [
+                "1to0Cua6B28xj8wFNxnmbrWArt3Wvu0KB"
+            ],
+            "Cậu Bé Cầm Thương Và Quái Vật Hổ - Ushio to Tora (Trọn Bộ Vietsub) - ( Bạn Nguyễn Hoàng Trí )": [
+                "1_MPD0g3UrN7JvwbruXpzfNEPAhPdwMIi"
+            ],
+            "Dấu Ấn Rồng Thiêng Phần 2 - Dấu Ấn Rô Tô (Bản Ansu - Emblem of Roto & Người Kế Thừa)": [
+                "1xkQZzNkin3g23KwnVffTMQKC5JHpyBKS"
+            ]
+        },
+        "favs": [],
+        "lastAt": {
+            "Ám Hành Ngự Sử - Blade Of The Phantom Master (Trọn Bộ 195 Chương Tiếng Việt)": 1793889887008,
+            "Cậu Bé Ba Mắt - Mitsume ga Tooru (Trọn Bộ Tiếng Việt Full)": 1794018762583,
+            "Cậu Bé Cầm Thương Và Quái Vật Hổ - Ushio to Tora (Trọn Bộ Vietsub) - ( Bạn Nguyễn Hoàng Trí )": 1794019343292,
+            "Dấu Ấn Rồng Thiêng Phần 2 - Dấu Ấn Rô Tô (Bản Ansu - Emblem of Roto & Người Kế Thừa)": 1794394010916
+        },
+        "updatedAt": 1794394010916
+    },
+    "d_v9oe5ljhogml": {
+        "views": {
+            "Cậu Bé Ba Mắt - Mitsume ga Tooru (Trọn Bộ Tiếng Việt Full)": 2,
+            "Chiếc Hộp Xanh (Blue Box)": 1
+        },
+        "chaps": {
+            "Cậu Bé Ba Mắt - Mitsume ga Tooru (Trọn Bộ Tiếng Việt Full)": [
+                "1to0Cua6B28xj8wFNxnmbrWArt3Wvu0KB"
+            ],
+            "Chiếc Hộp Xanh (Blue Box)": [
+                "1iZTA3DGJ3e5vhAR6kWkZSfrQpu4wxted"
+            ]
+        },
+        "favs": [],
+        "lastAt": {
+            "Cậu Bé Ba Mắt - Mitsume ga Tooru (Trọn Bộ Tiếng Việt Full)": 1794449514189,
+            "Chiếc Hộp Xanh (Blue Box)": 1794473772968
+        },
+        "updatedAt": 1794476998187
+    },
+    "d_32sq044f3k7h": {
+        "views": {
+            "cô mèo bàn bên và cậu bạn nai tơ (Trọn Bộ 108 Chương Tiếng Việt)": 10,
+            "One-Punch Man - Đấm Phát Chết Luôn (Bản Chuẩn Chap 1 - 286)": 4,
+            "Người Nhện Khởi Đầu Mới - Spider-Man Brand New Day (2026 Full HD Vietsub)": 1,
+            "Hoa Thơm Kiêu Hãnh - Kaoru Hana wa Rin to Saku (Bản FULL HD)": 2
+        },
+        "chaps": {
+            "cô mèo bàn bên và cậu bạn nai tơ (Trọn Bộ 108 Chương Tiếng Việt)": [
+                "1PUbaSHG9nHTOJHQt53k1SAOSiPNfhvnZ",
+                "1G-p9YWJjhrozu2FjCQlfWJ9CJS-UG4F5",
+                "1s7fpomYxQOpQ3eRxK0tssiI8r-1S-rSZ",
+                "1fxWufF4h60mLoOzit18AUJy3aIN7E_MO",
+                "1jv6-2EI8UK_5kFVXXQgLjNXKcVFBhNz3",
+                "1gLw53RH3G3aJb23DedGs_Liz1iK-s_ZF",
+                "1_eVQf6ls6KN-tyvt7AX8k19ZdwBnk5_q",
+                "1-hGByWQ1fbZtCBdSNZJM1Fvdh7Ujm8TD",
+                "138TouUxX4Gg_lbr6jZ_yTblSVSbdGyWa",
+                "1nO065x5XLr9Z84ooe82mYqsrJlC34YYN"
+            ],
+            "One-Punch Man - Đấm Phát Chết Luôn (Bản Chuẩn Chap 1 - 286)": [
+                "1FgRjQG-74eBvXO4_h4gWPPXpyRlY-u_x",
+                "1Un7iUFKm_pIRnhKEs1OLDoDS3tOcpotm",
+                "1da2PDNsDdQHQ540ai3P9mj98_KhTAKq0",
+                "191o9wPwr1EHYmhCuSns1yWGBiKNDSlWf"
+            ],
+            "Người Nhện Khởi Đầu Mới - Spider-Man Brand New Day (2026 Full HD Vietsub)": [
+                "1TzOLKkJawjNgMys5lyftExVTpz500n3x"
+            ],
+            "Hoa Thơm Kiêu Hãnh - Kaoru Hana wa Rin to Saku (Bản FULL HD)": [
+                "1zPbZ3FoOh1ty_jL6VwtczsSsaJYJm767"
+            ]
+        },
+        "favs": [],
+        "lastAt": {
+            "cô mèo bàn bên và cậu bạn nai tơ (Trọn Bộ 108 Chương Tiếng Việt)": 1794012378594,
+            "One-Punch Man - Đấm Phát Chết Luôn (Bản Chuẩn Chap 1 - 286)": 1793937280921,
+            "Người Nhện Khởi Đầu Mới - Spider-Man Brand New Day (2026 Full HD Vietsub)": 1794033177134,
+            "Hoa Thơm Kiêu Hãnh - Kaoru Hana wa Rin to Saku (Bản FULL HD)": 1794495210817
+        },
+        "updatedAt": 1794495210817
+    },
+    "d_praa2051c2mz": {
+        "views": {
+            "Ashita No Joe": 1,
+            "Á Nhân - Ajin Demi-Human (Trọn Bộ 86 Chương Full)": 1,
+            "JoJo's Bizarre Adventure - Cuộc Phiêu Lưu Bí Ẩn (Trọn Bộ 8 Phần)": 1
+        },
+        "chaps": {
+            "Ashita No Joe": [
+                "1fYRI9gQV6LRvnv1_SWgo4Y4YsXcsKmDt"
+            ],
+            "Á Nhân - Ajin Demi-Human (Trọn Bộ 86 Chương Full)": [
+                "1tJyycvmcC4iPIePoiczld7wSAtqGuJQA"
+            ],
+            "JoJo's Bizarre Adventure - Cuộc Phiêu Lưu Bí Ẩn (Trọn Bộ 8 Phần)": [
+                "10JqWMrNywUnpEac6uWBWSNUgMcILtroi"
+            ]
+        },
+        "favs": [],
+        "lastAt": {
+            "Ashita No Joe": 1793718100202,
+            "Á Nhân - Ajin Demi-Human (Trọn Bộ 86 Chương Full)": 1794240398166,
+            "JoJo's Bizarre Adventure - Cuộc Phiêu Lưu Bí Ẩn (Trọn Bộ 8 Phần)": 1794240817654
+        },
+        "updatedAt": 1794470385607
+    },
+    "d_hwqqb9siu75x": {
+        "views": {
+            "Thần Thoại Hy Lạp (Trọn Bộ PDF & EPUB) - ( Bạn ravo )": 2,
+            "Tổng Hợp Thần Thoại Hy Lạp - Greek Mythology (Trọn Bộ PDF & EPUB) - ( Bạn ravo )": 1
+        },
+        "chaps": {
+            "Thần Thoại Hy Lạp (Trọn Bộ PDF & EPUB) - ( Bạn ravo )": [
+                "1ZSxStLK7hLjge0K0SUMECGdt7boylw3x"
+            ],
+            "Tổng Hợp Thần Thoại Hy Lạp - Greek Mythology (Trọn Bộ PDF & EPUB) - ( Bạn ravo )": []
+        },
+        "favs": [],
+        "lastAt": {
+            "Thần Thoại Hy Lạp (Trọn Bộ PDF & EPUB) - ( Bạn ravo )": 1794466231895,
+            "Tổng Hợp Thần Thoại Hy Lạp - Greek Mythology (Trọn Bộ PDF & EPUB) - ( Bạn ravo )": 1794466246514
+        },
+        "updatedAt": 1794466246514
+    },
+    "d_udi3uk7ny0ht": {
+        "views": {
+            "Tuyệt Sắc Quốc Sư (Trọn Bộ PDF & EPUB) - ( Bạn ravo )": 1,
+            "Tuyển Tập Truyện Ngắn Đặc Sắc (Trọn Bộ PDF & EPUB) - ( Bạn Nguyễn Minh Tuấn )": 1
+        },
+        "chaps": {
+            "Tuyệt Sắc Quốc Sư (Trọn Bộ PDF & EPUB) - ( Bạn ravo )": [],
+            "Tuyển Tập Truyện Ngắn Đặc Sắc (Trọn Bộ PDF & EPUB) - ( Bạn Nguyễn Minh Tuấn )": []
+        },
+        "favs": [],
+        "lastAt": {
+            "Tuyệt Sắc Quốc Sư (Trọn Bộ PDF & EPUB) - ( Bạn ravo )": 1794469780926,
+            "Tuyển Tập Truyện Ngắn Đặc Sắc (Trọn Bộ PDF & EPUB) - ( Bạn Nguyễn Minh Tuấn )": 1794469785111
+        },
+        "updatedAt": 1794469785111
     }
-  };
+};
 
   function getOrInitDeviceUid() {
     try {
@@ -3634,11 +4813,34 @@
     return s;
   }
 
+  function extractNormalizedVoteMap(rec) {
+    const m = {};
+    if (!rec || typeof rec !== 'object') return m;
+    if (rec.voteMap && typeof rec.voteMap === 'object') {
+      for (const [rawS, v] of Object.entries(rec.voteMap)) {
+        const cs = resolveCanonicalSeriesName(rawS);
+        const num = Number(v) || 0;
+        if (cs && num !== 0 && Math.abs(num) > Math.abs(m[cs] || 0)) m[cs] = num;
+      }
+    }
+    if (Array.isArray(rec.votes)) {
+      const fallbackTs = Number(rec.updatedAt) || 1;
+      for (const rawS of rec.votes) {
+        const cs = resolveCanonicalSeriesName(rawS);
+        if (cs && !m[cs]) m[cs] = fallbackTs;
+      }
+    }
+    return m;
+  }
+
   function mergeTwoActorRecords(a, b) {
     const out = {
       views: {},
       chaps: {},
       favs: [],
+      votes: [],
+      voteMap: {},
+      ev: {},
       lastAt: {},
       updatedAt: Math.max((a && a.updatedAt) || 0, (b && b.updatedAt) || 0)
     };
@@ -3668,12 +4870,35 @@
       const la = Math.max((a && a.lastAt && a.lastAt[rawS]) || 0, (a && a.lastAt && a.lastAt[s]) || 0);
       const lb = Math.max((b && b.lastAt && b.lastAt[rawS]) || 0, (b && b.lastAt && b.lastAt[s]) || 0);
       out.lastAt[s] = Math.max(out.lastAt[s] || 0, la, lb);
+
+      const eva = (a && a.ev && Array.isArray(a.ev[rawS])) ? a.ev[rawS] : ((a && a.ev && Array.isArray(a.ev[s])) ? a.ev[s] : []);
+      const evb = (b && b.ev && Array.isArray(b.ev[rawS])) ? b.ev[rawS] : ((b && b.ev && Array.isArray(b.ev[s])) ? b.ev[s] : []);
+      if (eva.length > 0 || evb.length > 0) {
+        const evSet = new Set([...(out.ev[s] || []), ...eva, ...evb].map(Number).filter(x => x > 0));
+        out.ev[s] = Array.from(evSet).sort((x, y) => x - y).slice(-60);
+        if (out.ev[s].length > evb.length) changedFromB = true;
+      }
     }
+
     const favSet = new Set();
     if (a && Array.isArray(a.favs)) a.favs.forEach(x => { const cs = resolveCanonicalSeriesName(x); if (cs) favSet.add(cs); });
     if (b && Array.isArray(b.favs)) b.favs.forEach(x => { const cs = resolveCanonicalSeriesName(x); if (cs) favSet.add(cs); });
     out.favs = Array.from(favSet);
     if (out.favs.length > ((b && Array.isArray(b.favs)) ? b.favs.length : 0)) changedFromB = true;
+
+    const vmA = extractNormalizedVoteMap(a);
+    const vmB = extractNormalizedVoteMap(b);
+    const allVoteSeries = new Set([...Object.keys(vmA), ...Object.keys(vmB)]);
+    for (const s of allVoteSeries) {
+      const ta = vmA[s] || 0;
+      const tb = vmB[s] || 0;
+      const winner = Math.abs(ta) >= Math.abs(tb) ? ta : tb;
+      if (winner !== 0) {
+        out.voteMap[s] = winner;
+        if (winner > 0) out.votes.push(s);
+        if (winner !== tb) changedFromB = true;
+      }
+    }
     return { record: out, changedFromB };
   }
 
@@ -3693,7 +4918,7 @@
       }
     }
     return {
-      version: 2,
+      version: 3,
       updatedAt: (parsed && parsed.updatedAt) || Date.now(),
       actors
     };
@@ -3711,7 +4936,6 @@
     const anonKey = 'd_' + getOrInitDeviceUid();
     let changed = false;
 
-    // If user linked a personal sync code (`u_...`), migrate any prior anonymous `d_...` activity on this device into `u_...` so it's never double-counted
     if (myKey.startsWith('u_') && ledger.actors[anonKey]) {
       const m = mergeTwoActorRecords(ledger.actors[anonKey], ledger.actors[myKey]);
       ledger.actors[myKey] = m.record;
@@ -3721,6 +4945,7 @@
 
     const histMap = getReadingHistoryMap();
     const favArr = Array.from(getFavoritesSet());
+    const vMapLocal = getVotedMapLocal();
     const localViews = {};
     const localChaps = {};
     const localLastAt = {};
@@ -3736,11 +4961,23 @@
       if (ts > (localLastAt[s] || 0)) localLastAt[s] = ts;
     }
 
-    if (Object.keys(localViews).length > 0 || favArr.length > 0) {
+    if (Object.keys(localViews).length > 0 || favArr.length > 0 || Object.keys(vMapLocal).length > 0) {
+      const normVMap = {};
+      const activeVotes = [];
+      for (const [rawS, tv] of Object.entries(vMapLocal)) {
+        const cs = resolveCanonicalSeriesName(rawS);
+        const num = Number(tv) || 0;
+        if (cs && num !== 0) {
+          normVMap[cs] = num;
+          if (num > 0) activeVotes.push(cs);
+        }
+      }
       const syntheticLocal = {
         views: localViews,
         chaps: localChaps,
         favs: favArr.map(resolveCanonicalSeriesName).filter(Boolean),
+        votes: activeVotes,
+        voteMap: normVMap,
         lastAt: localLastAt,
         updatedAt: Date.now()
       };
@@ -3761,12 +4998,15 @@
     const s = resolveCanonicalSeriesName(rawSeriesName);
     if (!s || s.startsWith('http')) return;
     const now = Date.now();
+    const nowSec = Math.floor(now / 1000);
     const ledger = loadGlobalViewsLedgerLocal();
     syncLocalReadingHistoryIntoActorLedger(ledger);
     const myKey = getAnalyticsActorKey();
-    const cur = ledger.actors[myKey] || { views: {}, chaps: {}, favs: [], lastAt: {}, updatedAt: now };
+    const cur = ledger.actors[myKey] || { views: {}, chaps: {}, favs: [], votes: [], voteMap: {}, ev: {}, lastAt: {}, updatedAt: now };
 
     if (!cur.chaps[s]) cur.chaps[s] = [];
+    if (!cur.ev) cur.ev = {};
+    if (!cur.voteMap) cur.voteMap = {};
     let didIncrement = false;
 
     if (actionType === 'open_series') {
@@ -3774,6 +5014,9 @@
         _lastOpenSeriesTs[s] = now;
         cur.views[s] = (cur.views[s] || 0) + 1;
         cur.lastAt[s] = now;
+        if (!Array.isArray(cur.ev[s])) cur.ev[s] = [];
+        cur.ev[s].push(nowSec);
+        if (cur.ev[s].length > 60) cur.ev[s] = cur.ev[s].slice(-60);
         didIncrement = true;
       }
     } else if (actionType === 'read_chapter' || actionType === 'watch_video') {
@@ -3783,15 +5026,29 @@
         cur.views[s] = Math.max((cur.views[s] || 0) + 1, cur.chaps[s].length);
         cur.lastAt[s] = now;
         _lastOpenFileTs[fid] = now;
+        if (!Array.isArray(cur.ev[s])) cur.ev[s] = [];
+        cur.ev[s].push(nowSec);
+        if (cur.ev[s].length > 60) cur.ev[s] = cur.ev[s].slice(-60);
         didIncrement = true;
       } else if (fid && now - (_lastOpenFileTs[fid] || 0) > 300000) {
         _lastOpenFileTs[fid] = now;
         cur.views[s] = Math.max((cur.views[s] || 0) + 1, cur.chaps[s].length);
         cur.lastAt[s] = now;
+        if (!Array.isArray(cur.ev[s])) cur.ev[s] = [];
+        cur.ev[s].push(nowSec);
+        if (cur.ev[s].length > 60) cur.ev[s] = cur.ev[s].slice(-60);
         didIncrement = true;
       }
     } else if (actionType === 'fav') {
       cur.favs = Array.from(getFavoritesSet()).map(resolveCanonicalSeriesName).filter(Boolean);
+      didIncrement = true;
+    } else if (actionType === 'vote') {
+      const localVM = getVotedMapLocal();
+      for (const [k, tv] of Object.entries(localVM)) {
+        const cs = resolveCanonicalSeriesName(k);
+        if (cs) cur.voteMap[cs] = Number(tv) || 0;
+      }
+      cur.votes = Object.entries(cur.voteMap).filter(([, tv]) => Number(tv) > 0).map(([k]) => k);
       didIncrement = true;
     }
 
@@ -3801,7 +5058,7 @@
       ledger.updatedAt = now;
       saveGlobalViewsLedgerLocal(ledger);
       recomputeCatalogRealViewStats(ledger);
-      if (currentFilter === 'top') {
+      if (currentFilter === 'top' || currentFilter === 'vote') {
         renderLibraryGrid();
       }
       clearTimeout(_globalViewsSyncTimer);
@@ -3811,9 +5068,25 @@
     }
   }
 
+  let topTimeWindow = 'all'; // 'today' | '7d' | '30d' | 'year' | 'all'
+
+  function getTopWindowCutoffMs(winKey) {
+    const now = Date.now();
+    if (winKey === 'today') {
+      const startToday = new Date();
+      startToday.setHours(0, 0, 0, 0);
+      return Math.min(startToday.getTime(), now - 86400 * 1000);
+    }
+    if (winKey === '7d') return now - 7 * 86400 * 1000;
+    if (winKey === '30d') return now - 30 * 86400 * 1000;
+    if (winKey === 'year') return new Date(new Date().getFullYear(), 0, 1).getTime();
+    return 0;
+  }
+
   function recomputeCatalogRealViewStats(optionalLedger) {
     const ledger = optionalLedger || loadGlobalViewsLedgerLocal();
     syncLocalReadingHistoryIntoActorLedger(ledger);
+    const cutoffMs = getTopWindowCutoffMs(topTimeWindow);
     const seriesStats = {};
 
     for (const [actorKey, actor] of Object.entries(ledger.actors || {})) {
@@ -3821,63 +5094,123 @@
       const viewsObj = actor.views || {};
       const chapsObj = actor.chaps || {};
       const lastAtObj = actor.lastAt || {};
+      const evObj = actor.ev || {};
       const favsArr = Array.isArray(actor.favs) ? actor.favs : [];
+      const voteMap = extractNormalizedVoteMap(actor);
 
       const touchedByActor = new Set([...Object.keys(viewsObj), ...Object.keys(chapsObj)]);
       for (const rawS of touchedByActor) {
         const s = resolveCanonicalSeriesName(rawS);
         if (!s) continue;
         const cArr = Array.isArray(chapsObj[rawS]) ? chapsObj[rawS] : [];
-        const vCnt = Math.max(Number(viewsObj[rawS]) || 0, cArr.length);
-        if (vCnt <= 0) continue;
-        if (!seriesStats[s]) {
-          seriesStats[s] = { views: 0, readers: new Set(), chaps: 0, favs: new Set(), lastAt: 0 };
-        }
-        seriesStats[s].views += vCnt;
-        seriesStats[s].readers.add(actorKey);
-        seriesStats[s].chaps += cArr.length;
+        const totalVCnt = Math.max(Number(viewsObj[rawS]) || 0, cArr.length);
+        if (totalVCnt <= 0) continue;
         const ts = Number(lastAtObj[rawS]) || 0;
+
+        let winViews = 0;
+        if (cutoffMs <= 0) {
+          winViews = totalVCnt;
+        } else {
+          const evArr = Array.isArray(evObj[rawS]) ? evObj[rawS] : [];
+          if (evArr.length > 0) {
+            let evInWin = 0;
+            for (const sec of evArr) {
+              if ((Number(sec) * 1000) >= cutoffMs) evInWin++;
+            }
+            const legacyRem = Math.max(0, totalVCnt - evArr.length);
+            winViews = evInWin + ((legacyRem > 0 && ts >= cutoffMs) ? legacyRem : 0);
+          } else if (ts >= cutoffMs) {
+            winViews = totalVCnt;
+          }
+        }
+
+        if (!seriesStats[s]) {
+          seriesStats[s] = { views: 0, allViews: 0, readers: new Set(), allReaders: new Set(), chaps: 0, favs: new Set(), votes: new Set(), lastAt: 0 };
+        }
+        seriesStats[s].allViews += totalVCnt;
+        seriesStats[s].allReaders.add(actorKey);
         if (ts > seriesStats[s].lastAt) seriesStats[s].lastAt = ts;
+        if (winViews > 0) {
+          seriesStats[s].views += winViews;
+          seriesStats[s].readers.add(actorKey);
+          seriesStats[s].chaps += cArr.length;
+        }
       }
 
       for (const rawFav of favsArr) {
         const s = resolveCanonicalSeriesName(rawFav);
         if (!s) continue;
         if (!seriesStats[s]) {
-          seriesStats[s] = { views: 0, readers: new Set(), chaps: 0, favs: new Set(), lastAt: 0 };
+          seriesStats[s] = { views: 0, allViews: 0, readers: new Set(), allReaders: new Set(), chaps: 0, favs: new Set(), votes: new Set(), lastAt: 0 };
         }
         seriesStats[s].favs.add(actorKey);
+      }
+
+      for (const [s, tv] of Object.entries(voteMap)) {
+        if (Number(tv) > 0) {
+          if (!seriesStats[s]) {
+            seriesStats[s] = { views: 0, allViews: 0, readers: new Set(), allReaders: new Set(), chaps: 0, favs: new Set(), votes: new Set(), lastAt: 0 };
+          }
+          seriesStats[s].votes.add(actorKey);
+          if (Number(tv) > seriesStats[s].lastAt) seriesStats[s].lastAt = Number(tv);
+        }
       }
     }
 
     let totalRealSeries = 0;
     let totalRealViewsSum = 0;
-    let totalDistinctReaders = new Set(Object.keys(ledger.actors || {})).size;
+    let totalVotedSeries = 0;
+    let totalVotesSum = 0;
+    const activeWindowReaders = new Set();
+    const totalDistinctReaders = new Set(Object.keys(ledger.actors || {})).size;
 
     catalogItems.forEach(it => {
       const st = seriesStats[it.name];
-      if (st && (st.views > 0 || st.favs.size > 0)) {
+      if (st) {
         it._realViews = st.views;
+        it._realAllViews = st.allViews;
         it._realReaders = st.readers.size;
+        it._realAllReaders = st.allReaders.size;
         it._realChaps = st.chaps;
         it._realFavs = st.favs.size;
+        it._realVotes = st.votes.size;
         it._realLastAt = st.lastAt;
-        totalRealSeries++;
-        totalRealViewsSum += st.views;
+        if (st.views > 0 || (cutoffMs <= 0 && st.favs.size > 0)) {
+          totalRealSeries++;
+          totalRealViewsSum += st.views;
+          st.readers.forEach(r => activeWindowReaders.add(r));
+        }
+        if (st.votes.size > 0) {
+          totalVotedSeries++;
+          totalVotesSum += st.votes.size;
+        }
       } else {
         it._realViews = 0;
+        it._realAllViews = 0;
         it._realReaders = 0;
+        it._realAllReaders = 0;
         it._realChaps = 0;
         it._realFavs = 0;
+        it._realVotes = 0;
         it._realLastAt = 0;
       }
     });
 
+    const winLabelMap = { today: '24h Hôm Nay', '7d': '7 Ngày Qua', '30d': '30 Ngày Qua', year: 'Năm 2026', all: 'Mọi Thời Đại' };
     const sumEl = document.getElementById('top-real-summary-pill');
     if (sumEl) {
-      sumEl.textContent = `📊 Đếm thật 100%: ${totalRealSeries} bộ • ${totalRealViewsSum} lượt xem • ${totalDistinctReaders} độc giả`;
+      const rCnt = cutoffMs > 0 ? activeWindowReaders.size : totalDistinctReaders;
+      sumEl.textContent = `📊 ${winLabelMap[topTimeWindow] || 'Đếm thật'}: ${totalRealSeries} bộ • ${totalRealViewsSum} lượt xem thật • ${rCnt} độc giả`;
     }
-    return { totalRealSeries, totalRealViewsSum, totalDistinctReaders };
+    const voteCntEl = document.getElementById('count-vote');
+    if (voteCntEl) voteCntEl.textContent = totalVotedSeries;
+    const voteSumEl = document.getElementById('vote-real-summary-pill');
+    if (voteSumEl) {
+      voteSumEl.textContent = totalVotedSeries > 0
+        ? `🗳️ Đề cử thật 100%: ${totalVotedSeries} bộ • ${totalVotesSum} phiếu bầu cộng đồng (1 người = tối đa 1 phiếu/bộ)`
+        : `🗳️ Bấm nút 👍 trên thẻ truyện/sách/phim bạn tâm đắc để đề cử lên Bảng Xếp Hạng!`;
+    }
+    return { totalRealSeries, totalRealViewsSum, totalDistinctReaders, totalVotedSeries, totalVotesSum };
   }
 
   let _isSyncingGlobalViews = false;
@@ -3885,7 +5218,7 @@
     if (_isSyncingGlobalViews) return;
     _isSyncingGlobalViews = true;
     const btn = document.getElementById('top-refresh-views-btn');
-    if (btn && showToast) btn.textContent = '⏳ Đang đồng bộ Đám Mây...';
+    if (btn && showToast) btn.textContent = '⏳ Đang đồng bộ...';
     try {
       const localLedger = loadGlobalViewsLedgerLocal();
       const localChanged = syncLocalReadingHistoryIntoActorLedger(localLedger);
@@ -3911,18 +5244,30 @@
           mergedActors[k] = m.record;
           if (m.changedFromB) needPush = true;
         }
+        // Sync back my own Cloud vote state if restored on another device
+        if (mergedActors[myKey] && mergedActors[myKey].voteMap) {
+          const curLocalVM = getVotedMapLocal();
+          let vmChanged = false;
+          for (const [s, tv] of Object.entries(mergedActors[myKey].voteMap)) {
+            if (Math.abs(Number(tv) || 0) > Math.abs(Number(curLocalVM[s]) || 0)) {
+              curLocalVM[s] = Number(tv);
+              vmChanged = true;
+            }
+          }
+          if (vmChanged) saveVotedMapLocal(curLocalVM);
+        }
       } else if (res && res.notFound) {
         needPush = true;
       }
 
       const finalLedger = {
-        version: 2,
+        version: 3,
         updatedAt: Date.now(),
         actors: mergedActors
       };
       saveGlobalViewsLedgerLocal(finalLedger);
       const stats = recomputeCatalogRealViewStats(finalLedger);
-      if (currentFilter === 'top') {
+      if (currentFilter === 'top' || currentFilter === 'vote') {
         renderLibraryGrid();
       }
 
@@ -3931,7 +5276,7 @@
       }
 
       if (showToast) {
-        showAppToast(`✅ Đã cập nhật Bảng Xếp Hạng Thật: ${stats.totalRealSeries} bộ có người đọc (${stats.totalRealViewsSum} lượt xem thật từ ${stats.totalDistinctReaders} độc giả)!`, 3500);
+        showAppToast(`✅ Đã cập nhật Bảng Xếp Hạng Thật: ${stats.totalRealSeries} bộ có người đọc (${stats.totalRealViewsSum} lượt xem • ${stats.totalVotesSum} phiếu đề cử)!`, 3400);
       }
     } catch (e) {
       if (showToast) {
@@ -3939,48 +5284,72 @@
       }
     } finally {
       _isSyncingGlobalViews = false;
-      if (btn) btn.textContent = '🔄 Làm Mới Lượt Xem Thật';
+      if (btn) btn.textContent = '🔄 Làm Mới';
     }
   }
 
   function updateCategoryCounts() {
+    rebuildTagLookupDict();
     let mCount = 0, nCount = 0, aCount = 0, vCount = 0;
-    const mangaIndices = [];
-    const novelIndices = [];
-    const animeIndices = [];
-    const movieIndices = [];
+    const tagCounter = {};
+    const authorCounter = new Map();
     _canonicalSeriesCache = null;
+
+    // Track newest mtime cutoff (top ~320 latest updated items across categories for ✨ MỚI badge)
+    const mtimeSamples = [];
+
     catalogItems.forEach((it, idx) => {
       if (!it.url && it.id) it.url = 'https://drive.google.com/drive/folders/' + it.id;
       it._type = inferItemType(it);
-      if (it._type === 'novel') {
-        nCount++;
-        novelIndices.push(idx);
-      } else if (it._type === 'anime') {
-        aCount++;
-        animeIndices.push(idx);
-      } else if (it._type === 'movie') {
-        vCount++;
-        movieIndices.push(idx);
-      } else {
-        mCount++;
-        mangaIndices.push(idx);
+      if (it._type === 'novel') nCount++;
+      else if (it._type === 'anime') aCount++;
+      else if (it._type === 'movie') vCount++;
+      else mCount++;
+
+      // Ensure Multi-Tags & Author exist (offline prebuilt or instant runtime auto-tagger)
+      if (!Array.isArray(it.t) || it.t.length === 0) {
+        runtimeClassifyItem(it);
       }
-      it._createdTs = it.createdTime ? (Date.parse(it.createdTime) || 0) : 0;
-      it._isNewFlag = !!it.isNew;
-      it._newScore = it._createdTs > 0 ? it._createdTs : idx;
+      for (let k = 0; k < it.t.length; k++) {
+        const tid = it.t[k];
+        tagCounter[tid] = (tagCounter[tid] || 0) + 1;
+      }
+      if (it.a) {
+        const prev = authorCounter.get(it.a);
+        if (prev) prev.count++;
+        else authorCounter.set(it.a, { name: it.a, norm: normalizeVN(it.a), count: 1 });
+      }
+
+      // Real modification timestamp in seconds (it.m from DriveFS SQLite or modifiedTime/createdTime fallback)
+      const mSec = Number(it.m) || ((it.modifiedTime || it.createdTime) ? Math.floor((Date.parse(it.modifiedTime || it.createdTime) || 0) / 1000) : 0);
+      it._mtimeSec = mSec;
+      it._newScore = mSec > 0 ? mSec : (idx + 1);
+      if (mSec > 0) mtimeSamples.push(mSec);
+
+      // Build unified search index (Series Name + Author + Tag Names)
+      let tagWords = '';
+      for (let k = 0; k < it.t.length; k++) {
+        const td = ccxTagById[it.t[k]];
+        if (td) tagWords += ' ' + td._norm;
+      }
+      it._norm = normalizeVN(it.name + (it.a ? ' ' + it.a : '')) + tagWords;
     });
+
+    ccxTagCounts = tagCounter;
+    ccxSortedAuthors = Array.from(authorCounter.values()).sort((a, b) => b.count - a.count || a.name.localeCompare(b.name, 'vi'));
+
+    // Determine ✨ MỚI badge threshold based on top 180 newest timestamps (or last 14 days)
+    let newThresholdSec = Math.floor(Date.now() / 1000) - 14 * 86400;
+    if (mtimeSamples.length > 200) {
+      mtimeSamples.sort((a, b) => b - a);
+      newThresholdSec = Math.min(newThresholdSec, mtimeSamples[179]);
+    }
+    catalogItems.forEach(it => {
+      it._isNewFlag = !!(it.isNew || (it._mtimeSec >= newThresholdSec && it._mtimeSec > 0));
+    });
+
     recomputeCatalogRealViewStats();
-    // Mark latest items in each category as new if not already marked by Drive API
-    [mangaIndices.slice(-14), novelIndices.slice(-10), animeIndices.slice(-10), movieIndices.slice(-8)].forEach(group => {
-      group.forEach((idx, pos) => {
-        const item = catalogItems[idx];
-        if (item) {
-          item._isNewFlag = true;
-          if (!item._createdTs) item._newScore = 100000 + pos * 100 + idx;
-        }
-      });
-    });
+
     const elAll = document.getElementById('count-all');
     const elManga = document.getElementById('count-manga');
     const elNovel = document.getElementById('count-novel');
@@ -3993,14 +5362,24 @@
     if (elMovie) elMovie.textContent = vCount;
   }
 
-  let hardwareDeviceInfo = { isTablet: false, smallestScreenWidthDp: 390, versionCode: 28, versionName: '3.8.4' };
+  let hardwareDeviceInfo = { isTablet: false, smallestScreenWidthDp: 390, versionCode: 29, versionName: '3.9.0' };
   let isEcoCoolMode = false;
 
   window._ccxHotRefreshFolderTree = function() {
     try {
+      const prevLocal = window.CCX_FOLDER_TREE || {};
       const s = document.createElement('script');
       s.async = true;
-      s.src = 'https://conchimxanh-ai.github.io/Turing-Morphogenesis-Quant-Shield/folder_tree.js?v=3.8.4&t=' + Math.floor(Date.now() / 180000);
+      s.onload = function() {
+        try {
+          if (window.CCX_FOLDER_TREE && prevLocal) {
+            for (const k in prevLocal) {
+              if (!window.CCX_FOLDER_TREE[k]) window.CCX_FOLDER_TREE[k] = prevLocal[k];
+            }
+          }
+        } catch (e) {}
+      };
+      s.src = 'https://conchimxanh-ai.github.io/Turing-Morphogenesis-Quant-Shield/folder_tree.js?v=3.9.0&t=' + Math.floor(Date.now() / 180000);
       document.head.appendChild(s);
     } catch (e) {}
   };
@@ -4111,7 +5490,7 @@
       catalogItems = seedItems;
     }
     updateCategoryCounts();
-    const curVerStr = hardwareDeviceInfo.versionName || '3.7.2';
+    const curVerStr = hardwareDeviceInfo.versionName || '3.9.0';
     document.getElementById('header-status').textContent = `${getDeviceTypeLabel()} • V${curVerStr} (${catalogItems.length} bộ)`;
     const savedSyncCode = localStorage.getItem('ccx_cloud_sync_code_v1') || '';
     const syncInp = document.getElementById('cloud-sync-code-input');
@@ -4202,8 +5581,8 @@
     const catStatsEl = document.getElementById('about-catalog-stats');
     const logBox = document.getElementById('about-changelog-box');
 
-    const vName = (latestOtaInfo && latestOtaInfo.currentVersionName) || hardwareDeviceInfo.versionName || '3.8.4';
-    const vCode = (latestOtaInfo && latestOtaInfo.currentVersionCode) || hardwareDeviceInfo.versionCode || 28;
+    const vName = (latestOtaInfo && latestOtaInfo.currentVersionName) || hardwareDeviceInfo.versionName || '3.9.0';
+    const vCode = (latestOtaInfo && latestOtaInfo.currentVersionCode) || hardwareDeviceInfo.versionCode || 29;
     if (curVerEl) curVerEl.textContent = `V${vName} Supreme (Build #${vCode})`;
 
     if (latestVerEl) {
@@ -4371,21 +5750,257 @@
   }
 
   let topSubFilter = 'all';
+  let voteSubFilter = 'all';
+  let newSubFilter = 'all';
+  let selectedTagIds = new Set();
+  let selectedAuthors = new Set();
+  let multiTagCombineMode = 'AND'; // 'AND' | 'OR'
+
+  function itemMatchesActiveMultiTags(it) {
+    const hasTags = selectedTagIds.size > 0;
+    const hasAuthors = selectedAuthors.size > 0;
+    if (!hasTags && !hasAuthors) return true;
+    const itemTags = Array.isArray(it.t) ? it.t : [];
+
+    if (multiTagCombineMode === 'AND') {
+      if (hasAuthors) {
+        if (!it.a || !selectedAuthors.has(it.a)) return false;
+      }
+      if (hasTags) {
+        for (const tid of selectedTagIds) {
+          if (!itemTags.includes(tid)) return false;
+        }
+      }
+      return true;
+    } else {
+      // OR mode: match ANY selected tag OR ANY selected author
+      if (hasAuthors && it.a && selectedAuthors.has(it.a)) return true;
+      if (hasTags) {
+        for (const tid of selectedTagIds) {
+          if (itemTags.includes(tid)) return true;
+        }
+      }
+      return false;
+    }
+  }
+
+  function countLiveMultiTagMatches() {
+    let cnt = 0;
+    for (let i = 0; i < catalogItems.length; i++) {
+      if (itemMatchesActiveMultiTags(catalogItems[i])) cnt++;
+    }
+    return cnt;
+  }
+
+  function updateMultiTagHeaderAndBar() {
+    const totalSel = selectedTagIds.size + selectedAuthors.size;
+    const btn = document.getElementById('btn-multitag-open');
+    const lbl = document.getElementById('multitag-btn-label');
+    if (btn && lbl) {
+      btn.classList.toggle('has-active', totalSel > 0);
+      lbl.textContent = totalSel > 0 ? `Đa Tag (${totalSel})` : 'Đa Tag';
+    }
+    const bar = document.getElementById('active-multitag-bar');
+    if (!bar) return;
+    if (totalSel === 0) {
+      bar.classList.add('hidden');
+      bar.innerHTML = '';
+      return;
+    }
+    bar.classList.remove('hidden');
+    const chips = [];
+    chips.push(`<span style="font-size:11px; color:var(--cyan-neon); font-weight:900; white-space:nowrap;">🏷️ Đang lọc (${multiTagCombineMode === 'AND' ? 'Tất cả' : 'Bất kỳ'}):</span>`);
+    for (const auth of selectedAuthors) {
+      const safeA = escapeHtml(auth);
+      const jsA = safeA.replace(/'/g, "\\'");
+      chips.push(`<span class="active-tag-chip author-chip" onclick="toggleQuickAuthorFilter(event, '${jsA}')">✍️ ${safeA} <b>✕</b></span>`);
+    }
+    for (const tid of selectedTagIds) {
+      const td = ccxTagById[tid];
+      if (!td) continue;
+      chips.push(`<span class="active-tag-chip" onclick="toggleQuickTagFilter(event, ${tid})">${escapeHtml(td.short || (td.icon + ' ' + td.label))} <b>✕</b></span>`);
+    }
+    chips.push(`<span class="active-tag-chip" style="background:rgba(239,68,68,0.22); border-color:rgba(248,113,113,0.55); color:#FECACA;" onclick="clearAllMultiTags(true)">🗑️ Xóa hết</span>`);
+    bar.innerHTML = chips.join('');
+  }
+
+  function openMultiTagDrawer() {
+    const dr = document.getElementById('multitag-drawer');
+    if (!dr) return;
+    dr.classList.remove('hidden');
+    pushCcxHistoryState('multitag_drawer');
+    renderMultiTagDrawerBody();
+  }
+
+  function closeMultiTagDrawer() {
+    const dr = document.getElementById('multitag-drawer');
+    if (dr) dr.classList.add('hidden');
+  }
+
+  function setMultiTagCombineMode(mode) {
+    multiTagCombineMode = (mode === 'OR') ? 'OR' : 'AND';
+    const bAnd = document.getElementById('tag-mode-and');
+    const bOr = document.getElementById('tag-mode-or');
+    if (bAnd) bAnd.classList.toggle('active', multiTagCombineMode === 'AND');
+    if (bOr) bOr.classList.toggle('active', multiTagCombineMode === 'OR');
+    renderMultiTagDrawerBody();
+    updateMultiTagHeaderAndBar();
+    renderLibraryGrid();
+  }
+
+  function toggleDrawerTag(tid) {
+    const idNum = Number(tid);
+    if (selectedTagIds.has(idNum)) selectedTagIds.delete(idNum);
+    else selectedTagIds.add(idNum);
+    renderMultiTagDrawerBody();
+    updateMultiTagHeaderAndBar();
+    renderLibraryGrid();
+  }
+
+  function toggleDrawerAuthor(authorName) {
+    if (!authorName) return;
+    if (selectedAuthors.has(authorName)) {
+      selectedAuthors.delete(authorName);
+    } else {
+      selectedAuthors.add(authorName);
+      if (selectedAuthors.size > 1 && multiTagCombineMode === 'AND') {
+        // Selecting 2 authors naturally implies OR unless user switches back
+        multiTagCombineMode = 'OR';
+        const bAnd = document.getElementById('tag-mode-and');
+        const bOr = document.getElementById('tag-mode-or');
+        if (bAnd) bAnd.classList.remove('active');
+        if (bOr) bOr.classList.add('active');
+      }
+    }
+    renderMultiTagDrawerBody();
+    updateMultiTagHeaderAndBar();
+    renderLibraryGrid();
+  }
+
+  function toggleQuickTagFilter(ev, tid) {
+    if (ev) ev.stopPropagation();
+    const idNum = Number(tid);
+    if (selectedTagIds.has(idNum)) selectedTagIds.delete(idNum);
+    else selectedTagIds.add(idNum);
+    updateMultiTagHeaderAndBar();
+    renderLibraryGrid();
+  }
+
+  function toggleQuickAuthorFilter(ev, authorName) {
+    if (ev) ev.stopPropagation();
+    if (!authorName) return;
+    if (selectedAuthors.has(authorName)) selectedAuthors.delete(authorName);
+    else {
+      selectedAuthors.clear();
+      selectedAuthors.add(authorName);
+    }
+    updateMultiTagHeaderAndBar();
+    renderLibraryGrid();
+  }
+
+  function clearAllMultiTags(closeAfter) {
+    selectedTagIds.clear();
+    selectedAuthors.clear();
+    const inp = document.getElementById('tag-drawer-search');
+    if (inp) inp.value = '';
+    updateMultiTagHeaderAndBar();
+    if (!document.getElementById('multitag-drawer').classList.contains('hidden')) {
+      renderMultiTagDrawerBody();
+    }
+    renderLibraryGrid();
+    if (closeAfter) closeMultiTagDrawer();
+  }
+
+  function renderMultiTagDrawerBody() {
+    const body = document.getElementById('multitag-drawer-body');
+    const applyBtn = document.getElementById('btn-multitag-apply');
+    if (!body) return;
+    const q = normalizeVN((document.getElementById('tag-drawer-search') || {}).value || '');
+
+    const groups = [
+      { key: 'ebook', title: '📚 Chủ Đề Sách & Ebook Học Tập / Đời Sống' },
+      { key: 'genre', title: '⚔️ Thể Loại Truyện Tranh, Tiểu Thuyết & Phim' },
+      { key: 'format', title: '🎙️ Định Dạng, Ngôn Ngữ & Quốc Gia' }
+    ];
+
+    let htmlParts = [];
+    for (const g of groups) {
+      const tagsInGroup = ccxTagDict.filter(t => t.group === g.key && (!q || (ccxTagById[t.id] && ccxTagById[t.id]._norm.includes(q))));
+      if (tagsInGroup.length === 0) continue;
+      htmlParts.push(`<div class="multitag-group-title"><span>${g.title}</span></div>`);
+      htmlParts.push('<div class="multitag-chip-wrap">');
+      for (const t of tagsInGroup) {
+        const cnt = ccxTagCounts[t.id] || 0;
+        const isSel = selectedTagIds.has(t.id);
+        htmlParts.push(`<button type="button" class="drawer-tag-btn ${isSel ? 'selected' : ''}" onclick="toggleDrawerTag(${t.id})"><span>${t.icon} ${escapeHtml(t.label)}</span><span class="tag-cnt">(${cnt.toLocaleString('vi-VN')})</span></button>`);
+      }
+      htmlParts.push('</div>');
+    }
+
+    // Authors section (Top 36 by book count by default, or up to 60 matching authors when searching!)
+    const matchedAuthors = q
+      ? ccxSortedAuthors.filter(a => a.norm.includes(q)).slice(0, 60)
+      : ccxSortedAuthors.slice(0, 36);
+
+    // Always include any currently selected author so user can easily uncheck it
+    const shownSet = new Set(matchedAuthors.map(a => a.name));
+    for (const selA of selectedAuthors) {
+      if (!shownSet.has(selA)) {
+        const found = ccxSortedAuthors.find(a => a.name === selA);
+        if (found) matchedAuthors.unshift(found);
+      }
+    }
+
+    if (matchedAuthors.length > 0) {
+      htmlParts.push(`<div class="multitag-group-title"><span>✍️ Tác Giả (${q ? 'Kết quả khớp' : 'Nổi bật — gõ ô trên để tìm trong ' + ccxSortedAuthors.length.toLocaleString('vi-VN') + ' tác giả'})</span></div>`);
+      htmlParts.push('<div class="multitag-chip-wrap">');
+      for (const a of matchedAuthors) {
+        const isSel = selectedAuthors.has(a.name);
+        const safeA = escapeHtml(a.name);
+        const jsA = safeA.replace(/'/g, "\\'");
+        htmlParts.push(`<button type="button" class="drawer-tag-btn author-btn ${isSel ? 'selected' : ''}" onclick="toggleDrawerAuthor('${jsA}')"><span>✍️ ${safeA}</span><span class="tag-cnt">(${a.count})</span></button>`);
+      }
+      htmlParts.push('</div>');
+    }
+
+    if (htmlParts.length === 0) {
+      htmlParts.push('<div style="text-align:center; padding:28px 12px; color:var(--text-sub);">Không tìm thấy Tag hoặc Tác giả nào khớp từ khóa này.</div>');
+    }
+
+    body.innerHTML = htmlParts.join('');
+    if (applyBtn) {
+      const matchCnt = countLiveMultiTagMatches();
+      applyBtn.textContent = `⚡ Xem Ngay ${matchCnt.toLocaleString('vi-VN')} Bộ Khớp`;
+    }
+  }
 
   function setLibraryFilter(filter) {
     currentFilter = filter;
-    ['all', 'top', 'new', 'manga', 'novel', 'anime', 'movie', 'fav', 'reading'].forEach(f => {
+    ['all', 'top', 'vote', 'new', 'manga', 'novel', 'anime', 'movie', 'fav', 'reading'].forEach(f => {
       const el = document.getElementById('pill-' + f);
       if (el) el.classList.toggle('active', f === filter);
     });
     const subBar = document.getElementById('top-subfilter-bar');
-    if (subBar) {
-      subBar.classList.toggle('hidden', filter !== 'top');
-    }
-    if (filter === 'top') {
+    if (subBar) subBar.classList.toggle('hidden', filter !== 'top');
+    const voteBar = document.getElementById('vote-subfilter-bar');
+    if (voteBar) voteBar.classList.toggle('hidden', filter !== 'vote');
+    const newBar = document.getElementById('new-subfilter-bar');
+    if (newBar) newBar.classList.toggle('hidden', filter !== 'new');
+
+    if (filter === 'top' || filter === 'vote') {
       recomputeCatalogRealViewStats();
       syncGlobalRealViewsWithCloud(false);
     }
+    renderLibraryGrid();
+  }
+
+  function setTopTimeWindow(winKey) {
+    topTimeWindow = winKey || 'all';
+    ['today', '7d', '30d', 'year', 'all'].forEach(k => {
+      const el = document.getElementById('top-win-' + k);
+      if (el) el.classList.toggle('active', k === topTimeWindow);
+    });
+    recomputeCatalogRealViewStats();
     renderLibraryGrid();
   }
 
@@ -4396,6 +6011,60 @@
       if (el) el.classList.toggle('active', k === topSubFilter);
     });
     renderLibraryGrid();
+  }
+
+  function setVoteSubFilter(sub) {
+    voteSubFilter = sub || 'all';
+    ['all', 'manga', 'novel', 'anime', 'movie'].forEach(k => {
+      const el = document.getElementById('vote-sub-' + k);
+      if (el) el.classList.toggle('active', k === voteSubFilter);
+    });
+    renderLibraryGrid();
+  }
+
+  function setNewSubFilter(sub) {
+    newSubFilter = sub || 'all';
+    ['all', 'manga', 'novel', 'anime', 'movie'].forEach(k => {
+      const el = document.getElementById('new-sub-' + k);
+      if (el) el.classList.toggle('active', k === newSubFilter);
+    });
+    renderLibraryGrid();
+  }
+
+  function formatRealUpdatedDateBadge(mtimeSec) {
+    if (!mtimeSec || mtimeSec <= 0) return '';
+    const nowSec = Math.floor(Date.now() / 1000);
+    const diff = Math.max(0, nowSec - mtimeSec);
+    if (diff < 86400) return '🕒 Hôm nay';
+    if (diff < 172800) return '🕒 Hôm qua';
+    if (diff < 7 * 86400) return `🕒 ${Math.floor(diff / 86400)} ngày trước`;
+    const d = new Date(mtimeSec * 1000);
+    const dd = String(d.getDate()).padStart(2, '0');
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    return `📅 ${dd}/${mm}/${d.getFullYear()}`;
+  }
+
+  function pickDisplayCardTags(it) {
+    const arr = Array.isArray(it.t) ? it.t : [];
+    if (arr.length === 0) return [];
+    const chosen = [];
+    // Priority 1: Thuyết Minh / Lồng Tiếng (23)
+    if (arr.includes(23)) chosen.push(23);
+    // Priority 2: Ebook subject tags (1..5, 7, 8) or specific Genres (10..21)
+    for (const id of arr) {
+      if (chosen.length >= 2) break;
+      if ((id >= 1 && id <= 5) || id === 7 || id === 8 || (id >= 10 && id <= 21)) {
+        if (!chosen.includes(id)) chosen.push(id);
+      }
+    }
+    // Priority 3: Văn học (6), Hành động (9), Bản màu (25), EPUB+PDF (26)
+    for (const id of arr) {
+      if (chosen.length >= 2) break;
+      if (id === 6 || id === 9 || id === 25 || id === 26) {
+        if (!chosen.includes(id)) chosen.push(id);
+      }
+    }
+    return chosen.slice(0, it.a ? 2 : 3);
   }
 
   function clearSearch() {
@@ -4410,6 +6079,8 @@
     const historyMap = getReadingHistoryMap();
     const readingSeriesSet = new Set(Object.values(historyMap).map(x => x.series));
     const favSet = getFavoritesSet();
+    const votedSet = getVotedSeriesSet();
+    const hasMultiTag = selectedTagIds.size > 0 || selectedAuthors.size > 0;
 
     const offlineSeriesCountMap = {};
     try {
@@ -4422,22 +6093,33 @@
       }
     } catch (e) {}
 
-    if (currentFilter === 'top') {
+    if (currentFilter === 'top' || currentFilter === 'vote') {
       recomputeCatalogRealViewStats();
     }
+
+    const cutoffMs = getTopWindowCutoffMs(topTimeWindow);
 
     let filtered = catalogItems.filter(it => {
       if (q) {
         if (!it._norm) it._norm = normalizeVN(it.name);
         if (!it._norm.includes(q)) return false;
       }
+      if (hasMultiTag && !itemMatchesActiveMultiTags(it)) return false;
+
       const t = it._type || inferItemType(it);
       if (currentFilter === 'top') {
         if (topSubFilter !== 'all' && t !== topSubFilter) return false;
-        // 100% Real-View Policy: Only show series that have real verified views or favorites!
+        if (cutoffMs > 0) return (it._realViews || 0) > 0;
         return (it._realViews || 0) > 0 || (it._realFavs || 0) > 0;
       }
-      if (currentFilter === 'new') return !!it._isNewFlag;
+      if (currentFilter === 'vote') {
+        if (voteSubFilter !== 'all' && t !== voteSubFilter) return false;
+        return (it._realVotes || 0) > 0;
+      }
+      if (currentFilter === 'new') {
+        if (newSubFilter !== 'all' && t !== newSubFilter) return false;
+        return true;
+      }
       if (currentFilter === 'manga') return t === 'manga';
       if (currentFilter === 'novel') return t === 'novel';
       if (currentFilter === 'anime') return t === 'anime';
@@ -4449,29 +6131,43 @@
 
     if (currentFilter === 'new') {
       filtered = filtered.slice().sort((a, b) => (b._newScore || 0) - (a._newScore || 0));
+      if (!q && !hasMultiTag && filtered.length > 300) {
+        filtered = filtered.slice(0, 300);
+      }
     } else if (currentFilter === 'top') {
       filtered = filtered.slice().sort((a, b) => {
         if ((b._realViews || 0) !== (a._realViews || 0)) return (b._realViews || 0) - (a._realViews || 0);
         if ((b._realReaders || 0) !== (a._realReaders || 0)) return (b._realReaders || 0) - (a._realReaders || 0);
+        if ((b._realVotes || 0) !== (a._realVotes || 0)) return (b._realVotes || 0) - (a._realVotes || 0);
         if ((b._realChaps || 0) !== (a._realChaps || 0)) return (b._realChaps || 0) - (a._realChaps || 0);
+        if ((b._realFavs || 0) !== (a._realFavs || 0)) return (b._realFavs || 0) - (a._realFavs || 0);
+        return (b._realLastAt || 0) - (a._realLastAt || 0);
+      });
+    } else if (currentFilter === 'vote') {
+      filtered = filtered.slice().sort((a, b) => {
+        if ((b._realVotes || 0) !== (a._realVotes || 0)) return (b._realVotes || 0) - (a._realVotes || 0);
+        if ((b._realAllViews || 0) !== (a._realAllViews || 0)) return (b._realAllViews || 0) - (a._realAllViews || 0);
         if ((b._realFavs || 0) !== (a._realFavs || 0)) return (b._realFavs || 0) - (a._realFavs || 0);
         return (b._realLastAt || 0) - (a._realLastAt || 0);
       });
     }
 
     if (filtered.length === 0) {
-      const emptyMsg = currentFilter === 'fav'
-        ? 'Chưa có bộ nào trong Tủ Yêu Thích. Hãy bấm biểu tượng 🤍 trên thẻ truyện/phim để ghim nhé!'
-        : (currentFilter === 'top'
-          ? 'Chưa có bộ nào trong danh mục này có lượt xem thật trên Đám Mây. Khi có người mở đọc/xem, bộ đó sẽ tự động xuất hiện tại đây!'
-          : 'Không tìm thấy bộ Truyện / Anime / Phim nào khớp từ khóa.');
-      grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:40px 16px; color:var(--text-sub);">${emptyMsg}</div>`;
+      let emptyMsg = 'Không tìm thấy bộ Truyện / Sách / Anime / Phim nào khớp bộ lọc.';
+      if (currentFilter === 'fav') {
+        emptyMsg = 'Chưa có bộ nào trong Tủ Yêu Thích. Hãy bấm biểu tượng 🤍 trên thẻ truyện/phim để ghim nhé!';
+      } else if (currentFilter === 'vote') {
+        emptyMsg = '🗳️ Chưa có bộ nào được đề cử trong mục này (100% số phiếu thật, không tạo phiếu ảo). Hãy bấm nút 👍 trên bộ truyện/sách/phim bạn tâm đắc để mở hàng Bảng Đề Cử nhé!';
+      } else if (currentFilter === 'top') {
+        emptyMsg = 'Chưa có bộ nào trong khung thời gian / danh mục này có lượt xem thật trên Đám Mây. Bạn có thể chuyển sang khung 🗓️ 30 Ngày hoặc 👑 Mọi Thời Đại nhé!';
+      }
+      grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:40px 16px; color:var(--text-sub); line-height:1.6;">${emptyMsg}</div>`;
       return;
     }
 
     window._ccxFilteredGridList = filtered;
     window._ccxRenderedGridCount = 0;
-    window._ccxGridMetaCtx = { readingSeriesSet, offlineSeriesCountMap, favSet };
+    window._ccxGridMetaCtx = { readingSeriesSet, offlineSeriesCountMap, favSet, votedSet };
     grid.innerHTML = '';
     appendMoreLibraryGridCards(window._isIosDevice || isEcoCoolMode ? 48 : 80);
 
@@ -4500,7 +6196,7 @@
     const startIdx = window._ccxRenderedGridCount || 0;
     if (!grid || startIdx >= list.length) return;
     const endIdx = Math.min(list.length, startIdx + (batchSize || 48));
-    const ctx = window._ccxGridMetaCtx || { readingSeriesSet: new Set(), offlineSeriesCountMap: {}, favSet: new Set() };
+    const ctx = window._ccxGridMetaCtx || { readingSeriesSet: new Set(), offlineSeriesCountMap: {}, favSet: new Set(), votedSet: new Set() };
     const isCool = isEcoCoolMode || !!window._isIosDevice;
 
     const oldMoreBtn = document.getElementById('ccx-grid-load-more-row');
@@ -4512,14 +6208,17 @@
       const isReading = ctx.readingSeriesSet.has(it.name);
       const offCnt = ctx.offlineSeriesCountMap[it.name] || 0;
       const isFav = ctx.favSet.has(it.name);
+      const isVoted = ctx.votedSet.has(it.name);
+      const voteCnt = it._realVotes || 0;
       const isNewSeries = !!it._isNewFlag;
       const safeName = escapeHtml(it.name);
       const jsName = safeName.replace(/'/g, "\\'");
       const safeId = escapeHtml(it.id || it.url);
+
       let badgeLabel = '📚 TRUYỆN TRANH';
       let badgeClass = '';
       if (t === 'novel') {
-        badgeLabel = '📖 TRUYỆN CHỮ';
+        badgeLabel = '📖 SÁCH / TRUYỆN CHỮ';
         badgeClass = 'badge-full';
       } else if (t === 'anime') {
         badgeLabel = '🎬 ANIME HD';
@@ -4531,30 +6230,58 @@
         badgeLabel = '✓ TRUYỆN FULL';
         badgeClass = 'badge-full';
       }
+
       let topBadgeHtml = '';
-      if (currentFilter === 'top') {
+      if (currentFilter === 'top' || currentFilter === 'vote') {
         const rk = i + 1;
+        const prefix = currentFilter === 'vote' ? 'ĐỀ CỬ' : 'TOP';
         if (rk === 1) {
-          topBadgeHtml = `<span style="font-size:10px; background:linear-gradient(90deg,#F59E0B,#EF4444); color:#fff; padding:2px 7px; border-radius:5px; font-weight:900; box-shadow:0 0 10px rgba(245,158,11,0.5);">👑 TOP #1</span>`;
+          topBadgeHtml = `<span style="font-size:10px; background:linear-gradient(90deg,#F59E0B,#EF4444); color:#fff; padding:2px 7px; border-radius:5px; font-weight:900; box-shadow:0 0 10px rgba(245,158,11,0.5);">👑 ${prefix} #1</span>`;
         } else if (rk <= 3) {
-          topBadgeHtml = `<span style="font-size:10px; background:linear-gradient(90deg,#FBBF24,#D97706); color:#05070B; padding:2px 7px; border-radius:5px; font-weight:900;">🏆 TOP #${rk}</span>`;
+          topBadgeHtml = `<span style="font-size:10px; background:linear-gradient(90deg,#FBBF24,#D97706); color:#05070B; padding:2px 7px; border-radius:5px; font-weight:900;">🏆 ${prefix} #${rk}</span>`;
         } else if (rk <= 10) {
-          topBadgeHtml = `<span style="font-size:10px; background:linear-gradient(90deg,#00F0FF,#2563EB); color:#fff; padding:2px 7px; border-radius:5px; font-weight:900;">🔥 TOP #${rk}</span>`;
+          topBadgeHtml = `<span style="font-size:10px; background:linear-gradient(90deg,#00F0FF,#2563EB); color:#fff; padding:2px 7px; border-radius:5px; font-weight:900;">🔥 #${rk}</span>`;
         } else {
           topBadgeHtml = `<span style="font-size:9.5px; background:rgba(56,189,248,0.18); border:1px solid var(--cyan-neon); color:var(--cyan-neon); padding:1px 6px; border-radius:5px; font-weight:800;">⭐ #${rk}</span>`;
         }
       }
-      const realViews = it._realViews || 0;
-      const realReaders = it._realReaders || 0;
+
+      // Build compact 1-tap Author + Multi-Tag chips row (max 3 chips, zero clutter)
+      const miniChips = [];
+      if (it.a) {
+        const safeA = escapeHtml(it.a);
+        const jsA = safeA.replace(/'/g, "\\'");
+        const aSel = selectedAuthors.has(it.a) ? 'is-selected' : '';
+        miniChips.push(`<span class="card-mini-tag author-mini ${aSel}" onclick="toggleQuickAuthorFilter(event, '${jsA}')" title="Lọc tác giả ${safeA}">✍️ ${safeA}</span>`);
+      }
+      const pickedTags = pickDisplayCardTags(it);
+      for (const tid of pickedTags) {
+        const td = ccxTagById[tid];
+        if (!td) continue;
+        const tSel = selectedTagIds.has(tid) ? 'is-selected' : '';
+        const extraCls = tid === 23 ? 'dub-mini' : '';
+        miniChips.push(`<span class="card-mini-tag ${extraCls} ${tSel}" onclick="toggleQuickTagFilter(event, ${tid})">${escapeHtml(td.short || (td.icon + ' ' + td.label))}</span>`);
+      }
+      const tagRowHtml = miniChips.length > 0 ? `<div class="card-tag-row">${miniChips.join('')}</div>` : '';
+
+      const realViews = currentFilter === 'top' ? (it._realViews || 0) : (it._realAllViews || it._realViews || 0);
+      const realReaders = currentFilter === 'top' ? (it._realReaders || 0) : (it._realAllReaders || it._realReaders || 0);
       const realChaps = it._realChaps || 0;
+      const voteStatStr = (currentFilter === 'vote' && voteCnt > 0)
+        ? `<span style="color:#FDE68A; font-weight:800;">👍 ${voteCnt} phiếu đề cử</span> • `
+        : '';
       const readCountStr = (currentFilter === 'top' || realViews > 0)
-        ? `<span style="color:#FBBF24; font-weight:800;">👁️ ${realViews.toLocaleString('vi-VN')} lượt xem thật • 👥 ${realReaders} độc giả${realChaps > 0 ? ` (${realChaps} tập)` : ''}</span> • `
+        ? `<span style="color:#FBBF24; font-weight:800;">👁️ ${realViews.toLocaleString('vi-VN')} lượt xem • 👥 ${realReaders} độc giả${realChaps > 0 ? ` (${realChaps} tập)` : ''}</span> • `
+        : '';
+      const dateStr = (currentFilter === 'new' && it._mtimeSec > 0)
+        ? `<span style="color:#F472B6; font-weight:800;">${formatRealUpdatedDateBadge(it._mtimeSec)}</span> • `
         : '';
       const subMeta = offCnt > 0
-        ? `${readCountStr}<span style="color:#34D399; font-weight:800;">✅ Đã tải ${offCnt} tập trong máy</span>`
-        : `${readCountStr}${it.filesText ? escapeHtml(it.filesText) : '📥 Tải cả bộ'}`;
+        ? `${voteStatStr}${dateStr}${readCountStr}<span style="color:#34D399; font-weight:800;">✅ Đã tải ${offCnt} tập</span>`
+        : `${voteStatStr}${dateStr}${readCountStr}${it.filesText ? escapeHtml(it.filesText) : '📥 Tải cả bộ'}`;
+
       return `
-        <div class="manga-card" style="${offCnt > 0 ? 'border-color:rgba(16,185,129,0.55);' : (currentFilter === 'top' && i < 3 ? 'border-color:rgba(245,158,11,0.65);' : '')}" onclick="openSeriesRoot('${safeId}', '${jsName}')">
+        <div class="manga-card" style="${offCnt > 0 ? 'border-color:rgba(16,185,129,0.55);' : ((currentFilter === 'top' || currentFilter === 'vote') && i < 3 ? 'border-color:rgba(245,158,11,0.65);' : '')}" onclick="openSeriesRoot('${safeId}', '${jsName}')">
           ${isCool ? '' : '<div class="card-glow"></div>'}
           <div>
             <div class="card-badge-row">
@@ -4563,12 +6290,14 @@
                 <span class="badge-tag ${badgeClass}">${badgeLabel}</span>
                 ${isNewSeries ? `<span style="font-size:9.5px; background:linear-gradient(90deg,#EC4899,#8B5CF6); color:#fff; padding:2px 6px; border-radius:5px; font-weight:800;">✨ MỚI</span>` : ''}
               </div>
-              <div style="display:flex; align-items:center; gap:6px;">
-                ${offCnt > 0 ? `<span style="font-size:10.5px; color:#34D399; font-weight:800;">📥 Đã tải (${offCnt})</span>` : (isReading ? '<span style="font-size:10.5px; color:var(--amber-neon); font-weight:800;">🔥 Đang xem</span>' : '')}
-                <button class="fav-btn ${isFav ? 'active' : ''}" onclick="toggleFavoriteSeries(event, '${jsName}')">${isFav ? '❤️' : '🤍'}</button>
+              <div style="display:flex; align-items:center; gap:5px;">
+                ${offCnt > 0 ? `<span style="font-size:10px; color:#34D399; font-weight:800;">📥(${offCnt})</span>` : (isReading ? '<span style="font-size:10px; color:var(--amber-neon); font-weight:800;">🔥Đang xem</span>' : '')}
+                <button class="vote-btn ${isVoted ? 'active' : ''}" onclick="toggleVoteSeries(event, '${jsName}')" title="Đề cử bộ này (1 người = 1 phiếu)">👍${voteCnt > 0 ? `<span>${voteCnt}</span>` : ''}</button>
+                <button class="fav-btn ${isFav ? 'active' : ''}" onclick="toggleFavoriteSeries(event, '${jsName}')" title="Yêu thích">${isFav ? '❤️' : '🤍'}</button>
               </div>
             </div>
             <div class="card-title">${safeName}</div>
+            ${tagRowHtml}
           </div>
           <div class="card-footer">
             <span>${subMeta}</span>
@@ -4661,6 +6390,7 @@
 
     modal.classList.remove('hidden');
     titleEl.textContent = top.title;
+    syncFolderModalHeaderActions();
 
     let res = window._ccxResolveLocalFolderTree ? window._ccxResolveLocalFolderTree(top.id) : null;
     if (!res || !Array.isArray(res.items) || res.items.length === 0) {
@@ -4688,17 +6418,28 @@
       }
     }
 
+    const isEbookFileName = (nm) => /\.(epub|mobi|azw3|prc)$/i.test(String(nm || '').trim());
     const items = (res.items || []).sort((a, b) => {
       if (a.isFolder !== b.isFolder) return a.isFolder ? -1 : 1;
+      const aEb = !a.isFolder && isEbookFileName(a.name);
+      const bEb = !b.isFolder && isEbookFileName(b.name);
+      if (aEb !== bEb) return aEb ? 1 : -1;
       return naturalCompare(a, b);
     });
 
-    currentFolderPdfItems = items.filter(x => !x.isFolder && !x.isImage && !x.isVideo);
+    currentFolderPdfItems = items.filter(x => !x.isFolder && !x.isImage && !x.isVideo && !isEbookFileName(x.name));
+    const currentFolderEbookItems = items.filter(x => !x.isFolder && !x.isImage && !x.isVideo && isEbookFileName(x.name));
+    window._currentFolderEbookItems = currentFolderEbookItems;
     currentFolderImageItems = items.filter(x => !x.isFolder && x.isImage);
     const currentFolderVideoItems = items.filter(x => !x.isFolder && x.isVideo);
-    const downloadableItems = items.filter(x => !x.isFolder);
+    const hasBothPdfAndEbook = currentFolderPdfItems.length > 0 && currentFolderEbookItems.length > 0;
+    const downloadableItems = hasBothPdfAndEbook
+      ? items.filter(x => !x.isFolder && !isEbookFileName(x.name))
+      : items.filter(x => !x.isFolder);
 
-    subEl.textContent = `Đã mở khóa ${items.length} mục • Sẵn sàng Xem & Tải Trọn Bộ`;
+    subEl.textContent = hasBothPdfAndEbook
+      ? `Đã mở khóa ${currentFolderPdfItems.length} Bản PDF đọc trên App + ${currentFolderEbookItems.length} File Ebook gốc (.EPUB)`
+      : `Đã mở khóa ${items.length} mục • Sẵn sàng Xem & Tải Trọn Bộ`;
 
     if (items.length === 0) {
       listEl.innerHTML = `<div style="text-align:center; padding:40px 16px; color:var(--text-sub);">Thư mục này chưa có file nào hoặc chứa các thư mục con trống.</div>`;
@@ -4708,12 +6449,12 @@
     const historyMap = getReadingHistoryMap();
 
     let bannerHtml = '';
-    if (downloadableItems.length > 0) {
+    if (downloadableItems.length > 0 && !(currentFolderPdfItems.length === 0 && currentFolderEbookItems.length > 0)) {
       bannerHtml += `
         <div class="file-item" style="border-color:rgba(16,185,129,0.55); background:linear-gradient(90deg, rgba(16,185,129,0.16) 0%, rgba(37,99,235,0.16) 100%);">
           <div class="file-info">
-            <div class="file-name" style="color:#34D399;">📥 Tải Cả Thư Mục Này Về Máy (Trọn Bộ ${downloadableItems.length} Tập/File)</div>
-            <div class="file-meta"><span>Tự động tải tuần tự toàn bộ tập trong thư mục vào Tủ Offline & thư mục Download/ConChimXanh/</span></div>
+            <div class="file-name" style="color:#34D399;">📥 Tải ${hasBothPdfAndEbook ? 'Trọn Bộ PDF Về Tủ Offline' : 'Cả Thư Mục Này Về Máy'} (${downloadableItems.length} Tập/File)</div>
+            <div class="file-meta"><span>Tự động tải tuần tự toàn bộ tập đọc trực tiếp vào Tủ Offline & thư mục Download/ConChimXanh/</span></div>
           </div>
           <button class="action-btn btn-save" style="background:linear-gradient(135deg, #10B981, #059669); color:#FFFFFF; border:none;" onclick="downloadEntireCurrentFolder()">📥 Tải Cả Bộ</button>
         </div>
@@ -4731,7 +6472,7 @@
       `;
     }
 
-    window._currentFolderAllItems = items;
+    window._currentFolderAllItems = downloadableItems;
     window._currentFolderVideoItems = currentFolderVideoItems;
     if (currentFolderVideoItems.length > 0) {
       try {
@@ -4742,6 +6483,9 @@
         localStorage.setItem('ccx_ep_cache_v1', JSON.stringify(epCache));
       } catch (e) {}
     }
+
+    let shownPdfHeader = false;
+    let shownEbookHeader = false;
 
     listEl.innerHTML = bannerHtml + items.map((item, idx) => {
       const safeId = escapeHtml(item.id);
@@ -4797,25 +6541,73 @@
             </div>
           </div>
         `;
+      } else if (isEbookFileName(item.name)) {
+        let sectionHdr = '';
+        if (!shownEbookHeader) {
+          shownEbookHeader = true;
+          sectionHdr = `
+            <div style="margin:14px 2px 6px; padding:8px 12px; border-radius:10px; background:linear-gradient(90deg, rgba(59,130,246,0.18), rgba(30,64,175,0.12)); border:1px solid rgba(96,165,250,0.35); display:flex; align-items:center; justify-content:space-between; gap:8px;">
+              <span style="font-size:11.5px; font-weight:900; color:#93C5FD; letter-spacing:0.3px;">📘 FILE EBOOK GỐC TÁCH RIÊNG (.EPUB — MÁY ĐỌC SÁCH / TẢI RIÊNG)</span>
+              <span style="font-size:10.5px; font-weight:800; color:#BFDBFE; white-space:nowrap;">${currentFolderEbookItems.length} file</span>
+            </div>
+          `;
+        }
+        const extUpper = (String(item.name || '').split('.').pop() || 'EPUB').toUpperCase();
+        const sizeMB = item.size > 0 ? (item.size / 1048576).toFixed(1) + ' MB' : extUpper;
+        const hintHtml = currentFolderPdfItems.length > 0
+          ? `<span style="color:#93C5FD; font-weight:700;">• 📘 Bản ${extUpper} tách riêng (Đọc trên App dùng Bản PDF ở trên)</span>`
+          : `<span style="color:var(--amber-neon); font-weight:700;">• 📖 Bấm Đọc để mở Trình đọc Giấy Ấm trực tiếp</span>`;
+        const readBtnHtml = (currentFolderPdfItems.length > 0 || /\.epub$/i.test(item.name))
+          ? `<button class="action-btn btn-read" style="background:rgba(59,130,246,0.22); border:1px solid rgba(96,165,250,0.5); color:#DBEAFE;" onclick="openEbookOrCompanionPdf('${safeId}', '${jsName}')">${currentFolderPdfItems.length > 0 ? '📕 Mở PDF' : '📖 Đọc EPUB'}</button>`
+          : '';
+        return sectionHdr + `
+          <div class="file-item" onclick="openEbookOrCompanionPdf('${safeId}', '${jsName}')" style="cursor:pointer; animation-delay:${rowDelay}ms; border-color:rgba(96,165,250,0.32); background:rgba(30,58,138,0.14);">
+            <div class="file-info">
+              <div class="file-name">📘 ${safeName}</div>
+              <div class="file-meta">
+                <span>${sizeMB}</span>
+                ${hintHtml}
+              </div>
+            </div>
+            <div class="file-actions" onclick="event.stopPropagation();">
+              ${readBtnHtml}
+              <button class="action-btn btn-save" onclick="downloadRawEbookFile('${safeId}', '${jsName}')">📥 Tải ${extUpper}</button>
+            </div>
+          </div>
+        `;
       } else {
+        let sectionHdr = '';
+        if (hasBothPdfAndEbook && !shownPdfHeader) {
+          shownPdfHeader = true;
+          sectionHdr = `
+            <div style="margin:6px 2px 6px; padding:8px 12px; border-radius:10px; background:linear-gradient(90deg, rgba(245,158,11,0.20), rgba(239,68,68,0.14)); border:1px solid rgba(251,191,36,0.42); display:flex; align-items:center; justify-content:space-between; gap:8px;">
+              <span style="font-size:11.5px; font-weight:900; color:#FDE68A; letter-spacing:0.3px;">📕 BẢN PDF GIẤY ẤM — ĐỌC TRỰC TIẾP TRÊN ANDROID & iOS</span>
+              <span style="font-size:10.5px; font-weight:800; color:#FEF3C7; white-space:nowrap;">${currentFolderPdfItems.length} file</span>
+            </div>
+          `;
+        }
         const sizeMB = item.size > 0 ? (item.size / 1048576).toFixed(1) + ' MB' : 'PDF';
         const prog = historyMap[item.id];
+        const pdfRoleBadge = hasBothPdfAndEbook
+          ? `<span style="color:#FBBF24; font-weight:800;">• 📕 BẢN PDF ĐỌC TRỰC TIẾP TRÊN APP</span>`
+          : '';
         const progBadge = prog ? `<span style="color:var(--amber-neon); font-weight:700;">• Đang đọc Trang ${prog.page}/${prog.total}</span>` : '';
         const offBadge = item.isOffline ? `<span style="color:#34D399; font-weight:800;">• ✅ ĐÃ TẢI TRONG MÁY</span>` : '';
         const jsSeries = escapeHtml(currentSeriesName || top.title || '').replace(/'/g, "\\'");
-        return `
-          <div class="file-item" style="animation-delay:${rowDelay}ms; ${item.isOffline ? 'border-color:rgba(16,185,129,0.55); background:rgba(16,185,129,0.08);' : ''}">
+        return sectionHdr + `
+          <div class="file-item" onclick="startReadingPdf('${safeId}', '${jsName}', false)" style="cursor:pointer; animation-delay:${rowDelay}ms; ${item.isOffline ? 'border-color:rgba(16,185,129,0.55); background:rgba(16,185,129,0.08);' : (hasBothPdfAndEbook ? 'border-color:rgba(251,191,36,0.42); background:rgba(245,158,11,0.08);' : '')}">
             <div class="file-info">
               <div class="file-name">${item.isOffline ? '✅' : '📕'} ${safeName}</div>
               <div class="file-meta">
                 <span>${sizeMB}</span>
+                ${pdfRoleBadge}
                 ${progBadge}
                 ${offBadge}
               </div>
             </div>
-            <div class="file-actions">
-              <button class="action-btn btn-read" onclick="startReadingPdf('${safeId}', '${jsName}', false)">📖 Đọc</button>
-              <button class="action-btn btn-save" onclick="downloadSingleItemOffline('${safeId}', '${jsName}')">${item.isOffline ? '✅ Đã Tải' : '📥 Tải'}</button>
+            <div class="file-actions" onclick="event.stopPropagation();">
+              <button class="action-btn btn-read" onclick="startReadingPdf('${safeId}', '${jsName}', false)">${hasBothPdfAndEbook ? '📖 Đọc Ngay' : '📖 Đọc'}</button>
+              <button class="action-btn btn-save" onclick="downloadSingleItemOffline('${safeId}', '${jsName}')">${item.isOffline ? '✅ Đã Tải' : (hasBothPdfAndEbook ? '📥 Tải PDF' : '📥 Tải')}</button>
               ${item.isOffline ? `<button class="action-btn btn-delete" onclick="removeOfflineFromFolderModal(this, '${safeId}', '${jsSeries}', '${jsName}')" title="Xóa file này khỏi bộ nhớ máy">✕</button>` : ''}
             </div>
           </div>
@@ -4829,10 +6621,217 @@
         startReadingImageChapter(1);
       } else if (items[0].isVideo) {
         startWatchingVideo(items[0].id, items[0].name, false);
+      } else if (isEbookFileName(items[0].name)) {
+        openEbookOrCompanionPdf(items[0].id, items[0].name);
       } else {
         startReadingPdf(items[0].id, items[0].name, false);
       }
     }
+  }
+
+  function downloadRawEbookFile(fileId, fileName) {
+    if (!fileId) return;
+    const dlUrl = `https://drive.google.com/uc?export=download&id=${encodeURIComponent(fileId)}`;
+    showAppToast(`📥 Đang tải file Ebook gốc "${fileName}" về máy...`, 2800);
+    if (window._isNativeAndroidBridge && window.CCXBridge && window.CCXBridge.openExternalBrowser) {
+      window.CCXBridge.openExternalBrowser(dlUrl);
+    } else {
+      const a = document.createElement('a');
+      a.href = dlUrl;
+      a.target = '_blank';
+      a.rel = 'noopener noreferrer';
+      a.download = fileName || 'ebook.epub';
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(() => { try { a.remove(); } catch (e) {} }, 500);
+    }
+  }
+
+  async function openEbookOrCompanionPdf(fileId, fileName) {
+    if (currentFolderPdfItems && currentFolderPdfItems.length > 0) {
+      const stem = String(fileName || '').replace(/\.(epub|mobi|azw3|prc)$/i, '').trim().toLowerCase();
+      const matched = currentFolderPdfItems.find(p => {
+        const pStem = String(p.name || '').replace(/\.pdf$/i, '').trim().toLowerCase();
+        return pStem === stem || pStem.startsWith(stem) || stem.startsWith(pStem);
+      }) || currentFolderPdfItems[0];
+      showAppToast(`📕 Đang mở Bản PDF Giấy Ấm tối ưu đọc trên App: "${matched.name}"`, 2800);
+      startReadingPdf(matched.id, matched.name, false);
+      return;
+    }
+    if (/\.epub$/i.test(String(fileName || ''))) {
+      await startReadingInlineEpubFallback(fileId, fileName);
+      return;
+    }
+    downloadRawEbookFile(fileId, fileName);
+  }
+
+  async function startReadingInlineEpubFallback(fileId, fileName) {
+    const loader = document.getElementById('loading-dialog');
+    document.getElementById('loader-title').textContent = '📖 Đang Mở Trình Đọc EPUB Giấy Ấm...';
+    document.getElementById('loader-stage').textContent = fileName;
+    document.getElementById('loader-bar').style.width = '25%';
+    document.getElementById('loader-pct').textContent = '25%';
+    loader.classList.remove('hidden');
+    try {
+      let buf = null;
+      if (typeof getValidWebAccessToken === 'function') {
+        const tok = await getValidWebAccessToken();
+        if (tok) {
+          const r = await fetch(`https://www.googleapis.com/drive/v3/files/${encodeURIComponent(fileId)}?alt=media&supportsAllDrives=true`, {
+            headers: { 'Authorization': 'Bearer ' + tok }
+          });
+          if (r.ok) buf = await r.arrayBuffer();
+        }
+      }
+      if (!buf && window._isNativeAndroidBridge) {
+        const prep = await callBridgeAsync('preparePdfStream', [fileId, fileName, currentSeriesName || fileName, false]);
+        if (prep && prep.ok && prep.streamUrl) {
+          const r = await fetch(prep.streamUrl);
+          if (r.ok) buf = await r.arrayBuffer();
+        }
+      }
+      if (!buf || buf.byteLength < 100 || typeof DecompressionStream === 'undefined') {
+        loader.classList.add('hidden');
+        downloadRawEbookFile(fileId, fileName);
+        return;
+      }
+      document.getElementById('loader-bar').style.width = '70%';
+      document.getElementById('loader-pct').textContent = '70%';
+      const htmlChapters = await unpackEpubBufferToHtmlChapters(new Uint8Array(buf));
+      loader.classList.add('hidden');
+      if (!htmlChapters || htmlChapters.length === 0) {
+        downloadRawEbookFile(fileId, fileName);
+        return;
+      }
+      showInlineWarmPaperEpubModal(fileName, htmlChapters);
+    } catch (e) {
+      loader.classList.add('hidden');
+      downloadRawEbookFile(fileId, fileName);
+    }
+  }
+
+  async function unpackEpubBufferToHtmlChapters(u8) {
+    const dv = new DataView(u8.buffer, u8.byteOffset, u8.byteLength);
+    let eocd = -1;
+    for (let i = u8.length - 22; i >= Math.max(0, u8.length - 65557); i--) {
+      if (dv.getUint32(i, true) === 0x06054b50) { eocd = i; break; }
+    }
+    if (eocd < 0) return [];
+    const totalEntries = dv.getUint16(eocd + 10, true);
+    let cdPos = dv.getUint32(eocd + 16, true);
+    const decUtf8 = new TextDecoder('utf-8');
+    const entries = new Map();
+    for (let i = 0; i < totalEntries && cdPos + 46 <= u8.length; i++) {
+      if (dv.getUint32(cdPos, true) !== 0x02014b50) break;
+      const method = dv.getUint16(cdPos + 10, true);
+      const compSize = dv.getUint32(cdPos + 20, true);
+      const nameLen = dv.getUint16(cdPos + 28, true);
+      const extraLen = dv.getUint16(cdPos + 30, true);
+      const commLen = dv.getUint16(cdPos + 32, true);
+      const lfhOff = dv.getUint32(cdPos + 42, true);
+      const name = decUtf8.decode(u8.subarray(cdPos + 46, cdPos + 46 + nameLen)).replace(/\\/g, '/');
+      entries.set(name, { method, compSize, lfhOff });
+      cdPos += 46 + nameLen + extraLen + commLen;
+    }
+    const readEntryText = async (pathKey) => {
+      const meta = entries.get(pathKey);
+      if (!meta || meta.lfhOff + 30 > u8.length) return '';
+      const fnLen = dv.getUint16(meta.lfhOff + 26, true);
+      const exLen = dv.getUint16(meta.lfhOff + 28, true);
+      const start = meta.lfhOff + 30 + fnLen + exLen;
+      const slice = u8.subarray(start, start + meta.compSize);
+      if (meta.method === 0) return decUtf8.decode(slice);
+      if (meta.method === 8) {
+        const ds = new DecompressionStream('deflate-raw');
+        const writer = ds.writable.getWriter();
+        writer.write(slice).catch(() => {});
+        writer.close().catch(() => {});
+        const outBuf = await new Response(ds.readable).arrayBuffer();
+        return decUtf8.decode(outBuf);
+      }
+      return '';
+    };
+    let opfPath = '';
+    const containerXml = await readEntryText('META-INF/container.xml');
+    const mOpf = containerXml.match(/full-path\s*=\s*["']([^"']+)["']/i);
+    if (mOpf) opfPath = mOpf[1];
+    else {
+      for (const k of entries.keys()) if (/\.opf$/i.test(k)) { opfPath = k; break; }
+    }
+    if (!opfPath) return [];
+    const opfDir = opfPath.includes('/') ? opfPath.slice(0, opfPath.lastIndexOf('/') + 1) : '';
+    const opfXml = await readEntryText(opfPath);
+    const manifest = new Map();
+    const itemRe = /<item\b([^>]+?)\/?>/gi;
+    let m;
+    while ((m = itemRe.exec(opfXml)) !== null) {
+      const idM = m[1].match(/\bid\s*=\s*["']([^"']+)["']/i);
+      const hrefM = m[1].match(/\bhref\s*=\s*["']([^"']+)["']/i);
+      if (idM && hrefM) manifest.set(idM[1], decodeURIComponent(hrefM[1].split('#')[0]));
+    }
+    const spineFiles = [];
+    const spineRe = /<itemref\b[^>]*?\bidref\s*=\s*["']([^"']+)["']/gi;
+    while ((m = spineRe.exec(opfXml)) !== null) {
+      const rel = manifest.get(m[1]);
+      if (rel && /\.(x?html?|htm|xml)$/i.test(rel)) {
+        const norm = (opfDir + rel).replace(/\/\.\//g, '/');
+        if (entries.has(norm)) spineFiles.push(norm);
+        else if (entries.has(rel)) spineFiles.push(rel);
+      }
+    }
+    const chapters = [];
+    for (let i = 0; i < spineFiles.length; i++) {
+      const raw = await readEntryText(spineFiles[i]);
+      if (!raw) continue;
+      const bodyM = raw.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
+      let html = bodyM ? bodyM[1] : raw;
+      html = html
+        .replace(/<script[\s\S]*?<\/script>/gi, '')
+        .replace(/<style[\s\S]*?<\/style>/gi, '')
+        .replace(/<img\b[^>]*>/gi, '')
+        .replace(/<svg[\s\S]*?<\/svg>/gi, '')
+        .trim();
+      if (html.replace(/<[^>]+>/g, '').trim().length > 5) {
+        chapters.push(html);
+      }
+    }
+    return chapters;
+  }
+
+  function showInlineWarmPaperEpubModal(title, chapters) {
+    let modal = document.getElementById('ccx-inline-epub-modal');
+    if (!modal) {
+      modal = document.createElement('div');
+      modal.id = 'ccx-inline-epub-modal';
+      modal.style.cssText = 'position:fixed;inset:0;z-index:9999;background:#FDFAF2;color:#231B12;display:flex;flex-direction:column;';
+      document.body.appendChild(modal);
+    }
+    let chIdx = 0;
+    const renderChap = () => {
+      const bodyEl = document.getElementById('ccx-epub-chap-body');
+      const lblEl = document.getElementById('ccx-epub-chap-lbl');
+      if (bodyEl) {
+        bodyEl.innerHTML = chapters[chIdx] || '';
+        bodyEl.scrollTop = 0;
+      }
+      if (lblEl) lblEl.textContent = `Phần ${chIdx + 1} / ${chapters.length}`;
+    };
+    modal.innerHTML = `
+      <div style="padding:12px 14px;background:#F3EBDD;border-bottom:1px solid #DFD2BC;display:flex;align-items:center;justify-content:space-between;gap:10px;">
+        <button onclick="document.getElementById('ccx-inline-epub-modal').style.display='none'" style="padding:7px 12px;border-radius:9px;border:1px solid #C8B79B;background:#FFFDF7;color:#3B2E1E;font-weight:800;font-size:12.5px;cursor:pointer;">← Đóng</button>
+        <div style="flex:1;min-width:0;font-weight:800;font-size:13px;color:#2C2115;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:center;">📖 ${escapeHtml(title)}</div>
+        <span id="ccx-epub-chap-lbl" style="font-size:11.5px;font-weight:800;color:#785B37;white-space:nowrap;">Phần 1 / ${chapters.length}</span>
+      </div>
+      <div id="ccx-epub-chap-body" style="flex:1;overflow-y:auto;padding:22px 18px 40px;font-family:'Palatino Linotype',Georgia,serif;font-size:18px;line-height:1.72;color:#231B12;max-width:760px;width:100%;margin:0 auto;box-sizing:border-box;"></div>
+      <div style="padding:10px 14px;background:#F3EBDD;border-top:1px solid #DFD2BC;display:flex;align-items:center;justify-content:space-between;gap:10px;">
+        <button id="ccx-epub-prev-btn" style="flex:1;padding:10px;border-radius:10px;border:1px solid #C8B79B;background:#FFFDF7;color:#3B2E1E;font-weight:800;cursor:pointer;">⏮️ Chương Trước</button>
+        <button id="ccx-epub-next-btn" style="flex:1;padding:10px;border-radius:10px;border:none;background:#B45309;color:#FFFFFF;font-weight:800;cursor:pointer;">Chương Tiếp ⏭️</button>
+      </div>
+    `;
+    modal.style.display = 'flex';
+    document.getElementById('ccx-epub-prev-btn').onclick = () => { if (chIdx > 0) { chIdx--; renderChap(); } };
+    document.getElementById('ccx-epub-next-btn').onclick = () => { if (chIdx + 1 < chapters.length) { chIdx++; renderChap(); } };
+    renderChap();
   }
 
   async function downloadSingleItemOffline(fileId, fileName) {
@@ -9189,6 +11188,11 @@
   }
 
   window.handleAndroidBack = function(fromPopState) {
+    const mtDrawer = document.getElementById('multitag-drawer');
+    if (mtDrawer && !mtDrawer.classList.contains('hidden')) {
+      closeMultiTagDrawer();
+      return;
+    }
     if (!document.getElementById('ota-modal').classList.contains('hidden')) {
       closeOtaUpdateModal();
       return;
