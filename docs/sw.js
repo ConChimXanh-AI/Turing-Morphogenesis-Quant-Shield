@@ -1,9 +1,9 @@
-// Con Chim Xanh Hub V3.9.0 — iOS / iPadOS Standalone PWA Service Worker
+// Con Chim Xanh Hub V3.9.1 (iOS Reader Fix) — iOS / iPadOS Standalone PWA Service Worker
 // Provides:
 // 1. Offline App Shell caching (index.html, pdf.min.js, pdf.worker.min.js, catalog_data.js, icons)
 // 2. HTTP 206 Byte-Range Proxy for /ccx-stream/video?id=... & /ccx-stream/img?id=... with Google Drive OAuth Bearer header + Auto-Clone Bypass
 
-const CACHE_NAME = 'ccx-hub-pwa-v3.9.0';
+const CACHE_NAME = 'ccx-hub-pwa-v3.9.2-ios-reader-fix';
 const APP_SHELL_ASSETS = [
   './',
   './index.html',

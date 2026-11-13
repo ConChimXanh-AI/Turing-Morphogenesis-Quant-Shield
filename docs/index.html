@@ -1315,6 +1315,11 @@
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.78);
     touch-action: manipulation;
   }
+  #reader-floating-back-btn {
+    display: none !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+  }
   .top-subfilter-bar {
     display: flex;
     gap: 7px;
@@ -2353,7 +2358,7 @@
 <div id="reader-overlay" class="hidden">
   <div id="dimmer-layer"></div>
 
-  <button id="reader-floating-back-btn" class="floating-back-pill hidden" onclick="closeReader()" ontouchend="event.preventDefault(); event.stopPropagation(); closeReader();">← Quay lại</button>
+  <button id="reader-floating-back-btn" class="floating-back-pill hidden" style="display:none !important;" aria-hidden="true" onclick="closeReader()" ontouchend="event.preventDefault(); event.stopPropagation(); closeReader();">← Quay lại</button>
 
   <div class="reader-topbar" id="reader-topbar">
     <button class="back-btn" onclick="closeReader()" ontouchend="event.preventDefault(); event.stopPropagation(); closeReader();">←</button>
@@ -5480,7 +5485,7 @@
     if (elMovie) elMovie.textContent = vCount;
   }
 
-  let hardwareDeviceInfo = { isTablet: false, smallestScreenWidthDp: 390, versionCode: 29, versionName: '3.9.0' };
+  let hardwareDeviceInfo = { isTablet: false, smallestScreenWidthDp: 390, versionCode: 31, versionName: '3.9.1' };
   let isEcoCoolMode = false;
 
   window._ccxHotRefreshFolderTree = function() {
@@ -5608,7 +5613,7 @@
       catalogItems = seedItems;
     }
     updateCategoryCounts();
-    const curVerStr = hardwareDeviceInfo.versionName || '3.9.0';
+    const curVerStr = hardwareDeviceInfo.versionName || '3.9.1';
     document.getElementById('header-status').textContent = `${getDeviceTypeLabel()} • V${curVerStr} (${catalogItems.length} bộ)`;
     const savedSyncCode = localStorage.getItem('ccx_cloud_sync_code_v1') || '';
     const syncInp = document.getElementById('cloud-sync-code-input');
@@ -5657,7 +5662,7 @@
       }
       catalogItems = res.items;
       updateCategoryCounts();
-      const curVerStr = hardwareDeviceInfo.versionName || '3.7.2';
+      const curVerStr = hardwareDeviceInfo.versionName || '3.9.1';
       document.getElementById('header-status').textContent = `${getDeviceTypeLabel()} • V${curVerStr} (${catalogItems.length} bộ)`;
       renderLibraryGrid();
       renderAboutAndDonateTab();
@@ -5699,8 +5704,8 @@
     const catStatsEl = document.getElementById('about-catalog-stats');
     const logBox = document.getElementById('about-changelog-box');
 
-    const vName = (latestOtaInfo && latestOtaInfo.currentVersionName) || hardwareDeviceInfo.versionName || '3.9.0';
-    const vCode = (latestOtaInfo && latestOtaInfo.currentVersionCode) || hardwareDeviceInfo.versionCode || 29;
+    const vName = (latestOtaInfo && latestOtaInfo.currentVersionName) || hardwareDeviceInfo.versionName || '3.9.1';
+    const vCode = (latestOtaInfo && latestOtaInfo.currentVersionCode) || hardwareDeviceInfo.versionCode || 31;
     if (curVerEl) curVerEl.textContent = `V${vName} Supreme (Build #${vCode})`;
 
     if (latestVerEl) {
@@ -6465,8 +6470,8 @@
   function syncReaderFloatingBackBtn() {
     const flBtn = document.getElementById('reader-floating-back-btn');
     if (flBtn) {
-      const readerOpen = !document.getElementById('reader-overlay').classList.contains('hidden');
-      flBtn.classList.toggle('hidden', !(readerOpen && barsCollapsed));
+      flBtn.classList.add('hidden');
+      flBtn.style.display = 'none';
     }
   }
 
@@ -11356,7 +11361,7 @@
     clearTimeout(resizeTimer);
     resizeTimer = setTimeout(() => {
       const statusEl = document.getElementById('header-status');
-      const curVerStr = hardwareDeviceInfo.versionName || '3.2.0';
+      const curVerStr = hardwareDeviceInfo.versionName || '3.9.1';
       if (statusEl) statusEl.textContent = `${getDeviceTypeLabel()} • V${curVerStr} (${catalogItems.length} bộ)`;
       if (!document.getElementById('reader-overlay').classList.contains('hidden')) {
         buildReaderViewport();
