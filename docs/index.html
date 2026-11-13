@@ -1373,6 +1373,9 @@
   .file-list {
     flex: 1;
     overflow-y: auto;
+    overflow-x: hidden;
+    width: 100%;
+    box-sizing: border-box;
     padding: 12px 14px 40px 14px;
     display: flex;
     flex-direction: column;
@@ -1384,6 +1387,9 @@
     border: 1px solid var(--border-cyber);
     border-radius: 12px;
     padding: 12px;
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -1404,6 +1410,7 @@
 
   .file-info {
     flex: 1;
+    min-width: 0;
     overflow: hidden;
   }
 
@@ -1414,6 +1421,7 @@
     line-height: 1.35;
     margin-bottom: 4px;
     word-break: break-word;
+    overflow-wrap: anywhere;
   }
 
   .file-meta {
@@ -1429,6 +1437,8 @@
     display: flex;
     gap: 7px;
     flex-shrink: 0;
+    max-width: 100%;
+    box-sizing: border-box;
   }
 
   .action-btn {
@@ -1440,7 +1450,40 @@
     cursor: pointer;
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 4px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    box-sizing: border-box;
+  }
+
+  @media (max-width: 500px) {
+    .file-item.has-actions {
+      flex-wrap: wrap;
+      gap: 9px;
+    }
+    .file-item.has-actions > .file-info {
+      flex: 1 1 100%;
+      width: 100%;
+    }
+    .file-item.has-actions > .file-actions {
+      width: 100%;
+      justify-content: stretch;
+      gap: 8px;
+    }
+    .file-item.has-actions > .file-actions > .action-btn {
+      flex: 1 1 0;
+      min-width: 0;
+      padding: 8px 10px;
+    }
+    .file-item.has-actions > .file-actions > .action-btn.btn-delete {
+      flex: 0 0 auto;
+      padding: 8px 11px;
+    }
+    .file-item.has-actions > .action-btn {
+      width: 100%;
+      padding: 9px 12px;
+    }
   }
 
   .btn-read {
@@ -2921,8 +2964,7 @@
         const minSide = Math.min(window.innerWidth, window.innerHeight);
         const isTab = window._isIpadOS || minSide >= 600;
         return JSON.stringify({
-          versionCode: 29,
-          versionName: '3.9.0',
+          versionCode: 30, versionName: '3.9.0',
           isTablet: isTab,
           smallestScreenWidthDp: minSide,
           platform: window._isIosDevice ? 'ios' : 'web'
@@ -3025,9 +3067,9 @@
           const changelog = 'Phiên bản V3.9.0 Supreme (Build #29): 1) Hệ thống Lọc Đa Tag (Multi-Tag) thông minh cho 18.650+ bộ (Chủ đề Sách/Ebook Kinh doanh, Tâm lý, Ngoại ngữ, Lịch sử... + Thể loại Truyện/Phim + Thuyết minh/Vietsub + 3.331 Tác giả trích xuất chuẩn); 2) Bảng xếp hạng 🏆 Top Đọc Nhiều lọc theo Khung Thời Gian Thật (Hôm Nay • 7 Ngày • 30 Ngày • Năm 2026 • Mọi Thời Đại); 3) Tính năng 🗳️ Top Đề Cử (Vote 👍 1 chạm đồng bộ Đám Mây, chống spam 1 người/1 phiếu); 4) 🆕 Mới Cập Nhật sắp xếp chuẩn xác 100% theo ngày giờ cập nhật thật + Tách bạch Bản PDF Đọc Trực Tiếp & File Ebook Gốc (.EPUB) + Giảm 47% dung lượng Catalog cho iOS Eco-Cool!';
           window.onCCXCallback(cbId, {
             ok: true,
-            currentVersionCode: 29,
+            currentVersionCode: 30,
             currentVersionName: '3.9.0',
-            latestVersionCode: 29,
+            latestVersionCode: 30,
             latestVersionName: '3.9.0',
             hasUpdate: false,
             changelog: changelog
@@ -6451,7 +6493,7 @@
     let bannerHtml = '';
     if (downloadableItems.length > 0 && !(currentFolderPdfItems.length === 0 && currentFolderEbookItems.length > 0)) {
       bannerHtml += `
-        <div class="file-item" style="border-color:rgba(16,185,129,0.55); background:linear-gradient(90deg, rgba(16,185,129,0.16) 0%, rgba(37,99,235,0.16) 100%);">
+        <div class="file-item has-actions" style="border-color:rgba(16,185,129,0.55); background:linear-gradient(90deg, rgba(16,185,129,0.16) 0%, rgba(37,99,235,0.16) 100%);">
           <div class="file-info">
             <div class="file-name" style="color:#34D399;">📥 Tải ${hasBothPdfAndEbook ? 'Trọn Bộ PDF Về Tủ Offline' : 'Cả Thư Mục Này Về Máy'} (${downloadableItems.length} Tập/File)</div>
             <div class="file-meta"><span>Tự động tải tuần tự toàn bộ tập đọc trực tiếp vào Tủ Offline & thư mục Download/ConChimXanh/</span></div>
@@ -6462,7 +6504,7 @@
     }
     if (currentFolderImageItems.length > 0) {
       bannerHtml += `
-        <div class="file-item" style="border-color:var(--cyan-neon); background:linear-gradient(90deg, rgba(0,240,255,0.12) 0%, rgba(37,99,235,0.18) 100%);">
+        <div class="file-item has-actions" style="border-color:var(--cyan-neon); background:linear-gradient(90deg, rgba(0,240,255,0.12) 0%, rgba(37,99,235,0.18) 100%);">
           <div class="file-info">
             <div class="file-name" style="color:var(--cyan-neon);">🖼️ Đọc Liền Mạch Cả Chương Ảnh (${currentFolderImageItems.length} trang)</div>
             <div class="file-meta"><span>Tự động nối toàn bộ ảnh trong thư mục thành cuộn dọc 120Hz</span></div>
@@ -6525,7 +6567,7 @@
           : `<span style="color:var(--cyan-neon); font-weight:700;">• ⚡ Xem luôn 0 MB (Không tốn bộ nhớ)</span>`;
         const jsSeries = escapeHtml(currentSeriesName || top.title || '').replace(/'/g, "\\'");
         return `
-          <div class="file-item" onclick="startWatchingVideo('${safeId}', '${jsName}', false)" style="cursor:pointer; animation-delay:${rowDelay}ms; ${item.isOffline ? 'border-color:rgba(16,185,129,0.55); background:rgba(16,185,129,0.08);' : ''}">
+          <div class="file-item has-actions" onclick="startWatchingVideo('${safeId}', '${jsName}', false)" style="cursor:pointer; animation-delay:${rowDelay}ms; ${item.isOffline ? 'border-color:rgba(16,185,129,0.55); background:rgba(16,185,129,0.08);' : ''}">
             <div class="file-info">
               <div class="file-name">${item.isOffline ? '✅' : '🎬'} ${safeName}</div>
               <div class="file-meta">
@@ -6561,7 +6603,7 @@
           ? `<button class="action-btn btn-read" style="background:rgba(59,130,246,0.22); border:1px solid rgba(96,165,250,0.5); color:#DBEAFE;" onclick="openEbookOrCompanionPdf('${safeId}', '${jsName}')">${currentFolderPdfItems.length > 0 ? '📕 Mở PDF' : '📖 Đọc EPUB'}</button>`
           : '';
         return sectionHdr + `
-          <div class="file-item" onclick="openEbookOrCompanionPdf('${safeId}', '${jsName}')" style="cursor:pointer; animation-delay:${rowDelay}ms; border-color:rgba(96,165,250,0.32); background:rgba(30,58,138,0.14);">
+          <div class="file-item has-actions" onclick="openEbookOrCompanionPdf('${safeId}', '${jsName}')" style="cursor:pointer; animation-delay:${rowDelay}ms; border-color:rgba(96,165,250,0.32); background:rgba(30,58,138,0.14);">
             <div class="file-info">
               <div class="file-name">📘 ${safeName}</div>
               <div class="file-meta">
@@ -6595,7 +6637,7 @@
         const offBadge = item.isOffline ? `<span style="color:#34D399; font-weight:800;">• ✅ ĐÃ TẢI TRONG MÁY</span>` : '';
         const jsSeries = escapeHtml(currentSeriesName || top.title || '').replace(/'/g, "\\'");
         return sectionHdr + `
-          <div class="file-item" onclick="startReadingPdf('${safeId}', '${jsName}', false)" style="cursor:pointer; animation-delay:${rowDelay}ms; ${item.isOffline ? 'border-color:rgba(16,185,129,0.55); background:rgba(16,185,129,0.08);' : (hasBothPdfAndEbook ? 'border-color:rgba(251,191,36,0.42); background:rgba(245,158,11,0.08);' : '')}">
+          <div class="file-item has-actions" onclick="startReadingPdf('${safeId}', '${jsName}', false)" style="cursor:pointer; animation-delay:${rowDelay}ms; ${item.isOffline ? 'border-color:rgba(16,185,129,0.55); background:rgba(16,185,129,0.08);' : (hasBothPdfAndEbook ? 'border-color:rgba(251,191,36,0.42); background:rgba(245,158,11,0.08);' : '')}">
             <div class="file-info">
               <div class="file-name">${item.isOffline ? '✅' : '📕'} ${safeName}</div>
               <div class="file-meta">
